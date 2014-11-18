@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Cards</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="player_name">Spieler Name</string>
+    <string name="new_game">Neues Spiel</string>
+    <string name="join_game">Spiel beitreten</string>
+    <string name="bot_game">Gegen den Computer</string>
+    <string name="copyright_short">&#169; 2014 Sergius Maier, Lukas Taake\n
+\n
+Spielkarten von Charles Esquiaqui</string>
+    <string name="title_activity_lobby_create">Neues Spiel</string>
+    <string name="title_activity_lobby_join">Spiel beitreten</string>
+    <string name="pref_file">com.github.mrm1st3r.cards.preferences</string>
+	<string name="bluetooth_not_supported">Bluetooth nicht vom Gerät unterstützt</string>
+	<string name="bt_uuid">1dbb8dc0-6f38-11e4-9803-0800200c9a66</string>
+</resources>
