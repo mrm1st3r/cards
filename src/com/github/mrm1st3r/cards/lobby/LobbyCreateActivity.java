@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import com.github.mrm1st3r.cards.MainActivity;
 import com.github.mrm1st3r.cards.R;
+import com.github.mrm1st3r.cards.connection.ServerThread;
 
 public class LobbyCreateActivity extends Activity {
 
@@ -51,7 +52,7 @@ public class LobbyCreateActivity extends Activity {
 			enableDiscoverability();
 		} else if (reqCode == REQUEST_ENABLE_DISCOVERABLE
 				&& resultCode == RESULT_OK) {
-			
+			this.serv = new ServerThread();
 		}
 	}
 

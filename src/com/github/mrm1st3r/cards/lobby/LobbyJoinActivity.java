@@ -6,6 +6,7 @@ import com.github.mrm1st3r.cards.R.layout;
 import com.github.mrm1st3r.cards.R.menu;
 
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,6 +17,8 @@ public class LobbyJoinActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_lobby_join);
+
+		searchForLobbies();
 	}
 
 	@Override
@@ -35,5 +38,11 @@ public class LobbyJoinActivity extends Activity {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	private void searchForLobbies() {
+		BluetoothAdapter self = BluetoothAdapter.getDefaultAdapter();
+
+		self.startDiscovery();
 	}
 }
