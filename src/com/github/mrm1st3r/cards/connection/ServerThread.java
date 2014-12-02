@@ -7,10 +7,13 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.res.Resources;
+import android.util.Log;
 
 import com.github.mrm1st3r.cards.R;
 
 public class ServerThread extends Thread {
+	
+	private static final String TAG = ServerThread.class.getSimpleName();
 
 	private final BluetoothServerSocket mmServerSocket;
 
@@ -44,8 +47,17 @@ public class ServerThread extends Thread {
 			if (socket != null) {
 				// Do work to manage the connection (in a separate thread)
 			
-				//manageConnectedSocket(socket);
+				manageConnectedSocket(socket);
 			}
+		}
+	}
+
+	private void manageConnectedSocket(BluetoothSocket sock) {
+		Log.d(TAG, sock.getRemoteDevice().getAddress());
+		try {
+			sock.close();
+		} catch (IOException e) {
+			Log.w(TAG, e);
 		}
 	}
 
