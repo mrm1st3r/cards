@@ -3,59 +3,56 @@ package com.github.mrm1st3r.cards.connection;
 import java.io.IOException;
 import java.util.UUID;
 
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.res.Resources;
-import android.content.res.Resources.NotFoundException;
-import android.util.Log;
 
 import com.github.mrm1st3r.cards.R;
 
+
 public class ClientThread extends Thread {
-	
+
 	private static final String TAG = ClientThread.class.getSimpleName();
+	private final BluetoothSocket mmSocket;
+	private final BluetoothDevice mmDevice;
 
-	private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			String action = intent.getAction();
+	public ClientThread(Context context, BluetoothDevice dev) {
 
-			if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-				// Get the BluetoothDevice object from the Intent
-				BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-				// Add the name and address to an array adapter to show in a ListView
-				// mArrayAdapter.add(device.getName() + "\n" + device.getAddress());
-				BluetoothSocket tmp = null;
-				try {
-					tmp = device.createRfcommSocketToServiceRecord(
-							UUID.fromString(
-									Resources.getSystem().getString(
-											R.string.bt_uuid)));
-				} catch (NotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
-				Log.d(TAG, tmp.getRemoteDevice().getAddress());
-			}
-		}
-	};
+		// Use a temporary object that is later assigned to mmSocket,
+		// because mmSocket is final
+		BluetoothSocket tmp = null;
+		mmDevice = dev;
 
+		// Get a BluetoothSocket to connect with the given BluetoothDevice
+		try {
+			// MY_UUID is the app's UUID string, also used by the server code
+			tmp = dev.createRfcommSocketToServiceRecord(UUID.fromString(
+					context.getString(
+							R.string.bt_uuid)));
+		} catch (IOException e) { }
+		mmSocket = tmp;
 
-	public ClientThread() {
-
-		// open bluetooth server-socket
-		
 	}
 
 	@Override
 	public void run() {
-
+        // Cancel discovery because it will slow down the connection
+        BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
+ 
+        try {
+            // Connect the device through the socket. This will block
+            // until it succeeds or throws an exception
+            mmSocket.connect();
+        } catch (IOException connectException) {
+            // Unable to connect; close the socket and get out
+            try {
+                mmSocket.close();
+            } catch (IOException closeException) { }
+            return;
+        }
+ 
+        // Do work to manage the connection (in a separate thread)
+    //    manageConnectedSocket(mmSocket);
 	}
 }

@@ -8,9 +8,19 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.github.mrm1st3r.cards.lobby.LobbyJoinActivity" >
 
-    <TextView
-        android:layout_width="wrap_content"
+    
+    <Button
+        android:id="@+id/btnRefresh"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/hello_world" />
+        android:onClick="refresh"
+        android:layout_alignParentBottom="true"
+        android:text="@string/refresh" />
+    <ListView
+        android:id="@+id/lobbyList"
+        android:layout_above="@id/btnRefresh"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+    </ListView>
 
 </RelativeLayout>

@@ -1,22 +1,21 @@
 package com.github.mrm1st3r.cards.lobby;
 
 import android.app.Activity;
-import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.mrm1st3r.btutil.BtUtil;
+import com.github.mrm1st3r.btutil.ResultAction;
 import com.github.mrm1st3r.cards.MainActivity;
 import com.github.mrm1st3r.cards.R;
 import com.github.mrm1st3r.cards.connection.ServerThread;
 
 public class LobbyCreateActivity extends Activity {
 
-	private static final int REQUEST_ENABLE_BT = 1;
-	private static final int REQUEST_ENABLE_DISCOVERABLE = 2;
-	
 	private static final int LOBBY_CREATE_TIMEOUT = 60;
 
 	private ServerThread serv = null;
@@ -25,43 +24,68 @@ public class LobbyCreateActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		BluetoothAdapter mBluetoothAdapter =
-				BluetoothAdapter.getDefaultAdapter();
-		// bluetooth not supported
-		if (mBluetoothAdapter == null) {
+		// go back to start if bluetooth is not supported
+		if (!BtUtil.isSupported()) {
 			Toast.makeText(this, getString(
 					R.string.bluetooth_not_supported), Toast.LENGTH_LONG)
 					.show();
-			Intent intent = new Intent(this, MainActivity.class);
-			startActivity(intent);
+			cancelLobby();
 		}
 
-		if (!mBluetoothAdapter.isEnabled()) {
-			Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-			startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-		} else {
-			enableDiscoverability();
-		}
+		BtUtil.enable(this, new ResultAction() {
+
+			@Override
+			public void onSuccess() {
+				BtUtil.enableDiscoverability(LobbyCreateActivity.this,
+						LOBBY_CREATE_TIMEOUT, new ResultAction() {
+
+					@Override
+					public void onSuccess() {
+						serv = new ServerThread(LobbyCreateActivity.this);
+						serv.start();
+
+					}
+
+					@Override
+					public void onFailure() {
+						cancelLobby();
+					}
+
+				});
+			}
+
+			@Override
+			public void onFailure() {
+				cancelLobby();
+			}
+
+		});
 
 		setContentView(R.layout.activity_lobby_create);
+		((TextView)findViewById(R.id.txtLobbyName)).setText(BtUtil.getDeviceName());
+	}
+
+	private void cancelLobby() {
+		Intent intent = new Intent(this, MainActivity.class);
+		startActivity(intent);
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		if (serv != null) {
+			serv.cancel();
+		}
 	}
 
 	@Override
 	protected void onActivityResult(int reqCode, int resultCode, Intent data) {
-		if (reqCode == REQUEST_ENABLE_BT && resultCode == RESULT_OK) {
-			enableDiscoverability();
-		} else if (reqCode == REQUEST_ENABLE_DISCOVERABLE
-				&& resultCode == RESULT_OK) {
-			this.serv = new ServerThread();
-		}
-	}
 
-	private void enableDiscoverability() {
-		Intent discoverableIntent =
-				new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-		discoverableIntent.putExtra(
-				BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, LOBBY_CREATE_TIMEOUT);
-		startActivityForResult(discoverableIntent, REQUEST_ENABLE_DISCOVERABLE);
+		if (BtUtil.onActivityResult(this, reqCode, resultCode, data)) {
+			// Bluetooth results should be covered by BtUtil.
+			return;
+		}
+
 	}
 
 	@Override

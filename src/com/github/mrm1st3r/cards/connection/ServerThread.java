@@ -1,12 +1,13 @@
 package com.github.mrm1st3r.cards.connection;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.UUID;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
-import android.content.res.Resources;
+import android.content.Context;
 import android.util.Log;
 
 import com.github.mrm1st3r.cards.R;
@@ -16,8 +17,11 @@ public class ServerThread extends Thread {
 	private static final String TAG = ServerThread.class.getSimpleName();
 
 	private final BluetoothServerSocket mmServerSocket;
+	private Context context = null;
+	private boolean closing = false;
 
-	public ServerThread() {
+	public ServerThread(final Context con) {
+		context = con;
 		// Use a temporary object that is later assigned to mmServerSocket,
 		// because mmServerSocket is final
 		BluetoothServerSocket tmp = null;
@@ -25,22 +29,32 @@ public class ServerThread extends Thread {
 			// open bluetooth server-socket
 			tmp = BluetoothAdapter.getDefaultAdapter().
 					listenUsingRfcommWithServiceRecord(
-							Resources.getSystem().getString(R.string.app_name),
+							context.getString(R.string.app_name),
 							UUID.fromString(
-									Resources.getSystem().getString(
+									context.getString(
 											R.string.bt_uuid)));
-		} catch (IOException e) { }
+		} catch (IOException e) {
+			Log.w(TAG, e);
+		}
 		mmServerSocket = tmp;
 	}
 
 	@Override
 	public void run() {
+		if (mmServerSocket == null) {
+			return;
+		}
 		BluetoothSocket socket = null;
 		// Keep listening until exception occurs or a socket is returned
 		while (true) {
 			try {
+				Log.d(TAG, "waiting for connection");
 				socket = mmServerSocket.accept();
 			} catch (IOException e) {
+				if (closing) {
+					return;
+				}
+				Log.w(TAG, e);
 				break;
 			}
 			// If a connection was accepted
@@ -55,6 +69,13 @@ public class ServerThread extends Thread {
 	private void manageConnectedSocket(BluetoothSocket sock) {
 		Log.d(TAG, sock.getRemoteDevice().getAddress());
 		try {
+			PrintWriter out = new PrintWriter(sock.getOutputStream());
+			out.println("test 123");
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		try {
 			sock.close();
 		} catch (IOException e) {
 			Log.w(TAG, e);
@@ -64,8 +85,11 @@ public class ServerThread extends Thread {
 	/** Will cancel the listening socket, and cause the thread to finish */
 	public void cancel() {
 		try {
+			closing = true;
 			mmServerSocket.close();
-		} catch (IOException e) { }
+		} catch (Exception e) {
+			Log.w(TAG, e);
+		}
 	}
 
 }

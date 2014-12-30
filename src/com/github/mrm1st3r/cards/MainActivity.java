@@ -1,6 +1,7 @@
 package com.github.mrm1st3r.cards;
 
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -30,8 +31,14 @@ public class MainActivity extends Activity {
 
 		SharedPreferences pref = getSharedPreferences(getString(R.string.pref_file), Context.MODE_PRIVATE);
 		
+		String name = pref.getString(MainActivity.PREF_PLAYER_NAME, null);
+		
+		if (name == null) {
+			name = BluetoothAdapter.getDefaultAdapter().getName();
+		}
+		
 		inputPlayerName = (EditText) findViewById(R.id.input_player_name);
-		inputPlayerName.setText(pref.getString(MainActivity.PREF_PLAYER_NAME, ""));
+		inputPlayerName.setText(name);
 		inputPlayerName.addTextChangedListener(new TextWatcher() {
 
 			@Override
