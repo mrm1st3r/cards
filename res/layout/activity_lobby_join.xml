@@ -18,6 +18,7 @@
         android:text="@string/refresh" />
     <ListView
         android:id="@+id/lobbyList"
+        android:layout_alignParentTop="true"
         android:layout_above="@id/btnRefresh"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >

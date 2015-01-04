@@ -14,8 +14,12 @@ Spielkarten von Charles Esquiaqui</string>
     <string name="title_activity_lobby_create">Neues Spiel</string>
     <string name="title_activity_lobby_join">Spiel beitreten</string>
     <string name="pref_file">com.github.mrm1st3r.cards.preferences</string>
-	<string name="bluetooth_not_supported">Bluetooth nicht vom Gerät unterstützt</string>
-	<string name="bt_uuid">1dbb8dc0-6f38-11e4-9803-0800200c9a66</string>
-	<string name="refresh">Aktualisieren</string>
-	<string name="lobbyName">Lobby Name:</string>
+    <string name="bluetooth_not_supported">Bluetooth nicht vom Gerät unterstützt</string>
+    <string name="bt_uuid">1dbb8dc0-6f38-11e4-9803-0800200c9a66</string>
+    <string name="refresh">Aktualisieren</string>
+    <string name="lobbyName">Lobby Name:</string>
+    <string name="title_activity_lobby">Lobby</string>
+    <string name="connected_players">Verbundene Spieler</string>
+    <string name="start">Spiel starten</string>
+
 </resources>

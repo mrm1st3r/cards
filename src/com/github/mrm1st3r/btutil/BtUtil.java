@@ -3,7 +3,6 @@ package com.github.mrm1st3r.btutil;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
-import android.util.Log;
 import android.util.SparseArray;
 
 /**
@@ -15,6 +14,7 @@ public final class BtUtil {
 	/**
 	 * Debug tag.
 	 */
+	@SuppressWarnings("unused")
 	private static final String TAG = BtUtil.class.getSimpleName();
 	/**
 	 * Request code for enabling bluetooth.
@@ -106,7 +106,7 @@ public final class BtUtil {
 		}
 		callbacks.remove(reqCode);
 		
-		Log.d(TAG, "Received result " + resultCode + " for code " + reqCode);
+		// Log.d(TAG, "Received result " + resultCode + " for code " + reqCode);
 		
 		if (resultCode != Activity.RESULT_CANCELED) {
 			act.onSuccess();

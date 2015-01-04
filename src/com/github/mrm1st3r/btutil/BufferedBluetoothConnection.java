@@ -7,12 +7,12 @@ import java.io.OutputStream;
 import android.bluetooth.BluetoothSocket;
 import android.util.Log;
 
-public class BufferedBluetoothConnection extends Thread {
+public class BufferedBluetoothConnection extends BluetoothConnection {
 
+	private static final long serialVersionUID = 1L;
 	private static final String TAG = BufferedBluetoothConnection.class.getSimpleName();
 	private static final int READ_BUFFER_SIZE = 4096;
 
-	private final BluetoothSocket connection;
 	private final InputStream in;
 	private final OutputStream out;
 	private final Object readLock = new Object();
@@ -51,8 +51,14 @@ public class BufferedBluetoothConnection extends Thread {
 			synchronized (readLock) {
 				bytesMissing = data.length - bufferLength;
 			}
+			//Log.d(TAG, "bytes missing: " + bytesMissing);
+			//Log.d(TAG, "millis left: " + ((timeStart + timeoutMillis) - System.currentTimeMillis()));
 		} while (bytesMissing > 0 && 
-				(timeStart + timeoutMillis < System.currentTimeMillis()));
+				((timeStart + timeoutMillis) > System.currentTimeMillis()));
+		
+		if (bytesMissing > 0) {
+			throw new IOException("No bytes to read");
+		}
 		
 		// copy data into given array
 		synchronized (readLock) {
@@ -64,6 +70,8 @@ public class BufferedBluetoothConnection extends Thread {
 				System.arraycopy(readBuffer, 0, data, bytesLeft,
 						(data.length - bytesLeft));
 			}
+			bufferPos += data.length;
+			bufferLength -= data.length;
 		}
 	}
 
@@ -80,6 +88,7 @@ public class BufferedBluetoothConnection extends Thread {
 				if (bytes == 0) {
 					continue;
 				}
+				//Log.d(TAG, HexDump.toHexString(buffer));
 				synchronized (readLock) {
 					bufferLength += bytes;
 					// copy read bytes into ring buffer
@@ -104,12 +113,5 @@ public class BufferedBluetoothConnection extends Thread {
 		}
 	}
 
-	public void close() {
-		try {
-			closing = true;
-			connection.close();
-		} catch (IOException e) {
-			Log.w(TAG, e);
-		}
-	}
+
 }

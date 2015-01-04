@@ -8,7 +8,7 @@ import android.widget.BaseAdapter;
 
 public abstract class HashMapAdapter<K, V> extends BaseAdapter {
 	
-	private HashMap<K, V> mData = new HashMap<K, V>();
+	private HashMap<K, V> mData = null;
 	protected Context context;
 
 	public HashMapAdapter(Context c, HashMap<K, V> data) {
