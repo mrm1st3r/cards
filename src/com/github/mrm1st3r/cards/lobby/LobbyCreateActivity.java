@@ -189,6 +189,8 @@ public class LobbyCreateActivity extends Activity {
 			asConn.write("start");
 			asConn.pause();
 		}
+		// stop listening for new connections.
+		serv.cancel();
 		
 		Intent intent = new Intent(this, Gamemaster.class);
 		startActivity(intent);

@@ -20,29 +20,31 @@
 
     <Button
         android:id="@+id/btn_new_game"
-        android:layout_width="wrap_content"
+        android:layout_width="240dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
         android:text="@string/new_game"
-        android:width="240dp"
         android:onClick="startGame" />
 
     <Button
         android:id="@+id/btn_join_game"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/join_game"
-        android:width="240dp"
+        android:layout_width="240dp"
         android:onClick="startGame" />
 
     <Button
         android:id="@+id/btn_bot_game"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:enabled="false"
         android:onClick="startGame"
         android:text="@string/bot_game"
-        android:width="240dp" />
+        android:layout_width="240dp" />
+    <Button
+        android:id="@+id/btn_rules"
+        android:layout_width="240dp"
+        android:layout_height="wrap_content"
+        android:text="@string/btn_rules" />
 
     <TextView
         android:id="@+id/lbl_rival0"

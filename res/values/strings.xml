@@ -25,5 +25,6 @@ Spielkarten von Charles Esquiaqui</string>
     <string name="joining">Verbinde zu Spiel&#8230;</string>
     <string name="title_activity_game">Cards</string>
     <string name="cancel">Abbrechen</string>
+    <string name="btn_rules">Regeln Anzeigen</string>
 
 </resources>
