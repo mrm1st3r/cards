@@ -3,10 +3,12 @@ package com.github.mrm1st3r.cards.lobby;
 import java.util.HashMap;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -14,11 +16,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,6 +43,9 @@ public class LobbyJoinActivity extends Activity {
 	private HashMap<String, BluetoothDevice> mDeviceList;
 	private ListView deviceList;
 	private ClientThread conn = null;
+	
+	private Button btnRefresh = null;
+	private ProgressDialog dlgJoin = null;
 
 	private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
 		@Override
@@ -49,7 +54,10 @@ public class LobbyJoinActivity extends Activity {
 
 			//Log.d(TAG, "Received Broadcast of type " + action);
 			
-			if (!BluetoothDevice.ACTION_FOUND.equals(action)) {
+			if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
+				btnRefresh.setEnabled(true);
+				btnRefresh.setText(getResources().getString(R.string.refresh));
+			} else if (!BluetoothDevice.ACTION_FOUND.equals(action)) {
 				return;
 			}
 			// Get the BluetoothDevice object from the Intent
@@ -76,6 +84,8 @@ public class LobbyJoinActivity extends Activity {
 					.show();
 			cancel();
 		}
+		
+		btnRefresh = (Button) findViewById(R.id.btnRefresh);
 		
 		BtUtil.enable(this, new ResultAction() {
 
@@ -122,18 +132,6 @@ public class LobbyJoinActivity extends Activity {
 
 	}
 
-	@Override
-	public final boolean onOptionsItemSelected(final MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
-	}
-
 	private void searchForLobbies() {
 		Log.d(TAG, "searching for new devices...");
 		mDeviceList = new HashMap<String, BluetoothDevice>();
@@ -174,6 +172,7 @@ public class LobbyJoinActivity extends Activity {
 		});
 		
 		IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+		filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
 		registerReceiver(mReceiver, filter);
 		
 		refresh(null);
@@ -187,11 +186,29 @@ public class LobbyJoinActivity extends Activity {
 		if (!self.startDiscovery()) {
 			Toast.makeText(this, "Fehler beim aktualisieren", Toast.LENGTH_SHORT).show();
 			Log.w(TAG, "Failed to start bluetooth discovery");
+		} else {
+			btnRefresh.setEnabled(false);
+			btnRefresh.setText(getResources().getString(R.string.refreshing));
 		}
 	}
 
 	private void joinLobby(BluetoothDevice dev) {
 		Log.d(TAG, "connecting to " + dev.getAddress());
+		
+		dlgJoin = new ProgressDialog(this);
+		dlgJoin.setCancelable(true);
+		dlgJoin.setCanceledOnTouchOutside(false);
+		dlgJoin.setMessage(getResources().getString(R.string.joining));
+		dlgJoin.setButton(ProgressDialog.BUTTON_NEGATIVE, 
+				getResources().getString(R.string.cancel), new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						conn.cancel();
+					}			
+		});
+		dlgJoin.show();
+		
 		conn = new ClientThread(this, dev, new OnConnectHandler() {
 
 			@Override
@@ -202,6 +219,7 @@ public class LobbyJoinActivity extends Activity {
 				AsyncBluetoothConnection asConn = (AsyncBluetoothConnection) conn;
 				asConn.write(name);
 				asConn.pause();
+				dlgJoin.dismiss();
 				((Cards)getApplication()).connections.put(asConn, null);
 				Intent intent = new Intent(LobbyJoinActivity.this, LobbyActivity.class);
 

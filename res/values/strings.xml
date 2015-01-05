@@ -21,5 +21,9 @@ Spielkarten von Charles Esquiaqui</string>
     <string name="title_activity_lobby">Lobby</string>
     <string name="connected_players">Verbundene Spieler</string>
     <string name="start">Spiel starten</string>
+    <string name="refreshing">aktualisiere&#8230;</string>
+    <string name="joining">Verbinde zu Spiel&#8230;</string>
+    <string name="title_activity_game">Cards</string>
+    <string name="cancel">Abbrechen</string>
 
 </resources>

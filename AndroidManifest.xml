@@ -50,6 +50,10 @@
             android:name="com.github.mrm1st3r.cards.lobby.LobbyActivity"
             android:label="@string/title_activity_lobby" >
         </activity>
+        <activity
+            android:name="com.github.mrm1st3r.cards.ingame.GameActivity"
+            android:label="@string/title_activity_game">
+        </activity>
     </application>
 
 </manifest>

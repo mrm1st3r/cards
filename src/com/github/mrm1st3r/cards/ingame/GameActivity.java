@@ -1,4 +1,4 @@
-package com.github.mrm1stt3r.cards.ingame;
+package com.github.mrm1st3r.cards.ingame;
 
 import com.github.mrm1st3r.cards.R;
 import com.github.mrm1st3r.cards.game.Card;
@@ -14,8 +14,10 @@ public class GameActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle bun) {
 		super.onCreate(bun);
+		setContentView(R.layout.activity_game);
+
 		
-		Bundle bundle = getIntent().getExtras();
+/*		Bundle bundle = getIntent().getExtras();
 		Player[] players = (Player[])bundle.get("players");
 		int me = bundle.getInt("me");
 		int max = bundle.getInt("max");
@@ -26,14 +28,14 @@ public class GameActivity extends Activity {
 			i = me++;
 		}
 		while(i != me){
-			Text image = (ImageView) findViewById(view);
-			image.setImageResource(img);
+			//ImageView image = (ImageView) findViewById(view);
+			//image.setImageResource(img);
 			if(i == max){
 				i = 0;
 			} else {
 				i ++;
 			}
-		}
+		}*/
 	}
 
 	public void waiting(Bundle bun){

@@ -71,6 +71,9 @@ public class AsyncBluetoothConnection extends BluetoothConnection {
 					handler.onMessageReceived(str);
 				}
 			} catch (IOException e) {
+				if (pausing.get()) {
+					continue;
+				}
 				if (!closing) {
 					Log.w(TAG, e);
 				}
