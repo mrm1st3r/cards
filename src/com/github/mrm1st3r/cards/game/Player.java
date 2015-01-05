@@ -30,6 +30,8 @@ public abstract class Player {
 	 * Array mit den Karten des Spielers
 	 */
 	Card[] hand;
+	
+	Gameplay game;
 
 	/**
 	 * Konstruktor der Klasse "Player".
@@ -46,10 +48,10 @@ public abstract class Player {
 
 	/**
 	 * Ein freier Platz in der Hand des Spieler wird gesucht.<br>
-	 * Anschließend wird die Karte "c" an diese Stelle eingefügt.
+	 * Anschlieï¿½end wird die Karte "c" an diese Stelle eingefï¿½gt.
 	 * 
-	 * @param c	zueinfügende Karte
-	 * @return	True/False, je nachdem, ob das Einfügen funktioniert hat oder nicht
+	 * @param c	zueinfï¿½gende Karte
+	 * @return	True/False, je nachdem, ob das Einfï¿½gen funktioniert hat oder nicht
 	 */
 	public boolean add2Hand(Card c) {
 		int i = 0;
@@ -65,10 +67,10 @@ public abstract class Player {
 	}
 
 	/**
-	 * Karte "c" wird an der i-ten Stelle in die Hand des Spielers eingefügt.
+	 * Karte "c" wird an der i-ten Stelle in die Hand des Spielers eingefï¿½gt.
 	 * 
-	 * @param i	Index für die Stelle in der Hand
-	 * @param c	zueinfügende Karte
+	 * @param i	Index fï¿½r die Stelle in der Hand
+	 * @param c	zueinfï¿½gende Karte
 	 */
 	private void insertIntoHand(int i, Card c) {
 		hand[i] = c;
@@ -77,19 +79,19 @@ public abstract class Player {
 	/**
 	 * Entfernt die Karte an der i-ten Stelle der Hand des Spielers.
 	 * 
-	 * @param i	Index für die Stelle in der Hand
+	 * @param i	Index fï¿½r die Stelle in der Hand
 	 */
 	public void removeFromHand(int i) {
 		hand[i] = null;
 	}
 	
 	/**
-	 * Baut die Verbindung zum Bluetoothgerät auf und sendet eine Nachricht.
+	 * Baut die Verbindung zum Bluetoothgerï¿½t auf und sendet eine Nachricht.
 	 */
 	public abstract void connect(String msg);
 
 	/**
-	 * Getter für {@link #name}
+	 * Getter fï¿½r {@link #name}
 	 * 
 	 * @return {@link #name}
 	 */
@@ -98,7 +100,7 @@ public abstract class Player {
 	}
 
 	/**
-	 * Setter für {@link #name}
+	 * Setter fï¿½r {@link #name}
 	 * 
 	 * @param name um {@link #name} zu definieren
 	 */
@@ -107,7 +109,7 @@ public abstract class Player {
 	}
 
 	/**
-	 * Getter für {@link #score}
+	 * Getter fï¿½r {@link #score}
 	 * 
 	 * @return {@link #score}
 	 */
@@ -116,7 +118,7 @@ public abstract class Player {
 	}
 
 	/**
-	 * Setter für {@link #score}
+	 * Setter fï¿½r {@link #score}
 	 * 
 	 * @param score um {@link #score} zu definieren
 	 */
@@ -125,7 +127,7 @@ public abstract class Player {
 	}
 
 	/**
-	 * Getter für {@link #max}
+	 * Getter fï¿½r {@link #max}
 	 * 
 	 * @return {@link #max}
 	 */
@@ -134,7 +136,7 @@ public abstract class Player {
 	}
 
 	/**
-	 * Setter für {@link #max}
+	 * Setter fï¿½r {@link #max}
 	 * 
 	 * @param max um {@link #max} zu definieren
 	 */
@@ -143,7 +145,7 @@ public abstract class Player {
 	}
 
 	/**
-	 * Getter für {@link #hand}
+	 * Getter fï¿½r {@link #hand}
 	 * 
 	 * @return {@link #hand}
 	 */
@@ -152,7 +154,7 @@ public abstract class Player {
 	}
 
 	/**
-	 * Setter für {@link #hand}
+	 * Setter fï¿½r {@link #hand}
 	 * 
 	 * @param hand um {@link #hand} zu definieren
 	 */
@@ -161,7 +163,7 @@ public abstract class Player {
 	}
 
 	/**
-	 * Getter für {@link #life}
+	 * Getter fï¿½r {@link #life}
 	 * 
 	 * @return {@link #life}
 	 */
@@ -170,7 +172,7 @@ public abstract class Player {
 	}
 
 	/**
-	 * Setter für {@link #life}
+	 * Setter fï¿½r {@link #life}
 	 * 
 	 * @param life um {@link #life} zu definieren
 	 */
@@ -183,6 +185,10 @@ public abstract class Player {
 	 */
 	public void decreaseLife() {
 		this.life--;
+	}
+	
+	public void setGame(Gameplay g) {
+		game = g;
 	}
 
 	@Override

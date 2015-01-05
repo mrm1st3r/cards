@@ -219,6 +219,7 @@ public class LobbyJoinActivity extends Activity {
 				AsyncBluetoothConnection asConn = (AsyncBluetoothConnection) conn;
 				asConn.write(name);
 				asConn.pause();
+				mDeviceList.clear();
 				dlgJoin.dismiss();
 				((Cards)getApplication()).connections.put(asConn, null);
 				Intent intent = new Intent(LobbyJoinActivity.this, LobbyActivity.class);

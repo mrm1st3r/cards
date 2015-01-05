@@ -25,7 +25,12 @@ public class Localplayer extends Player {
 	}
 
 	@Override
-	public void connect(String msg){
-		conn.checkMessage(msg);
+	public void connect(final String msg){
+		conn.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				conn.checkMessage(msg);
+			}
+		});
 	}	
 }

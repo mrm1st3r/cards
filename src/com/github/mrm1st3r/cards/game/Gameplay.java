@@ -3,12 +3,14 @@ package com.github.mrm1st3r.cards.game;
 import java.util.Random;
 
 /**
- * Grundgerüst für alle Kartenspiele der App.
+ * Grundgerï¿½st fï¿½r alle Kartenspiele der App.
  * 
  * @author Sergius Maier
  * @version 0.8
  */
 public class Gameplay {
+
+	public final Object playerLock = new Object();
 
 	/**
 	 * Array mit allen aktiven Spielern
@@ -181,7 +183,7 @@ public class Gameplay {
 	}
 
 	/**
-	 * Die oberste Karte vom Deck/ Stapel wird entfernt und zurückgegegeben.
+	 * Die oberste Karte vom Deck/ Stapel wird entfernt und zurï¿½ckgegegeben.
 	 * 
 	 * @return oberste Karte des Decks/ Stapels
 	 */
@@ -208,11 +210,11 @@ public class Gameplay {
 	}
 
 	/**
-	 * Fügt einen Spieler hinzu.
+	 * Fï¿½gt einen Spieler hinzu.
 	 * 
 	 * @param p
-	 *            hinzuzufügender Spieler
-	 * @return True/False, je nachdem, ob das Einfügen funktioniert hat oder
+	 *            hinzuzufï¿½gender Spieler
+	 * @return True/False, je nachdem, ob das Einfï¿½gen funktioniert hat oder
 	 *         nicht
 	 */
 	public boolean addPlayer(Player p) {
@@ -222,6 +224,7 @@ public class Gameplay {
 		}
 		if (players[i] == null) {
 			players[i] = p;
+			p.setGame(this);
 			return true;
 		} else {
 			return false;
@@ -229,7 +232,7 @@ public class Gameplay {
 	}
 
 	/**
-	 * Getter für {@link #players}
+	 * Getter fï¿½r {@link #players}
 	 * 
 	 * @return {@link #players}
 	 */
@@ -238,7 +241,7 @@ public class Gameplay {
 	}
 
 	/**
-	 * Setter für {@link #players}
+	 * Setter fï¿½r {@link #players}
 	 * 
 	 * @param players
 	 *            um {@link #players} zu definieren
@@ -248,7 +251,7 @@ public class Gameplay {
 	}
 
 	/**
-	 * Getter für {@link #currP}
+	 * Getter fï¿½r {@link #currP}
 	 * 
 	 * @return {@link #currP}
 	 */
@@ -257,7 +260,7 @@ public class Gameplay {
 	}
 
 	/**
-	 * Setter für {@link #currP}
+	 * Setter fï¿½r {@link #currP}
 	 * 
 	 * @param currP
 	 *            um {@link #currP} zu definieren
@@ -267,7 +270,7 @@ public class Gameplay {
 	}
 
 	/**
-	 * Getter für {@link #max}
+	 * Getter fï¿½r {@link #max}
 	 * 
 	 * @return {@link #max}
 	 */
@@ -276,7 +279,7 @@ public class Gameplay {
 	}
 
 	/**
-	 * Setter für {@link #max}
+	 * Setter fï¿½r {@link #max}
 	 * 
 	 * @param max
 	 *            um {@link #max} zu definieren

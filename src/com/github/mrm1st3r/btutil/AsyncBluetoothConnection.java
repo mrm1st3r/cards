@@ -21,6 +21,7 @@ public class AsyncBluetoothConnection extends BluetoothConnection {
 	private OnMessageReceivedHandler handler;
 	private OnDisconnectHandler dcHandler;
 	private AtomicBoolean pausing = new AtomicBoolean(false);
+	private String buffer = null;
 
 	public AsyncBluetoothConnection(final BluetoothSocket sock, OnMessageReceivedHandler inHandler) {
 		InputStream tmpIn = null;
@@ -55,6 +56,11 @@ public class AsyncBluetoothConnection extends BluetoothConnection {
 				if (pausing.get() == true) {
 					try {
 						pausing.wait();
+						// received message while paused
+						if (buffer != null && handler != null) {
+							handler.onMessageReceived(buffer);
+							buffer = null;
+						}
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -65,6 +71,10 @@ public class AsyncBluetoothConnection extends BluetoothConnection {
 				str = in.readLine();
 				Log.d(TAG, "incoming: " + str);
 				if (str == null) {
+					continue;
+				}
+				if (pausing.get()) {
+					buffer = str;
 					continue;
 				}
 				if (handler != null) {

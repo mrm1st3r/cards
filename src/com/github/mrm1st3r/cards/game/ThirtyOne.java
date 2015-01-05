@@ -4,7 +4,7 @@ import java.util.Random;
 
 /**
  * Erweitert die Klasse "Gameplay".<br>
- * Hauptklasse für das Spiel "ThirtyOne" / Schwimmen.
+ * Hauptklasse fï¿½r das Spiel "ThirtyOne" / Schwimmen.
  * 
  * @author Sergius Maier
  * @version 0.8
@@ -46,8 +46,8 @@ public class ThirtyOne extends Gameplay {
 	/**
 	 * Start einer Runde.<br>
 	 * Es werden Karten an alle Spieler ausgeteilt.<br>
-	 * Der Dealer bekommt die Möglichkeit sich zwischen zwei Händen zu entscheiden.<br>
-	 * Der nächste wird festgelegt und das Spiel gestartet.
+	 * Der Dealer bekommt die Mï¿½glichkeit sich zwischen zwei Hï¿½nden zu entscheiden.<br>
+	 * Der nï¿½chste wird festgelegt und das Spiel gestartet.
 	 */
 	public void startRound() {
 		Player p;
@@ -73,6 +73,15 @@ public class ThirtyOne extends Gameplay {
 		int temp = 0;
 		while (stopped > max) {
 			//temp = turn();
+			players[currP].connect("active");
+			synchronized (playerLock) {
+				try {
+					playerLock.wait();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 			if (temp != max) {
 				stopped = temp;
 			}
@@ -134,10 +143,10 @@ public class ThirtyOne extends Gameplay {
 	}
 
 	/**
-	 * Dem Dealer wird die Möglichkeit gegeben sich zwischen zwei Händen zu entscheiden.
-	 * Die Hand für die er sich nicht entschieden hat wird auf den Tisch gelegt.
+	 * Dem Dealer wird die Mï¿½glichkeit gegeben sich zwischen zwei Hï¿½nden zu entscheiden.
+	 * Die Hand fï¿½r die er sich nicht entschieden hat wird auf den Tisch gelegt.
 	 * 
-	 * @return	Hand, für die sich der Dealer entschieden hat
+	 * @return	Hand, fï¿½r die sich der Dealer entschieden hat
 	 */
 	private Card[] choice() {
 		Card[] temp1 = new Card[hmax];
@@ -157,10 +166,10 @@ public class ThirtyOne extends Gameplay {
 	}
 
 	/**
-	 * Nächster Spieler wird bestimmt.
+	 * Nï¿½chster Spieler wird bestimmt.
 	 * 
 	 * @param p	aktueller Spieler
-	 * @return	nächster Spieler
+	 * @return	nï¿½chster Spieler
 	 */
 	private int nextPlayer(int p) {
 		int temp = 0;
@@ -173,7 +182,7 @@ public class ThirtyOne extends Gameplay {
 	}
 
 	/**
-	 * Es werden {@link hmax} Karten vom Stapel genommen und in die Hand des Spielers hinzugefügt.
+	 * Es werden {@link hmax} Karten vom Stapel genommen und in die Hand des Spielers hinzugefï¿½gt.
 	 * 
 	 * @param p	Spieler
 	 */
@@ -207,7 +216,7 @@ public class ThirtyOne extends Gameplay {
 	}
 
 	/**
-	 * Kalkuliert den Punktestand aus der Hand, die übergeben wurde.
+	 * Kalkuliert den Punktestand aus der Hand, die ï¿½bergeben wurde.
 	 * 
 	 * @param c	Hand, von der die Punkte ermittelt werden soll
 	 * @return	kalkulierte Punktezahl
@@ -246,7 +255,7 @@ public class ThirtyOne extends Gameplay {
 	}
 
 	/**
-	 * Getter für {@link #hmax}
+	 * Getter fï¿½r {@link #hmax}
 	 * 
 	 * @return {@link #hmax}
 	 */
@@ -255,7 +264,7 @@ public class ThirtyOne extends Gameplay {
 	}
 
 	/**
-	 * Setter für {@link #hmax}
+	 * Setter fï¿½r {@link #hmax}
 	 * 
 	 * @param hmax um {@link #hmax} zu definieren
 	 */
@@ -264,7 +273,7 @@ public class ThirtyOne extends Gameplay {
 	}
 
 	/**
-	 * Getter für {@link #table}
+	 * Getter fï¿½r {@link #table}
 	 * 
 	 * @return {@link #table}
 	 */
@@ -273,7 +282,7 @@ public class ThirtyOne extends Gameplay {
 	}
 
 	/**
-	 * Setter für {@link #table}
+	 * Setter fï¿½r {@link #table}
 	 * 
 	 * @param table um {@link #table} zu definieren
 	 */
@@ -282,7 +291,7 @@ public class ThirtyOne extends Gameplay {
 	}
 
 	/**
-	 * Getter für {@link #stopped}
+	 * Getter fï¿½r {@link #stopped}
 	 * 
 	 * @return {@link #stopped}
 	 */
@@ -291,7 +300,7 @@ public class ThirtyOne extends Gameplay {
 	}
 
 	/**
-	 * Setter für {@link #stopped}
+	 * Setter fï¿½r {@link #stopped}
 	 * 
 	 * @param stopped um {@link #stopped} zu definieren
 	 */
