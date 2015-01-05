@@ -3,13 +3,13 @@ package com.github.mrm1st3r.cards.lobby;
 import java.util.HashMap;
 
 import android.app.Activity;
+import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -52,7 +52,7 @@ public class LobbyCreateActivity extends Activity {
 			Toast.makeText(this, getString(
 					R.string.bluetooth_not_supported), Toast.LENGTH_LONG)
 					.show();
-			cancelLobby();
+			onBackPressed();
 		}
 
 		BtUtil.enable(this, new ResultAction() {
@@ -70,7 +70,7 @@ public class LobbyCreateActivity extends Activity {
 
 					@Override
 					public void onFailure() {
-						cancelLobby();
+						onBackPressed();
 					}
 
 				});
@@ -78,7 +78,7 @@ public class LobbyCreateActivity extends Activity {
 
 			@Override
 			public void onFailure() {
-				cancelLobby();
+				onBackPressed();
 			}
 
 		});
@@ -119,6 +119,10 @@ public class LobbyCreateActivity extends Activity {
 			public void onConnect(final BluetoothConnection conn) {
 				clientConnected(conn);
 			}
+			@Override
+			public void onConnectionFailed(BluetoothDevice dev) {
+				
+			}
 		});
 		serv.start();
 
@@ -131,11 +135,24 @@ public class LobbyCreateActivity extends Activity {
 		asConn.setReceiveHandler(new OnMessageReceivedHandler() {
 			@Override
 			public void onMessageReceived(final String msg) {
+				
 				// send player list to new player
 				for (String player : playerList.values()) {
 					asConn.write("join " + player);
 				}
-				playerList.put(asConn, msg);
+				// send host name to new player
+				SharedPreferences pref = getSharedPreferences(getString(R.string.pref_file), Context.MODE_PRIVATE);
+				String hostName = pref.getString(MainActivity.PREF_PLAYER_NAME, "");
+				asConn.write("join " + hostName);
+
+				String name = msg.substring(5);
+				Log.d(TAG, "received: " + msg + ", name: " + name);
+				if (msg.startsWith("join")) {
+					playerList.put(asConn, name);
+				} else if(msg.startsWith("left")) {
+					playerList.remove(asConn);
+				}
+				
 				LobbyCreateActivity.this.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
@@ -147,7 +164,7 @@ public class LobbyCreateActivity extends Activity {
 				
 				// send new player name to other players
 				for (BluetoothConnection c : playerList.keySet()) {
-					((AsyncBluetoothConnection)c).write("join " + msg);
+					((AsyncBluetoothConnection)c).write(msg);
 				}
 			}
 		});
@@ -172,12 +189,6 @@ public class LobbyCreateActivity extends Activity {
 				}
 			}
 		});
-		
-		// send host name to new player
-		SharedPreferences pref = getSharedPreferences(getString(R.string.pref_file), Context.MODE_PRIVATE);
-		String name = pref.getString(MainActivity.PREF_PLAYER_NAME, "");
-		asConn.write("join " + name);
-
 	}
 
 	public void start(View v) {
@@ -204,8 +215,6 @@ public class LobbyCreateActivity extends Activity {
 			conn.close();
 		}
 		playerList.clear();
-		Intent intent = new Intent(this, MainActivity.class);
-		startActivity(intent);
 	}
 
 	@Override
@@ -216,7 +225,7 @@ public class LobbyCreateActivity extends Activity {
 
 	@Override
 	protected void onActivityResult(int reqCode, int resultCode, Intent data) {
-
+		super.onActivityResult(reqCode, resultCode, data);
 		if (BtUtil.onActivityResult(this, reqCode, resultCode, data)) {
 			// Bluetooth results should be covered by BtUtil.
 			return;
@@ -228,12 +237,5 @@ public class LobbyCreateActivity extends Activity {
 	public void onBackPressed() {
 		super.onBackPressed();
 		cancelLobby();
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.lobby_create, menu);
-		return true;
 	}
 }

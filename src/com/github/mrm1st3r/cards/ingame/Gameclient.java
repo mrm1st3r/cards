@@ -12,7 +12,7 @@ public class Gameclient extends GameActivity{
 	AsyncBluetoothConnection connection = null;
 	
 	@Override
-	protected void onCreate(Bundle bun) {
+	public void onCreate(Bundle bun) {
 		super.onCreate(bun);
 		setContentView(R.layout.activity_game);
 		

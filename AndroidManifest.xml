@@ -48,7 +48,11 @@
         </activity>
         <activity
             android:name="com.github.mrm1st3r.cards.lobby.LobbyActivity"
-            android:label="@string/title_activity_lobby" >
+            android:label="@string/title_activity_lobby"
+            android:parentActivityName="com.github.mrm1st3r.cards.LobbyJoinActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.github.mrm1st3r.cards.LobbyJoinActivity" />
         </activity>
         <activity
             android:name="com.github.mrm1st3r.cards.ingame.GameActivity"

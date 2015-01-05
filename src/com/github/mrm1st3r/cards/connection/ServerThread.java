@@ -54,6 +54,7 @@ public class ServerThread extends Thread {
 			try {
 				Log.d(TAG, "waiting for connection");
 				socket = mmServerSocket.accept();
+				Log.d(TAG, "Incoming connection... " + socket);
 			} catch (IOException e) {
 				if (closing) {
 					return;
@@ -63,8 +64,6 @@ public class ServerThread extends Thread {
 			}
 			// If a connection was accepted
 			if (socket != null) {
-				// Do work to manage the connection (in a separate thread)
-			
 				manageConnectedSocket(socket);
 			}
 		}

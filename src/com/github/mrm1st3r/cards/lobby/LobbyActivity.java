@@ -3,7 +3,9 @@ package com.github.mrm1st3r.cards.lobby;
 import java.util.LinkedList;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -14,6 +16,7 @@ import com.github.mrm1st3r.btutil.BluetoothConnection;
 import com.github.mrm1st3r.btutil.OnDisconnectHandler;
 import com.github.mrm1st3r.btutil.OnMessageReceivedHandler;
 import com.github.mrm1st3r.cards.Cards;
+import com.github.mrm1st3r.cards.MainActivity;
 import com.github.mrm1st3r.cards.R;
 import com.github.mrm1st3r.cards.ingame.Gameclient;
 
@@ -24,6 +27,7 @@ public class LobbyActivity extends Activity {
 	private AsyncBluetoothConnection connection = null;
 	private LinkedList<String> players = new LinkedList<String>();
 	private ArrayAdapter<String> playerListAdapter;
+	private String name;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +42,12 @@ public class LobbyActivity extends Activity {
 		// get connection to host from application
 		connection = (AsyncBluetoothConnection) ((Cards) getApplication()).connections.keySet().iterator().next();
 
+		SharedPreferences pref = getSharedPreferences(getString(R.string.pref_file), Context.MODE_PRIVATE);
+		name = pref.getString(MainActivity.PREF_PLAYER_NAME, "");
+
+		// send own name to host
+		connection.write("join " + name);
+		
 		// register new receive handler for incoming data
 		connection.setReceiveHandler(new OnMessageReceivedHandler() {
 			@Override
@@ -71,12 +81,19 @@ public class LobbyActivity extends Activity {
 		});
 		connection.unpause();
 	}
+	
+	private void leaveLobby() {
+		if (connection != null) {
+			connection.close();
+			connection = null;
+		}
+		players.clear();
+	}
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		connection.close();
-		players.clear();
+		leaveLobby();
 	}
 
 	@Override
@@ -89,7 +106,6 @@ public class LobbyActivity extends Activity {
 	@Override
 	public void onBackPressed() {
 		super.onBackPressed();
-		players.clear();
-		connection.close();
+		leaveLobby();
 	}
 }

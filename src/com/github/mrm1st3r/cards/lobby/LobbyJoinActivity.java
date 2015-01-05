@@ -11,11 +11,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -31,7 +29,6 @@ import com.github.mrm1st3r.btutil.BtUtil;
 import com.github.mrm1st3r.btutil.OnConnectHandler;
 import com.github.mrm1st3r.btutil.ResultAction;
 import com.github.mrm1st3r.cards.Cards;
-import com.github.mrm1st3r.cards.MainActivity;
 import com.github.mrm1st3r.cards.R;
 import com.github.mrm1st3r.cards.connection.ClientThread;
 import com.github.mrm1st3r.util.HashMapAdapter;
@@ -82,7 +79,7 @@ public class LobbyJoinActivity extends Activity {
 			Toast.makeText(this, getString(
 					R.string.bluetooth_not_supported), Toast.LENGTH_LONG)
 					.show();
-			cancel();
+			cancelSearch();
 		}
 		
 		btnRefresh = (Button) findViewById(R.id.btnRefresh);
@@ -96,34 +93,40 @@ public class LobbyJoinActivity extends Activity {
 
 			@Override
 			public void onFailure() {
-				cancel();
+				onBackPressed();
 			}
 
 		});
 		
 		deviceList = (ListView)findViewById(R.id.lobbyList);
 	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		if (mDeviceAdapter != null) {
+			mDeviceAdapter.notifyDataSetChanged();
+		}
+	}
 
 	protected final void onDestroy()  {
 		super.onDestroy();
-		unregisterReceiver(mReceiver);
-		BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
+		cancelSearch();
 	}
 	
-	private void cancel() {
-		Intent intent = new Intent(this, MainActivity.class);
-		startActivity(intent);
-	}
-
-	@Override
-	public final boolean onCreateOptionsMenu(final Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.lobby_join, menu);
-		return true;
+	private void cancelSearch() {
+		Log.d(TAG, "canceling search");
+		try {
+			unregisterReceiver(mReceiver);
+		} catch (IllegalArgumentException e) {
+			// receiver already unregistered
+		}
+		BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
 	}
 	
 	@Override
 	protected void onActivityResult(int reqCode, int resultCode, Intent data) {
+		super.onActivityResult(reqCode, resultCode, data);
 
 		if (BtUtil.onActivityResult(this, reqCode, resultCode, data)) {
 			// Bluetooth results should be covered by BtUtil.
@@ -183,6 +186,12 @@ public class LobbyJoinActivity extends Activity {
 		BluetoothAdapter self = BluetoothAdapter.getDefaultAdapter();
 		self.cancelDiscovery();
 		mDeviceList.clear();
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				mDeviceAdapter.notifyDataSetChanged();
+			}
+		});
 		if (!self.startDiscovery()) {
 			Toast.makeText(this, "Fehler beim aktualisieren", Toast.LENGTH_SHORT).show();
 			Log.w(TAG, "Failed to start bluetooth discovery");
@@ -205,26 +214,42 @@ public class LobbyJoinActivity extends Activity {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						conn.cancel();
-					}			
+					}
 		});
 		dlgJoin.show();
 		
 		conn = new ClientThread(this, dev, new OnConnectHandler() {
-
 			@Override
 			public void onConnect(BluetoothConnection conn) {
-				SharedPreferences pref = getSharedPreferences(getString(R.string.pref_file), Context.MODE_PRIVATE);
-				
-				String name = pref.getString(MainActivity.PREF_PLAYER_NAME, "");
 				AsyncBluetoothConnection asConn = (AsyncBluetoothConnection) conn;
-				asConn.write(name);
+				Log.d(TAG, "joining lobby " + asConn.getDeviceName());
 				asConn.pause();
-				mDeviceList.clear();
 				dlgJoin.dismiss();
+				((Cards)getApplication()).connections.clear();
 				((Cards)getApplication()).connections.put(asConn, null);
-				Intent intent = new Intent(LobbyJoinActivity.this, LobbyActivity.class);
+				cancelSearch();
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						Intent intent = new Intent(LobbyJoinActivity.this, LobbyActivity.class);
+						startActivity(intent);
+					}
+				});
+			}
+			@Override
+			public void onConnectionFailed(BluetoothDevice dev) {
+				dlgJoin.dismiss();
+				mDeviceList.remove(dev.getAddress());
+				Log.w(TAG, "failed to connect to " + dev.getName());
 
-				startActivity(intent);
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						Toast.makeText(LobbyJoinActivity.this, getResources().getString(R.string.connection_failed), Toast.LENGTH_SHORT).show();
+						mDeviceAdapter.notifyDataSetChanged();
+					}
+				});
+				
 			}
 		});
 		conn.start();
@@ -233,6 +258,6 @@ public class LobbyJoinActivity extends Activity {
 	@Override
 	public void onBackPressed() {
 		super.onBackPressed();
-		BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
+		cancelSearch();
 	}
 }

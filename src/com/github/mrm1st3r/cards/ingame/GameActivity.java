@@ -1,15 +1,11 @@
 package com.github.mrm1st3r.cards.ingame;
 
-import com.github.mrm1st3r.cards.R;
-import com.github.mrm1st3r.cards.game.*;
-
 import android.app.Activity;
 import android.os.Bundle;
-import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.TextView;
+
+import com.github.mrm1st3r.cards.R;
 
 public class GameActivity extends Activity {
 

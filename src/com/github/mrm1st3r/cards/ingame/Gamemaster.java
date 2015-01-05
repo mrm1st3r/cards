@@ -18,7 +18,7 @@ public class Gamemaster extends GameActivity {
 	private ThirtyOne game;
 
 	@Override
-	protected void onCreate(Bundle bun) {
+	public void onCreate(Bundle bun) {
 		super.onCreate(bun);
 		setContentView(R.layout.activity_game);
 		newGame();

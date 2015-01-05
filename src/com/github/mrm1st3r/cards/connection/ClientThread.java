@@ -60,6 +60,7 @@ public class ClientThread extends Thread {
 				return;
 			}
 			Log.w(TAG, connectException);
+			handler.onConnectionFailed(mmDevice);
 			// Unable to connect; close the socket and get out
 			try {
 				mmSocket.close();

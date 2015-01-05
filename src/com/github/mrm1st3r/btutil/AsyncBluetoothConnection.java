@@ -115,6 +115,10 @@ public class AsyncBluetoothConnection extends BluetoothConnection {
 		}
 	}
 
+	public String getDeviceName() {
+		return connection.getRemoteDevice().getName();
+	}
+
 	public void write(String str) {
 		out.println(str);
 		out.flush();
