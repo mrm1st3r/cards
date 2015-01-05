@@ -112,7 +112,6 @@ public class GameActivity extends Activity {
 		
 		b = (Button)findViewById(R.id.btn_1card);
 		b.setText("1 Karte");
-		switchButton(R.id.btn_1card, true);
 		b = (Button)findViewById(R.id.btn_allcards);
 		b.setText("Alle Karten");
 	}
