@@ -1,6 +1,7 @@
 package com.github.mrm1st3r.cards.game;
 
 import com.github.mrm1st3r.btutil.AsyncBluetoothConnection;
+import com.github.mrm1st3r.btutil.OnMessageReceivedHandler;
 
 public class Bluetoothplayer extends Player{
 	
@@ -12,6 +13,17 @@ public class Bluetoothplayer extends Player{
 	public Bluetoothplayer(String n, int m, AsyncBluetoothConnection conn) {
 		super(n, m);
 		setConn(conn);
+		
+		conn.setReceiveHandler(new OnMessageReceivedHandler() {
+			@Override
+			public void onMessageReceived(String msg) {
+				
+				// tu was
+				synchronized (game.playerLock) {
+					game.playerLock.notify();
+				}
+			}
+		});
 	}
 
 	@Override
@@ -20,7 +32,7 @@ public class Bluetoothplayer extends Player{
 	}
 
 	/**
-	 * Getter für {@link #conn}
+	 * Getter fï¿½r {@link #conn}
 	 * 
 	 * @return {@link #conn}
 	 */
@@ -29,7 +41,7 @@ public class Bluetoothplayer extends Player{
 	}
 
 	/**
-	 * Setter für {@link #conn}
+	 * Setter fï¿½r {@link #conn}
 	 * 
 	 * @param conn um {@link #conn} zu definieren
 	 */

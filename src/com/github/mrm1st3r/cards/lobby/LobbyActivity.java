@@ -15,7 +15,7 @@ import com.github.mrm1st3r.btutil.OnDisconnectHandler;
 import com.github.mrm1st3r.btutil.OnMessageReceivedHandler;
 import com.github.mrm1st3r.cards.Cards;
 import com.github.mrm1st3r.cards.R;
-import com.github.mrm1st3r.cards.ingame.GameActivity;
+import com.github.mrm1st3r.cards.ingame.Gameclient;
 
 public class LobbyActivity extends Activity {
 
@@ -35,8 +35,10 @@ public class LobbyActivity extends Activity {
 				findFragmentById(R.id.player_list);
 		lobFrag.setAdapter(playerListAdapter);
 		
+		// get connection to host from application
 		connection = (AsyncBluetoothConnection) ((Cards) getApplication()).connections.keySet().iterator().next();
 
+		// register new receive handler for incoming data
 		connection.setReceiveHandler(new OnMessageReceivedHandler() {
 			@Override
 			public void onMessageReceived(final String msg) {
@@ -52,7 +54,7 @@ public class LobbyActivity extends Activity {
 							players.remove(name);
 							playerListAdapter.notifyDataSetChanged();
 						} else if (msg.equals("start")) {
-							Intent intent = new Intent(LobbyActivity.this, GameActivity.class);
+							Intent intent = new Intent(LobbyActivity.this, Gameclient.class);
 							startActivity(intent);
 						}
 						

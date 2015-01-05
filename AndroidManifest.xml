@@ -54,6 +54,14 @@
             android:name="com.github.mrm1st3r.cards.ingame.GameActivity"
             android:label="@string/title_activity_game">
         </activity>
+        <activity 
+            android:name="com.github.mrm1st3r.cards.ingame.Gamemaster"
+            android:label="@string/title_activity_game">
+        </activity>
+        <activity 
+            android:name="com.github.mrm1st3r.cards.ingame.Gameclient"
+            android:label="@string/title_activity_game">
+        </activity>
     </application>
 
 </manifest>

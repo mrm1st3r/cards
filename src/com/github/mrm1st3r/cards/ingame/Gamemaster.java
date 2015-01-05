@@ -14,6 +14,8 @@ import com.github.mrm1st3r.cards.game.*;
 public class Gamemaster extends GameActivity {
 
 	int max = 0;
+	private Thread gameThread;
+	private ThirtyOne game;
 
 	@Override
 	protected void onCreate(Bundle bun) {
@@ -26,7 +28,7 @@ public class Gamemaster extends GameActivity {
 				getString(R.string.pref_file), Context.MODE_PRIVATE);
 		String name = pref.getString(MainActivity.PREF_PLAYER_NAME, "");
 
-		ThirtyOne game = new ThirtyOne(max);
+		game = new ThirtyOne(max);
 		game.addPlayer(new Localplayer(name, 3, this));		
 
 		for (BluetoothConnection conn : ((Cards) getApplication()).connections
@@ -36,6 +38,12 @@ public class Gamemaster extends GameActivity {
 			String name1 = ((Cards) getApplication()).connections.get(conn);
 			game.addPlayer(new Bluetoothplayer(name1, 3, asConn));
 		}
-		game.start();
+		gameThread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				game.start();
+			}
+		});
+		gameThread.start();
 	}
 }

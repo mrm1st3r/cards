@@ -27,7 +27,7 @@ import com.github.mrm1st3r.cards.Cards;
 import com.github.mrm1st3r.cards.MainActivity;
 import com.github.mrm1st3r.cards.R;
 import com.github.mrm1st3r.cards.connection.ServerThread;
-import com.github.mrm1st3r.cards.ingame.GameActivity;
+import com.github.mrm1st3r.cards.ingame.Gamemaster;
 import com.github.mrm1st3r.util.HashMapAdapter;
 
 public class LobbyCreateActivity extends Activity {
@@ -131,12 +131,16 @@ public class LobbyCreateActivity extends Activity {
 		asConn.setReceiveHandler(new OnMessageReceivedHandler() {
 			@Override
 			public void onMessageReceived(final String msg) {
+				// send player list to new player
+				for (String player : playerList.values()) {
+					asConn.write("join " + player);
+				}
+				playerList.put(asConn, msg);
 				LobbyCreateActivity.this.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
 						btnStart.setEnabled(true);
 						Log.d(TAG, "received: " + msg);
-						playerList.put(asConn, msg);
 						playerListAdapter.notifyDataSetChanged();
 					}
 				});
@@ -144,10 +148,6 @@ public class LobbyCreateActivity extends Activity {
 				// send new player name to other players
 				for (BluetoothConnection c : playerList.keySet()) {
 					((AsyncBluetoothConnection)c).write("join " + msg);
-				}
-				// send player list to new player
-				for (String player : playerList.values()) {
-					asConn.write("join " + player);
 				}
 			}
 		});
@@ -180,7 +180,6 @@ public class LobbyCreateActivity extends Activity {
 
 	}
 
-	
 	public void start(View v) {
 		((Cards)getApplication()).connections = playerList;
 		
@@ -191,11 +190,18 @@ public class LobbyCreateActivity extends Activity {
 			asConn.pause();
 		}
 		
-		Intent intent = new Intent(this, GameActivity.class);
+		Intent intent = new Intent(this, Gamemaster.class);
 		startActivity(intent);
 	}
 
 	private void cancelLobby() {
+		if (serv != null) {
+			serv.cancel();
+		}
+		for (BluetoothConnection conn : playerList.keySet()) {
+			conn.close();
+		}
+		playerList.clear();
 		Intent intent = new Intent(this, MainActivity.class);
 		startActivity(intent);
 	}
@@ -203,9 +209,7 @@ public class LobbyCreateActivity extends Activity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		if (serv != null) {
-			serv.cancel();
-		}
+		cancelLobby();
 	}
 
 	@Override
@@ -221,10 +225,7 @@ public class LobbyCreateActivity extends Activity {
 	@Override
 	public void onBackPressed() {
 		super.onBackPressed();
-		for (BluetoothConnection conn : playerList.keySet()) {
-			conn.close();
-		}
-		playerList.clear();
+		cancelLobby();
 	}
 
 	@Override
