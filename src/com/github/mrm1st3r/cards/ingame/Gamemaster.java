@@ -21,7 +21,10 @@ public class Gamemaster extends GameActivity {
 	protected void onCreate(Bundle bun) {
 		super.onCreate(bun);
 		setContentView(R.layout.activity_game);
-
+		newGame();
+	}
+	
+	public void newGame(){
 		max = ((Cards) getApplication()).connections.size() + 1;
 
 		SharedPreferences pref = getSharedPreferences(

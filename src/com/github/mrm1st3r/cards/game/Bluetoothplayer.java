@@ -32,7 +32,7 @@ public class Bluetoothplayer extends Player{
 	}
 
 	/**
-	 * Getter fï¿½r {@link #conn}
+	 * Getter für {@link #conn}
 	 * 
 	 * @return {@link #conn}
 	 */

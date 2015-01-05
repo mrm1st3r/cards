@@ -25,64 +25,50 @@ public class GameActivity extends Activity {
 	public void checkMessage(String msg) {
 		if (msg == "active") {
 			// active();
+		} else if (msg == "wait"){
+			
+		} else if (msg == "lost"){
+			
+		} else if (msg == "takechoice"){
+			
+		} else if (msg == "message"){
+			
 		}
+		
+		// msg splitten für message hand table
 
 	}
 
-	public void waiting(Bundle bun) {
+	public void waiting() {
 		switchButton(R.id.btn_knock, false);
 		switchButton(R.id.btn_1card, false);
 		switchButton(R.id.btn_allcards, false);
 		switchButton(R.id.btn_push, false);
-		switchButton(R.id.btn_nextround, false);
-		switchButton(R.id.btn_31, false);
 		showCards();
 	}
 
-	public void out(Bundle bun) {
+	public void out() {
 		switchButton(R.id.btn_knock, false);
 		switchButton(R.id.btn_1card, false);
 		switchButton(R.id.btn_allcards, false);
 		switchButton(R.id.btn_push, false);
-		switchButton(R.id.btn_nextround, false);
-		switchButton(R.id.btn_31, false);
 		showCards();
 	}
 
-	public void active(Bundle bun) {
+	public void active() {
 		switchButton(R.id.btn_knock, true);
 		switchButton(R.id.btn_1card, true);
 		switchButton(R.id.btn_allcards, true);
 		switchButton(R.id.btn_push, true);
-		switchButton(R.id.btn_nextround, false);
-		switchButton(R.id.btn_31, true);
 		showCards();
 	}
 
-	public void takeChoice(Bundle bun) {
+	public void takeChoice() {
 		switchButton(R.id.btn_knock, false);
-		Button b = (Button) findViewById(R.id.btn_1card);
-		b.setText("Hand");
 		switchButton(R.id.btn_1card, true);
-		b.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
-
-			}
-		});
-		b = (Button) findViewById(R.id.btn_allcards);
-		b.setText("Tisch");
 		switchButton(R.id.btn_allcards, true);
 		switchButton(R.id.btn_push, false);
-		switchButton(R.id.btn_nextround, false);
-		switchButton(R.id.btn_31, false);
 		showCards();
-
-		b = (Button) findViewById(R.id.btn_1card);
-		b.setText("1 Karte");
-		b = (Button) findViewById(R.id.btn_allcards);
-		b.setText("Alle Karten");
 	}
 
 	public void showCards() {
@@ -126,12 +112,19 @@ public class GameActivity extends Activity {
 		btn.setEnabled(s);
 	}
 
-	public void btn_31() {
-		// Card[] temp = hand;
+	public void btn_1card() {
+		
 	}
 
-	public void btn_choice(int i) {
+	public void btn_allcards() {
 
 	}
-
+	
+	public void btn_knock(){
+		
+	}
+	
+	public void btn_push(){
+		
+	}
 }
