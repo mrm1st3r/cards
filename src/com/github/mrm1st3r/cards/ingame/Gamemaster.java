@@ -18,5 +18,11 @@ public class Gamemaster extends GameActivity {
 		max = bun.getInt("players");
 		
 		ThirtyOne game = new ThirtyOne(max);
+		for (int i = 0; i < max; i++){
+			game.addPlayer(new Player(bun.getString("player"+i), 3));
+		}
+		game.start();
+		
+		
 	}
 }
