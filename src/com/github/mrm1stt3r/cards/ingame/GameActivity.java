@@ -6,6 +6,8 @@ import com.github.mrm1st3r.cards.game.Player;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -89,12 +91,28 @@ public class GameActivity extends Activity {
 
 	public void takeChoice(Bundle bun) {
 		switchButton(R.id.btn_knock, false);
+		Button b = (Button)findViewById(R.id.btn_1card);
+		b.setText("Hand");
 		switchButton(R.id.btn_1card, true);
+		b.setOnClickListener(new OnClickListener(){
+		@Override
+		public void onClick(View arg0) {
+			// TODO Auto-generated method stub
+			
+		}});
+		b = (Button)findViewById(R.id.btn_allcards);
+		b.setText("Tisch");
 		switchButton(R.id.btn_allcards, true);
 		switchButton(R.id.btn_push, false);
 		switchButton(R.id.btn_nextround, false);
 		switchButton(R.id.btn_31, false);
 		showCards(bun);
+		
+		b = (Button)findViewById(R.id.btn_1card);
+		b.setText("1 Karte");
+		switchButton(R.id.btn_1card, true);
+		b = (Button)findViewById(R.id.btn_allcards);
+		b.setText("Alle Karten");
 	}
 
 	public void showCards(Bundle bun) {
@@ -139,7 +157,11 @@ public class GameActivity extends Activity {
 	}
 
 	public void btn_31() {
-		Card[] temp = hand;
+		//Card[] temp = hand;
 	}
 
+	public void btn_choice(int i){
+		
+	}
+	
 }
