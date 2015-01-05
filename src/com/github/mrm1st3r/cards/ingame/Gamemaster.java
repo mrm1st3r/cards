@@ -2,8 +2,12 @@ package com.github.mrm1st3r.cards.ingame;
 
 import android.os.Bundle;
 
+import com.github.mrm1st3r.btutil.AsyncBluetoothConnection;
+import com.github.mrm1st3r.btutil.BluetoothConnection;
+import com.github.mrm1st3r.cards.Cards;
 import com.github.mrm1st3r.cards.R;
-import com.github.mrm1st3r.cards.game.*;
+import com.github.mrm1st3r.cards.game.Player;
+import com.github.mrm1st3r.cards.game.ThirtyOne;
 
 public class Gamemaster extends GameActivity {
 	
@@ -23,6 +27,10 @@ public class Gamemaster extends GameActivity {
 		}
 		game.start();
 		
-		
+		for (BluetoothConnection conn : ((Cards) getApplication()).connections.keySet()) {
+			AsyncBluetoothConnection asConn = (AsyncBluetoothConnection) conn;
+			asConn.unpause();
+			asConn.write("test");
+		}
 	}
 }

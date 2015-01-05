@@ -65,46 +65,7 @@ public class LobbyCreateActivity extends Activity {
 
 					@Override
 					public void onSuccess() {
-						btnStart = (Button) findViewById(R.id.btnStart);
-						playerListAdapter = new HashMapAdapter<BluetoothConnection, String>(
-								LobbyCreateActivity.this, playerList) {
-
-							@Override
-							public View getView(int pos, View convertView,
-									ViewGroup parent) {
-								TextView rowView;
-								if (convertView == null) {
-									LayoutInflater inflater = (LayoutInflater) context
-											.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-									rowView = (TextView) inflater.inflate(
-											android.R.layout.simple_list_item_1, parent, false);
-								} else {
-									rowView = (TextView) convertView;
-								}
-								//TextView keyView = (TextView) rowView.findViewById(R.id.item_name);
-
-								rowView.setText(getItem(pos));
-
-								return rowView;
-							}
-
-						};
-						LobbyFragment lobFrag = (LobbyFragment)getFragmentManager().
-								findFragmentById(R.id.player_list);
-						if (lobFrag == null) {
-							Log.d(TAG, "fail");
-						}
-						lobFrag.setAdapter(playerListAdapter);
-						
-						serv = new ServerThread(LobbyCreateActivity.this,
-								new OnConnectHandler() {
-							@Override
-							public void onConnect(final BluetoothConnection conn) {
-								clientConnected(conn);
-							}
-						});
-						serv.start();
-
+						createLobby();
 					}
 
 					@Override
@@ -124,6 +85,43 @@ public class LobbyCreateActivity extends Activity {
 
 		setContentView(R.layout.activity_lobby_create);
 		((TextView)findViewById(R.id.txtLobbyName)).setText(BtUtil.getDeviceName());
+	}
+	
+	private void createLobby() {
+		btnStart = (Button) findViewById(R.id.btnStart);
+		playerListAdapter = new HashMapAdapter<BluetoothConnection, String>(
+				LobbyCreateActivity.this, playerList) {
+			@Override
+			public View getView(int pos, View convertView,
+					ViewGroup parent) {
+				TextView rowView;
+				if (convertView == null) {
+					LayoutInflater inflater = (LayoutInflater) context
+							.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+					rowView = (TextView) inflater.inflate(
+							android.R.layout.simple_list_item_1, parent, false);
+				} else {
+					rowView = (TextView) convertView;
+				}
+
+				rowView.setText(getItem(pos));
+
+				return rowView;
+			}
+
+		};
+		LobbyFragment lobFrag = (LobbyFragment)getFragmentManager().
+				findFragmentById(R.id.player_list);
+		lobFrag.setAdapter(playerListAdapter);
+		
+		serv = new ServerThread(LobbyCreateActivity.this, new OnConnectHandler() {
+			@Override
+			public void onConnect(final BluetoothConnection conn) {
+				clientConnected(conn);
+			}
+		});
+		serv.start();
+
 	}
 
 	private void clientConnected(BluetoothConnection conn) {
@@ -156,10 +154,10 @@ public class LobbyCreateActivity extends Activity {
 		asConn.setOnDisconnectHandler(new OnDisconnectHandler() {
 			@Override
 			public void onDisconnect(BluetoothConnection conn) {
+				playerList.remove(asConn);
 				LobbyCreateActivity.this.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						playerList.remove(asConn);
 						playerListAdapter.notifyDataSetChanged();
 						
 						// can't start game with no other players
@@ -168,7 +166,6 @@ public class LobbyCreateActivity extends Activity {
 						}
 					}
 				});
-				
 				// send leave note to other player
 				for (BluetoothConnection c : playerList.keySet()) {
 					((AsyncBluetoothConnection)c).write("left " + playerList.get(conn));
@@ -176,13 +173,14 @@ public class LobbyCreateActivity extends Activity {
 			}
 		});
 		
-		// send host playername
+		// send host name to new player
 		SharedPreferences pref = getSharedPreferences(getString(R.string.pref_file), Context.MODE_PRIVATE);
 		String name = pref.getString(MainActivity.PREF_PLAYER_NAME, "");
 		asConn.write("join " + name);
 
 	}
 
+	
 	public void start(View v) {
 		((Cards)getApplication()).connections = playerList;
 		
@@ -218,6 +216,15 @@ public class LobbyCreateActivity extends Activity {
 			return;
 		}
 
+	}
+	
+	@Override
+	public void onBackPressed() {
+		super.onBackPressed();
+		for (BluetoothConnection conn : playerList.keySet()) {
+			conn.close();
+		}
+		playerList.clear();
 	}
 
 	@Override

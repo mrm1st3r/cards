@@ -77,6 +77,13 @@ public class AsyncBluetoothConnection extends BluetoothConnection {
 				if (!closing) {
 					Log.w(TAG, e);
 				}
+				
+				try {
+					connection.close();
+				} catch (IOException e2) {
+					Log.d(TAG, e.getMessage());
+				}
+				
 				if (dcHandler != null) {
 					dcHandler.onDisconnect(this);
 				}

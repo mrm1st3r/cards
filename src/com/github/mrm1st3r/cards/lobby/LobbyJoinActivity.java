@@ -228,4 +228,10 @@ public class LobbyJoinActivity extends Activity {
 		});
 		conn.start();
 	}
+
+	@Override
+	public void onBackPressed() {
+		super.onBackPressed();
+		BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
+	}
 }

@@ -15,6 +15,7 @@ import com.github.mrm1st3r.btutil.OnDisconnectHandler;
 import com.github.mrm1st3r.btutil.OnMessageReceivedHandler;
 import com.github.mrm1st3r.cards.Cards;
 import com.github.mrm1st3r.cards.R;
+import com.github.mrm1st3r.cards.ingame.GameActivity;
 
 public class LobbyActivity extends Activity {
 
@@ -50,6 +51,9 @@ public class LobbyActivity extends Activity {
 						} else if (msg.startsWith("left")) {
 							players.remove(name);
 							playerListAdapter.notifyDataSetChanged();
+						} else if (msg.equals("start")) {
+							Intent intent = new Intent(LobbyActivity.this, GameActivity.class);
+							startActivity(intent);
 						}
 						
 					}
@@ -70,6 +74,7 @@ public class LobbyActivity extends Activity {
 	public void onDestroy() {
 		super.onDestroy();
 		connection.close();
+		players.clear();
 	}
 
 	@Override
@@ -77,5 +82,12 @@ public class LobbyActivity extends Activity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.lobby, menu);
 		return true;
+	}
+
+	@Override
+	public void onBackPressed() {
+		super.onBackPressed();
+		players.clear();
+		connection.close();
 	}
 }
