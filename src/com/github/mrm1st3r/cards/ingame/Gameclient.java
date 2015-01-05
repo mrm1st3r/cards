@@ -20,12 +20,12 @@ public class Gameclient extends GameActivity{
 
 		connection.setReceiveHandler(new OnMessageReceivedHandler() {
 			@Override
-			public void onMessageReceived(String msg) {
+			public void onMessageReceived(final String msg) {
 				// logik
 				Gameclient.this.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						// auf die Oberfläche zugreifen
+						checkMessage(msg);// auf die Oberfläche zugreifen
 					}
 				});
 			}

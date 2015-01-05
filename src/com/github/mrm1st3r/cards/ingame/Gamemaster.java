@@ -1,36 +1,41 @@
 package com.github.mrm1st3r.cards.ingame;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import com.github.mrm1st3r.btutil.AsyncBluetoothConnection;
 import com.github.mrm1st3r.btutil.BluetoothConnection;
 import com.github.mrm1st3r.cards.Cards;
+import com.github.mrm1st3r.cards.MainActivity;
 import com.github.mrm1st3r.cards.R;
-import com.github.mrm1st3r.cards.game.Player;
-import com.github.mrm1st3r.cards.game.ThirtyOne;
+import com.github.mrm1st3r.cards.game.*;
 
 public class Gamemaster extends GameActivity {
-	
+
 	int max = 0;
 
 	@Override
 	protected void onCreate(Bundle bun) {
 		super.onCreate(bun);
 		setContentView(R.layout.activity_game);
-		
-		bun = getIntent().getExtras();
-		max = bun.getInt("players");
-		
+
+		max = ((Cards) getApplication()).connections.size() + 1;
+
+		SharedPreferences pref = getSharedPreferences(
+				getString(R.string.pref_file), Context.MODE_PRIVATE);
+		String name = pref.getString(MainActivity.PREF_PLAYER_NAME, "");
+
 		ThirtyOne game = new ThirtyOne(max);
-		for (int i = 0; i < max; i++){
-			game.addPlayer(new Player(bun.getString("player"+i), 3));
-		}
-		game.start();
-		
-		for (BluetoothConnection conn : ((Cards) getApplication()).connections.keySet()) {
+		game.addPlayer(new Localplayer(name, 3, this));		
+
+		for (BluetoothConnection conn : ((Cards) getApplication()).connections
+				.keySet()) {
 			AsyncBluetoothConnection asConn = (AsyncBluetoothConnection) conn;
 			asConn.unpause();
-			asConn.write("test");
+			String name1 = ((Cards) getApplication()).connections.get(conn);
+			game.addPlayer(new Bluetoothplayer(name1, 3, asConn));
 		}
+		game.start();
 	}
 }

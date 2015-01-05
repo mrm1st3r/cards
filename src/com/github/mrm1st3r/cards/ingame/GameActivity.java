@@ -18,47 +18,10 @@ public class GameActivity extends Activity {
 	protected void onCreate(Bundle bun) {
 		super.onCreate(bun);
 		setContentView(R.layout.activity_game);
-
-		
-		Bundle bundle = getIntent().getExtras();
-		Player[] players = (Player[]) bundle.get("players");
-		int me = bundle.getInt("me");
-		int max = bundle.getInt("max");
-		int i = nextP(me, max, me);
-		int temp = 2;
-		TextView textViewToChange;
-		switch (temp) {
-		case 2:
-			textViewToChange = (TextView) findViewById(R.id.lbl_rival0);
-			textViewToChange.setText(players[i].getName());
-			if (temp == max) {
-				break;
-			}
-			i = nextP(i, max, me);
-		case 3:
-			textViewToChange = (TextView) findViewById(R.id.lbl_rival1);
-			textViewToChange.setText(players[i].getName());
-			if (temp == max) {
-				break;
-			}
-			i = nextP(i, max, me);
-		case 4:
-			textViewToChange = (TextView) findViewById(R.id.lbl_rival2);
-			textViewToChange.setText(players[i].getName());
-			break;
-		}
 	}
-
-	private int nextP(int i, int max, int me) {
-		if (i == max) {
-			i = 0;
-		} else {
-			i++;
-		}
-		if (i == me) {
-			i = nextP(i, max, me);
-		}
-		return i;
+	
+	public void checkMessage(String msg){
+		
 	}
 
 	public void waiting(Bundle bun) {

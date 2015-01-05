@@ -1,12 +1,14 @@
 package com.github.mrm1st3r.cards.game;
 
+import com.github.mrm1st3r.btutil.AsyncBluetoothConnection;
+
 /**
  * Kartenspieler
  * 
  * @author Sergius Maier
  * @version 0.8
  */
-public class Player {
+public abstract class Player {
 
 	/**
 	 * Spielername
@@ -32,8 +34,9 @@ public class Player {
 	/**
 	 * Konstruktor der Klasse "Player".
 	 * 
-	 * @param n	Name des Spielers
-	 * @param m	max. Anzahl Karten, die der Spieler in der Hand haben kann
+	 * @param n		Name des Spielers
+	 * @param m		max. Anzahl Karten, die der Spieler in der Hand haben kann
+	 * @param conn	Verbindung zum Client
 	 */
 	public Player(String n, int m) {
 		setName(n);
@@ -79,6 +82,11 @@ public class Player {
 	public void removeFromHand(int i) {
 		hand[i] = null;
 	}
+	
+	/**
+	 * Baut die Verbindung zum Bluetoothgerät auf und sendet eine Nachricht.
+	 */
+	public abstract void connect(String msg);
 
 	/**
 	 * Getter für {@link #name}
