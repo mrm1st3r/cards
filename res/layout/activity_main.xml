@@ -39,9 +39,10 @@
         android:id="@+id/btn_bot_game"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:enabled="false"
+        android:onClick="startGame"
         android:text="@string/bot_game"
-        android:width="240dp"
-        android:onClick="startGame" />
+        android:width="240dp" />
 
     <TextView
         android:id="@+id/lbl_rival0"

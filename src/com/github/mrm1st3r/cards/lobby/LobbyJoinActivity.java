@@ -9,6 +9,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,8 +23,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.mrm1st3r.btutil.AsyncBluetoothConnection;
+import com.github.mrm1st3r.btutil.BluetoothConnection;
 import com.github.mrm1st3r.btutil.BtUtil;
+import com.github.mrm1st3r.btutil.OnConnectHandler;
 import com.github.mrm1st3r.btutil.ResultAction;
+import com.github.mrm1st3r.cards.Cards;
 import com.github.mrm1st3r.cards.MainActivity;
 import com.github.mrm1st3r.cards.R;
 import com.github.mrm1st3r.cards.connection.ClientThread;
@@ -42,7 +47,7 @@ public class LobbyJoinActivity extends Activity {
 		public void onReceive(Context context, Intent intent) {
 			String action = intent.getAction();
 
-			Log.d(TAG, "Received Broadcast of type " + action);
+			//Log.d(TAG, "Received Broadcast of type " + action);
 			
 			if (!BluetoothDevice.ACTION_FOUND.equals(action)) {
 				return;
@@ -56,21 +61,6 @@ public class LobbyJoinActivity extends Activity {
 			// Add the name and address to an array adapter to show in a ListView
 			mDeviceList.put(device.getAddress(), device);
 			mDeviceAdapter.notifyDataSetChanged();
-			/*BluetoothSocket tmp = null;
-			try {
-				tmp = device.createRfcommSocketToServiceRecord(
-						UUID.fromString(
-								Resources.getSystem().getString(
-										R.string.bt_uuid)));
-			} catch (NotFoundException e) {
-				// TODO Auto-generated catch block
-				Log.w(TAG, e);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				Log.w(TAG, e);			}
-
-			Log.d(TAG, tmp.getRemoteDevice().getAddress());
-*/
 		}
 	};
 	
@@ -193,14 +183,31 @@ public class LobbyJoinActivity extends Activity {
 	public void refresh(View v) {
 		BluetoothAdapter self = BluetoothAdapter.getDefaultAdapter();
 		self.cancelDiscovery();
+		mDeviceList.clear();
 		if (!self.startDiscovery()) {
+			Toast.makeText(this, "Fehler beim aktualisieren", Toast.LENGTH_SHORT).show();
 			Log.w(TAG, "Failed to start bluetooth discovery");
 		}
 	}
 
 	private void joinLobby(BluetoothDevice dev) {
 		Log.d(TAG, "connecting to " + dev.getAddress());
-		conn = new ClientThread(this, dev);
+		conn = new ClientThread(this, dev, new OnConnectHandler() {
+
+			@Override
+			public void onConnect(BluetoothConnection conn) {
+				SharedPreferences pref = getSharedPreferences(getString(R.string.pref_file), Context.MODE_PRIVATE);
+				
+				String name = pref.getString(MainActivity.PREF_PLAYER_NAME, "");
+				AsyncBluetoothConnection asConn = (AsyncBluetoothConnection) conn;
+				asConn.write(name);
+				asConn.pause();
+				((Cards)getApplication()).connections.put(asConn, null);
+				Intent intent = new Intent(LobbyJoinActivity.this, LobbyActivity.class);
+
+				startActivity(intent);
+			}
+		});
 		conn.start();
 	}
 }

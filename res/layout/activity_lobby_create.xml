@@ -22,5 +22,22 @@
         android:layout_alignBottom="@+id/labelLobbyName"
         android:layout_toEndOf="@+id/labelLobbyName"
         android:layout_toRightOf="@+id/labelLobbyName" />
+    
+    <Button
+        android:id="@+id/btnStart"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="start"
+        android:enabled="false"
+        android:layout_alignParentBottom="true"
+        android:text="@string/start" />
+
+    <fragment android:name="com.github.mrm1st3r.cards.lobby.LobbyFragment"
+        android:id="@+id/player_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/labelLobbyName"
+        android:layout_above="@id/btnStart"
+        android:layout_marginTop="5dp" />
 
 </RelativeLayout>

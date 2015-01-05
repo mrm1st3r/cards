@@ -11,9 +11,7 @@ import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.github.mrm1st3r.cards.lobby.LobbyCreateActivity;
 import com.github.mrm1st3r.cards.lobby.LobbyJoinActivity;
@@ -21,6 +19,8 @@ import com.github.mrm1st3r.cards.lobby.LobbyJoinActivity;
 public class MainActivity extends Activity {
 
 	public static final String PREF_PLAYER_NAME = "player_name";
+	
+	private static final String TAG = MainActivity.class.getSimpleName();
 	
 	private EditText inputPlayerName;
 	
@@ -35,8 +35,13 @@ public class MainActivity extends Activity {
 		
 		if (name == null) {
 			name = BluetoothAdapter.getDefaultAdapter().getName();
+			SharedPreferences.Editor edit = getSharedPreferences(getString(R.string.pref_file),
+					Context.MODE_PRIVATE).edit();
+			
+			edit.putString(MainActivity.PREF_PLAYER_NAME, name);
+			edit.commit();
 		}
-		
+
 		inputPlayerName = (EditText) findViewById(R.id.input_player_name);
 		inputPlayerName.setText(name);
 		inputPlayerName.addTextChangedListener(new TextWatcher() {
@@ -80,7 +85,7 @@ public class MainActivity extends Activity {
 	}
 
 	public void startGame(View v) {
-		Toast.makeText(this, "clicked " + ((Button) v).getText(), Toast.LENGTH_LONG).show();
+		//Toast.makeText(this, "clicked " + ((Button) v).getText(), Toast.LENGTH_LONG).show();
 		Class<? extends Activity> activity = null;
 		int id = v.getId();
 		

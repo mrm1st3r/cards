@@ -1,7 +1,6 @@
 package com.github.mrm1st3r.cards.connection;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.UUID;
 
 import android.bluetooth.BluetoothAdapter;
@@ -10,6 +9,9 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.util.Log;
 
+import com.github.mrm1st3r.btutil.AsyncBluetoothConnection;
+import com.github.mrm1st3r.btutil.BluetoothConnection;
+import com.github.mrm1st3r.btutil.OnConnectHandler;
 import com.github.mrm1st3r.cards.R;
 
 public class ServerThread extends Thread {
@@ -19,9 +21,11 @@ public class ServerThread extends Thread {
 	private final BluetoothServerSocket mmServerSocket;
 	private Context context = null;
 	private boolean closing = false;
+	private OnConnectHandler handler = null;
 
-	public ServerThread(final Context con) {
+	public ServerThread(final Context con, OnConnectHandler connHandler) {
 		context = con;
+		handler = connHandler;
 		// Use a temporary object that is later assigned to mmServerSocket,
 		// because mmServerSocket is final
 		BluetoothServerSocket tmp = null;
@@ -68,9 +72,9 @@ public class ServerThread extends Thread {
 
 	private void manageConnectedSocket(BluetoothSocket sock) {
 		Log.d(TAG, sock.getRemoteDevice().getAddress());
-		try {
-			PrintWriter out = new PrintWriter(sock.getOutputStream());
-			out.println("test 123");
+		/*try {
+			//PrintWriter out = new PrintWriter(sock.getOutputStream());
+			//out.println("test 123");
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -79,7 +83,10 @@ public class ServerThread extends Thread {
 			sock.close();
 		} catch (IOException e) {
 			Log.w(TAG, e);
-		}
+		}*/
+		BluetoothConnection conn = new AsyncBluetoothConnection(sock, null);
+		conn.start();
+		handler.onConnect(conn);
 	}
 
 	/** Will cancel the listening socket, and cause the thread to finish */
