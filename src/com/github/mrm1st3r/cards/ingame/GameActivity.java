@@ -21,7 +21,7 @@ public class GameActivity extends Activity {
 	
 	public void checkMessage(String msg){
 		if(msg == "active"){
-			active();
+			//active();
 		}
 		
 	}
