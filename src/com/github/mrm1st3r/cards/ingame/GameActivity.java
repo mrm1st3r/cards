@@ -15,17 +15,11 @@ public class GameActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle bun) {
 		super.onCreate(bun);
-<<<<<<< HEAD:src/com/github/mrm1st3r/cards/ingame/GameActivity.java
 		setContentView(R.layout.activity_game);
 
 		
-/*		Bundle bundle = getIntent().getExtras();
-		Player[] players = (Player[])bundle.get("players");
-=======
-
 		Bundle bundle = getIntent().getExtras();
 		Player[] players = (Player[]) bundle.get("players");
->>>>>>> 5a8e8b74998bf0db086e145af2617fc75a4254f2:src/com/github/mrm1stt3r/cards/ingame/GameActivity.java
 		int me = bundle.getInt("me");
 		int max = bundle.getInt("max");
 		int i = nextP(me, max, me);
@@ -59,22 +53,10 @@ public class GameActivity extends Activity {
 		} else {
 			i++;
 		}
-<<<<<<< HEAD:src/com/github/mrm1st3r/cards/ingame/GameActivity.java
-		while(i != me){
-			//ImageView image = (ImageView) findViewById(view);
-			//image.setImageResource(img);
-			if(i == max){
-				i = 0;
-			} else {
-				i ++;
-			}
-		}*/
-=======
 		if (i == me) {
 			i = nextP(i, max, me);
 		}
 		return i;
->>>>>>> 5a8e8b74998bf0db086e145af2617fc75a4254f2:src/com/github/mrm1stt3r/cards/ingame/GameActivity.java
 	}
 
 	public void waiting(Bundle bun) {
