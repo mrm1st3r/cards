@@ -113,14 +113,6 @@
         android:layout_alignRight="@+id/lbl_rival0"
         android:text="1 Karte" />
 
-    <ImageView
-        android:id="@+id/img_table0"
-        android:layout_width="99dp"
-        android:layout_height="121dp"
-        android:layout_above="@+id/btn_1card"
-        android:layout_alignLeft="@+id/btn_1card"
-        android:src="@drawable/card_backside" />
-
     <Button
         android:id="@+id/btn_push"
         style="?android:attr/buttonStyleSmall"
@@ -190,5 +182,13 @@
         android:layout_below="@+id/lbl_score0"
         android:text="0"
         android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <ImageView
+        android:id="@+id/img_table0"
+        android:layout_width="99dp"
+        android:layout_height="121dp"
+        android:layout_above="@+id/btn_1card"
+        android:layout_alignParentLeft="true"
+        android:src="@drawable/card_backside" />
 
 </RelativeLayout>

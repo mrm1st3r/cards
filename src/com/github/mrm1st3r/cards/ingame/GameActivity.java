@@ -1,8 +1,7 @@
 package com.github.mrm1st3r.cards.ingame;
 
 import com.github.mrm1st3r.cards.R;
-import com.github.mrm1st3r.cards.game.Card;
-import com.github.mrm1st3r.cards.game.Player;
+import com.github.mrm1st3r.cards.game.*;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -22,7 +21,7 @@ public class GameActivity extends Activity {
 	
 	public void checkMessage(String msg){
 		if(msg == "active"){
-			
+			active();
 		}
 		
 	}
