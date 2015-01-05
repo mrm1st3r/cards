@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -24,9 +23,11 @@ import com.github.mrm1st3r.btutil.OnConnectHandler;
 import com.github.mrm1st3r.btutil.OnDisconnectHandler;
 import com.github.mrm1st3r.btutil.OnMessageReceivedHandler;
 import com.github.mrm1st3r.btutil.ResultAction;
+import com.github.mrm1st3r.cards.Cards;
 import com.github.mrm1st3r.cards.MainActivity;
 import com.github.mrm1st3r.cards.R;
 import com.github.mrm1st3r.cards.connection.ServerThread;
+import com.github.mrm1st3r.cards.ingame.GameActivity;
 import com.github.mrm1st3r.util.HashMapAdapter;
 
 public class LobbyCreateActivity extends Activity {
@@ -146,6 +147,10 @@ public class LobbyCreateActivity extends Activity {
 				for (BluetoothConnection c : playerList.keySet()) {
 					((AsyncBluetoothConnection)c).write("join " + msg);
 				}
+				// send player list to new player
+				for (String player : playerList.values()) {
+					asConn.write("join " + player);
+				}
 			}
 		});
 		asConn.setOnDisconnectHandler(new OnDisconnectHandler() {
@@ -175,14 +180,21 @@ public class LobbyCreateActivity extends Activity {
 		SharedPreferences pref = getSharedPreferences(getString(R.string.pref_file), Context.MODE_PRIVATE);
 		String name = pref.getString(MainActivity.PREF_PLAYER_NAME, "");
 		asConn.write("join " + name);
-		// send player list to new player
-		for (String player : playerList.values()) {
-			asConn.write("join " + player);
-		}
+
 	}
 
 	public void start(View v) {
+		((Cards)getApplication()).connections = playerList;
 		
+		// send start command to clients and pause connections
+		for (BluetoothConnection conn : playerList.keySet()) {
+			AsyncBluetoothConnection asConn = (AsyncBluetoothConnection)conn;
+			asConn.write("start");
+			asConn.pause();
+		}
+		
+		Intent intent = new Intent(this, GameActivity.class);
+		startActivity(intent);
 	}
 
 	private void cancelLobby() {
@@ -213,17 +225,5 @@ public class LobbyCreateActivity extends Activity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.lobby_create, menu);
 		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
 	}
 }
