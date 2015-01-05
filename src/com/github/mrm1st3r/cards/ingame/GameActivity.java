@@ -13,7 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 public class GameActivity extends Activity {
-
+	
 	@Override
 	protected void onCreate(Bundle bun) {
 		super.onCreate(bun);
@@ -21,9 +21,10 @@ public class GameActivity extends Activity {
 	}
 	
 	public void checkMessage(String msg){
-		switch(msg){
-		case
+		if(msg == "active"){
+			
 		}
+		
 	}
 
 	public void waiting(Bundle bun) {
