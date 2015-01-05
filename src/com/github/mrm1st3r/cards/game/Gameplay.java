@@ -35,14 +35,15 @@ public class Gameplay {
 	 */
 	int dealer;
 
-	
 	/**
 	 * Konstruktor der Klasse "Gameplay".<br>
 	 * Die Anzahl der aktiven Spieler wird festgelegt.<br>
 	 * Ein Kartendeck wird erstellt und durchgemischt.
 	 * 
-	 * @param m	Anzahl teilnehmender Spieler
-	 * @param n	Anzahl Karten
+	 * @param m
+	 *            Anzahl teilnehmender Spieler
+	 * @param n
+	 *            Anzahl Karten
 	 */
 	public Gameplay(int m, int n) {
 		setMax(m);
@@ -54,10 +55,11 @@ public class Gameplay {
 	/**
 	 * Ein Kartendeck wird erstellt.
 	 * 
-	 * @param m	Anzahl der Karten im Deck
+	 * @param m
+	 *            Anzahl der Karten im Deck
 	 */
 	public void createCards(int m) {
-		last = m;
+		last = m - 1;
 		int index = m / 4;
 		cards = new Card[m];
 		for (int i = 0; i < 4; i++) {
@@ -139,7 +141,8 @@ public class Gameplay {
 	/**
 	 * Mischt ein Kartenstapel durch.
 	 * 
-	 * @param c Array mit Karten (Deck/ Stapel)
+	 * @param c
+	 *            Array mit Karten (Deck/ Stapel)
 	 */
 	public static void mixCards(Card[] c) {
 		int n = c.length;
@@ -154,9 +157,12 @@ public class Gameplay {
 	/**
 	 * Vertauscht 2 Karten eines Kartenstapels mit einander.
 	 * 
-	 * @param c			Kartenstapel
-	 * @param i			Index der 1. Karte
-	 * @param change	Index der 2. Karte	
+	 * @param c
+	 *            Kartenstapel
+	 * @param i
+	 *            Index der 1. Karte
+	 * @param change
+	 *            Index der 2. Karte
 	 */
 	private static void swapCards(Card[] c, int i, int change) {
 		Card helper = c[i];
@@ -167,7 +173,8 @@ public class Gameplay {
 	/**
 	 * Die i-te Karte wird aus dem Deck entfernt.
 	 * 
-	 * @param i	Index der zuentfernenden Karte
+	 * @param i
+	 *            Index der zuentfernenden Karte
 	 */
 	public void removeCard(int i) {
 		cards[i] = null;
@@ -176,7 +183,7 @@ public class Gameplay {
 	/**
 	 * Die oberste Karte vom Deck/ Stapel wird entfernt und zurückgegegeben.
 	 * 
-	 * @return	oberste Karte des Decks/ Stapels
+	 * @return oberste Karte des Decks/ Stapels
 	 */
 	public Card takeCard() {
 		if (cards[last] != null) {
@@ -199,14 +206,16 @@ public class Gameplay {
 			i++;
 		}
 	}
-	
+
 	/**
 	 * Fügt einen Spieler hinzu.
 	 * 
-	 * @param p	hinzuzufügender Spieler
-	 * @return	True/False, je nachdem, ob das Einfügen funktioniert hat oder nicht
+	 * @param p
+	 *            hinzuzufügender Spieler
+	 * @return True/False, je nachdem, ob das Einfügen funktioniert hat oder
+	 *         nicht
 	 */
-	public boolean addPlayer(Player p){
+	public boolean addPlayer(Player p) {
 		int i = 0;
 		while (players[i] != null && i < max - 1) {
 			i++;
@@ -231,7 +240,8 @@ public class Gameplay {
 	/**
 	 * Setter für {@link #players}
 	 * 
-	 * @param players um {@link #players} zu definieren
+	 * @param players
+	 *            um {@link #players} zu definieren
 	 */
 	public void setPlayers(Player[] players) {
 		this.players = players;
@@ -249,7 +259,8 @@ public class Gameplay {
 	/**
 	 * Setter für {@link #currP}
 	 * 
-	 * @param currP um {@link #currP} zu definieren
+	 * @param currP
+	 *            um {@link #currP} zu definieren
 	 */
 	public void setCurrP(int currP) {
 		this.currP = currP;
@@ -267,7 +278,8 @@ public class Gameplay {
 	/**
 	 * Setter für {@link #max}
 	 * 
-	 * @param max um {@link #max} zu definieren
+	 * @param max
+	 *            um {@link #max} zu definieren
 	 */
 	private void setMax(int max) {
 		this.max = max;

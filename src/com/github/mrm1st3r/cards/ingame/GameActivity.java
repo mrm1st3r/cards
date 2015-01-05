@@ -21,7 +21,9 @@ public class GameActivity extends Activity {
 	}
 	
 	public void checkMessage(String msg){
-		
+		switch(msg){
+		case
+		}
 	}
 
 	public void waiting(Bundle bun) {
