@@ -4,7 +4,7 @@ import com.github.mrm1st3r.cards.ingame.GameActivity;
 
 public class Localplayer extends Player {
 	
-	GameActivity conn;
+	GameActivity gameAct;
 
 	/**
 	 * @param n
@@ -17,19 +17,19 @@ public class Localplayer extends Player {
 	}
 
 	public GameActivity getConn() {
-		return conn;
+		return gameAct;
 	}
 
 	public void setConn(GameActivity conn) {
-		this.conn = conn;
+		this.gameAct = conn;
 	}
 
 	@Override
 	public void connect(final String msg){
-		conn.runOnUiThread(new Runnable() {
+		gameAct.runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				conn.checkMessage(msg);
+				gameAct.checkMessage(msg);
 			}
 		});
 	}	

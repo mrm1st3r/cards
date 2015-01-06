@@ -32,4 +32,9 @@ public class Gameclient extends GameActivity{
 		});
 		connection.unpause();
 	}
+
+	@Override
+	public void sendMessage(String msg) {
+		connection.write(msg);		
+	}
 }

@@ -49,4 +49,9 @@ public class Gamemaster extends GameActivity {
 		});
 		gameThread.start();
 	}
+
+	@Override
+	public void sendMessage(String msg) {
+		game.checkMessage(msg);	
+	}
 }

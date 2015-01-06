@@ -307,4 +307,9 @@ public class ThirtyOne extends Gameplay {
 	public void setStopped(int stopped) {
 		this.stopped = stopped;
 	}
+
+	public void checkMessage(String string) {
+		// TODO Auto-generated method stub
+		
+	}
 }
