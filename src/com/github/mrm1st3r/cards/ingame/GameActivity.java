@@ -21,13 +21,13 @@ public class GameActivity extends Activity {
 	public void checkMessage(String msg) {
 		if (msg == "active") {
 			// active();
-		} else if (msg == "wait"){
+		} else if (msg == "waiting"){
 			
 		} else if (msg == "lost"){
 			
 		} else if (msg == "takechoice"){
 			
-		} else if (msg == "message"){
+		} else if (msg == "nextround"){
 			
 		}
 		

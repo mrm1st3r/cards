@@ -219,7 +219,8 @@ public class Gameplay {
 	 */
 	public boolean addPlayer(Player p) {
 		int i = 0;
-		while (players[i] != null && i < max - 1) {
+		while (players[i] != null && i < max - 1
+				) {
 			i++;
 		}
 		if (players[i] == null) {
