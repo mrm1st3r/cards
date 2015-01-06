@@ -1,4 +1,4 @@
-package com.github.mrm1st3r.cards.connection;
+package com.github.mrm1st3r.connection;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -9,9 +9,6 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.util.Log;
 
-import com.github.mrm1st3r.btutil.AsyncBluetoothConnection;
-import com.github.mrm1st3r.btutil.BluetoothConnection;
-import com.github.mrm1st3r.btutil.OnConnectHandler;
 import com.github.mrm1st3r.cards.R;
 
 
@@ -22,10 +19,10 @@ public class ClientThread extends Thread {
 	private final BluetoothSocket mmSocket;
 	private final BluetoothDevice mmDevice;
 
-	private OnConnectHandler handler = null;
+	private OnConnectionChangeHandler handler = null;
 
 	public ClientThread(Context context, BluetoothDevice dev,
-			OnConnectHandler connHandler) {
+			OnConnectionChangeHandler connHandler) {
 
 		handler = connHandler;
 		// Use a temporary object that is later assigned to mmSocket,

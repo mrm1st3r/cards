@@ -10,25 +10,27 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.github.mrm1st3r.btutil.AsyncBluetoothConnection;
-import com.github.mrm1st3r.btutil.BluetoothConnection;
-import com.github.mrm1st3r.btutil.BtUtil;
-import com.github.mrm1st3r.btutil.OnConnectHandler;
-import com.github.mrm1st3r.btutil.OnDisconnectHandler;
-import com.github.mrm1st3r.btutil.OnMessageReceivedHandler;
-import com.github.mrm1st3r.btutil.ResultAction;
 import com.github.mrm1st3r.cards.Cards;
 import com.github.mrm1st3r.cards.MainActivity;
 import com.github.mrm1st3r.cards.R;
-import com.github.mrm1st3r.cards.connection.ServerThread;
 import com.github.mrm1st3r.cards.ingame.Gamemaster;
+import com.github.mrm1st3r.connection.AsyncBluetoothConnection;
+import com.github.mrm1st3r.connection.BluetoothConnection;
+import com.github.mrm1st3r.connection.OnConnectionChangeHandler;
+import com.github.mrm1st3r.connection.OnMessageReceivedHandler;
+import com.github.mrm1st3r.connection.ServerThread;
+import com.github.mrm1st3r.connection.bluetooth.BluetoothUtil;
 import com.github.mrm1st3r.util.HashMapAdapter;
+import com.github.mrm1st3r.util.ResultAction;
 
 public class LobbyCreateActivity extends Activity {
 
@@ -48,43 +50,38 @@ public class LobbyCreateActivity extends Activity {
 		super.onCreate(savedInstanceState);
 
 		// go back to start if bluetooth is not supported
-		if (!BtUtil.isSupported()) {
+		if (!BluetoothUtil.isSupported()) {
 			Toast.makeText(this, getString(
 					R.string.bluetooth_not_supported), Toast.LENGTH_LONG)
 					.show();
 			onBackPressed();
 		}
 
-		BtUtil.enable(this, new ResultAction() {
+		BluetoothUtil.enable(this, new ResultAction() {
 
 			@Override
 			public void onSuccess() {
 
-				BtUtil.enableDiscoverability(LobbyCreateActivity.this,
+				BluetoothUtil.enableDiscoverable(LobbyCreateActivity.this,
 						LOBBY_CREATE_TIMEOUT, new ResultAction() {
-
 					@Override
 					public void onSuccess() {
 						createLobby();
 					}
-
 					@Override
 					public void onFailure() {
 						onBackPressed();
 					}
-
 				});
 			}
-
 			@Override
 			public void onFailure() {
 				onBackPressed();
 			}
-
 		});
 
 		setContentView(R.layout.activity_lobby_create);
-		((TextView)findViewById(R.id.txtLobbyName)).setText(BtUtil.getDeviceName());
+		((TextView)findViewById(R.id.txtLobbyName)).setText(BluetoothUtil.getDeviceName());
 	}
 	
 	private void createLobby() {
@@ -114,7 +111,7 @@ public class LobbyCreateActivity extends Activity {
 				findFragmentById(R.id.player_list);
 		lobFrag.setAdapter(playerListAdapter);
 		
-		serv = new ServerThread(LobbyCreateActivity.this, new OnConnectHandler() {
+		serv = new ServerThread(LobbyCreateActivity.this, new OnConnectionChangeHandler() {
 			@Override
 			public void onConnect(final BluetoothConnection conn) {
 				clientConnected(conn);
@@ -168,7 +165,7 @@ public class LobbyCreateActivity extends Activity {
 				}
 			}
 		});
-		asConn.setOnDisconnectHandler(new OnDisconnectHandler() {
+		asConn.setOnDisconnectHandler(new OnConnectionChangeHandler() {
 			@Override
 			public void onDisconnect(BluetoothConnection conn) {
 				playerList.remove(asConn);
@@ -217,6 +214,10 @@ public class LobbyCreateActivity extends Activity {
 		playerList.clear();
 	}
 
+	public void becomeVisible(MenuItem item) {
+		BluetoothUtil.enableDiscoverable(this, LOBBY_CREATE_TIMEOUT, null);
+	}
+
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
@@ -226,7 +227,7 @@ public class LobbyCreateActivity extends Activity {
 	@Override
 	protected void onActivityResult(int reqCode, int resultCode, Intent data) {
 		super.onActivityResult(reqCode, resultCode, data);
-		if (BtUtil.onActivityResult(this, reqCode, resultCode, data)) {
+		if (BluetoothUtil.onActivityResult(this, reqCode, resultCode, data)) {
 			// Bluetooth results should be covered by BtUtil.
 			return;
 		}
@@ -237,5 +238,12 @@ public class LobbyCreateActivity extends Activity {
 	public void onBackPressed() {
 		super.onBackPressed();
 		cancelLobby();
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.lobby_create, menu);
+	    return true;
 	}
 }

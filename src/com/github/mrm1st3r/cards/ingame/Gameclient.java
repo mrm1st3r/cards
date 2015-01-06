@@ -2,10 +2,10 @@ package com.github.mrm1st3r.cards.ingame;
 
 import android.os.Bundle;
 
-import com.github.mrm1st3r.btutil.AsyncBluetoothConnection;
-import com.github.mrm1st3r.btutil.OnMessageReceivedHandler;
 import com.github.mrm1st3r.cards.Cards;
 import com.github.mrm1st3r.cards.R;
+import com.github.mrm1st3r.connection.AsyncBluetoothConnection;
+import com.github.mrm1st3r.connection.OnMessageReceivedHandler;
 
 public class Gameclient extends GameActivity{
 

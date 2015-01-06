@@ -4,12 +4,12 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
-import com.github.mrm1st3r.btutil.AsyncBluetoothConnection;
-import com.github.mrm1st3r.btutil.BluetoothConnection;
 import com.github.mrm1st3r.cards.Cards;
 import com.github.mrm1st3r.cards.MainActivity;
 import com.github.mrm1st3r.cards.R;
 import com.github.mrm1st3r.cards.game.*;
+import com.github.mrm1st3r.connection.AsyncBluetoothConnection;
+import com.github.mrm1st3r.connection.BluetoothConnection;
 
 public class Gamemaster extends GameActivity {
 

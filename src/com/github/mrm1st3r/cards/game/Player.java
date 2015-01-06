@@ -1,6 +1,6 @@
 package com.github.mrm1st3r.cards.game;
 
-import com.github.mrm1st3r.btutil.AsyncBluetoothConnection;
+import com.github.mrm1st3r.connection.AsyncBluetoothConnection;
 
 /**
  * Kartenspieler

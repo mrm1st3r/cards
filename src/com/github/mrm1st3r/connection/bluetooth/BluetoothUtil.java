@@ -1,4 +1,6 @@
-package com.github.mrm1st3r.btutil;
+package com.github.mrm1st3r.connection.bluetooth;
+
+import com.github.mrm1st3r.util.ResultAction;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -8,14 +10,15 @@ import android.util.SparseArray;
 /**
  * Utility class for managing Bluetooth connections.
  * @author Lukas 'mrm1st3r' Taake
+ * @version 1.1.0
  */
-public final class BtUtil {
+public final class BluetoothUtil {
 
 	/**
 	 * Debug tag.
 	 */
 	@SuppressWarnings("unused")
-	private static final String TAG = BtUtil.class.getSimpleName();
+	private static final String TAG = BluetoothUtil.class.getSimpleName();
 	/**
 	 * Request code for enabling bluetooth.
 	 */
@@ -37,8 +40,11 @@ public final class BtUtil {
 
 	/**
 	 * Hidden constructor for utility class.
+	 * @throws InstantiationException there should be no instances of this class
 	 */
-	private BtUtil() { }
+	private BluetoothUtil() throws InstantiationException {
+		throw new InstantiationException();
+	}
 
 	/**
 	 * @return Bluetooth support
@@ -67,12 +73,12 @@ public final class BtUtil {
 	}
 
 	/**
-	 * Enable Bluetooth discoverability.
+	 * Enable Bluetooth discoverable mode.
 	 * @param context application context
-	 * @param time number of seconds to activate discoverability
+	 * @param time number of seconds to be discoverable
 	 * @param act callback to be executed afterwards.
 	 */
-	public static void enableDiscoverability(final Activity context,
+	public static void enableDiscoverable(final Activity context,
 			final int time, final ResultAction act) {
 
 		Intent discoverableIntent =
@@ -82,8 +88,9 @@ public final class BtUtil {
 		
 		context.startActivityForResult(discoverableIntent,
 				REQUEST_ENABLE_DISCOVERABLE);
-
-		callbacks.put(REQUEST_ENABLE_DISCOVERABLE, act);
+		if (act != null) {
+			callbacks.put(REQUEST_ENABLE_DISCOVERABLE, act);
+		}
 	}
 
 	/**
@@ -105,9 +112,7 @@ public final class BtUtil {
 			return false;
 		}
 		callbacks.remove(reqCode);
-		
-		// Log.d(TAG, "Received result " + resultCode + " for code " + reqCode);
-		
+
 		if (resultCode != Activity.RESULT_CANCELED) {
 			act.onSuccess();
 		} else {
@@ -117,10 +122,16 @@ public final class BtUtil {
 		return true;
 	}
 
+	/**
+	 * Search for visible Bluetooth devices.
+	 */
 	public static void findDevices() {
 		
 	}
 
+	/**
+	 * @return this device's Bluetooth name
+	 */
 	public static String getDeviceName() {
 		return adapter.getName();
 	}

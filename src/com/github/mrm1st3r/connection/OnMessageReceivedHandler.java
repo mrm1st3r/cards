@@ -1,4 +1,4 @@
-package com.github.mrm1st3r.btutil;
+package com.github.mrm1st3r.connection;
 
 public interface OnMessageReceivedHandler {
 

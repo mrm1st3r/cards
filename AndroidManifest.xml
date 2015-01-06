@@ -16,11 +16,11 @@
         android:required="true" />
 
     <application
-        android:name="com.github.mrm1st3r.cards.Cards"
+        android:name=".Cards"
         android:allowBackup="true"
         android:icon="@drawable/logo"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme" >
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name" >
@@ -47,24 +47,36 @@
                 android:value="com.github.mrm1st3r.cards.MainActivity" />
         </activity>
         <activity
-            android:name="com.github.mrm1st3r.cards.lobby.LobbyActivity"
+            android:name=".lobby.LobbyActivity"
             android:label="@string/title_activity_lobby"
-            android:parentActivityName="com.github.mrm1st3r.cards.LobbyJoinActivity" >
+            android:parentActivityName=".LobbyJoinActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.github.mrm1st3r.cards.LobbyJoinActivity" />
         </activity>
         <activity
-            android:name="com.github.mrm1st3r.cards.ingame.GameActivity"
-            android:label="@string/title_activity_game">
+            android:name=".ingame.Gamemaster"
+            android:label="@string/title_activity_game" 
+            android:parentActivityName="com.github.mrm1st3r.cards.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.github.mrm1st3r.cards.MainActivity" />
         </activity>
-        <activity 
-            android:name="com.github.mrm1st3r.cards.ingame.Gamemaster"
-            android:label="@string/title_activity_game">
+        <activity
+            android:name=".ingame.Gameclient"
+            android:label="@string/title_activity_game" 
+            android:parentActivityName="com.github.mrm1st3r.cards.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.github.mrm1st3r.cards.MainActivity" />
         </activity>
-        <activity 
-            android:name="com.github.mrm1st3r.cards.ingame.Gameclient"
-            android:label="@string/title_activity_game">
+        <activity
+            android:name=".RulesActivity"
+            android:label="@string/title_activity_rules"
+            android:parentActivityName="com.github.mrm1st3r.cards.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.github.mrm1st3r.cards.MainActivity" />
         </activity>
     </application>
 

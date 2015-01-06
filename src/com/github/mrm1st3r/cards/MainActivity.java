@@ -19,6 +19,7 @@ public class MainActivity extends Activity {
 
 	public static final String PREF_PLAYER_NAME = "player_name";
 	
+	@SuppressWarnings("unused")
 	private static final String TAG = MainActivity.class.getSimpleName();
 	
 	private EditText inputPlayerName;
@@ -71,7 +72,7 @@ public class MainActivity extends Activity {
 		return true;
 	}
 
-	public void startGame(View v) {
+	public void onButtonPressed(View v) {
 		//Toast.makeText(this, "clicked " + ((Button) v).getText(), Toast.LENGTH_LONG).show();
 		Class<? extends Activity> activity = null;
 		int id = v.getId();
@@ -83,8 +84,9 @@ public class MainActivity extends Activity {
 		} else if (id == R.id.btn_bot_game) {
 			return;
 			// TODO: implement playing against computer
+		} else if (id == R.id.btn_rules) {
+			activity = RulesActivity.class;
 		} else {
-			// unknown action
 			return;
 		}
 		

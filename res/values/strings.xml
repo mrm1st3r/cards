@@ -27,5 +27,28 @@ Spielkarten von Charles Esquiaqui</string>
     <string name="cancel">Abbrechen</string>
     <string name="btn_rules">Regeln Anzeigen</string>
     <string name="connection_failed">Verbindung fehlgeschlagen</string>
+    <string name="title_activity_rules">Spielregeln</string>
+    <string name="rules"><b>Zu Beginn</b> einer Partie wird jedem Spieler ein Kartenstapel mit 3 Karten ausgeteilt.
+Der Geber gibt sich selbst 2 Kartenstapel, von denen er sich nur den ersten angucken darf
+und dann entscheiden muss, ob er diesen behält, oder lieber den unbekannten haben möchte.
+Der jeweils nicht ausgewählte Stapel wird offen auf den Tisch gelegt.
+Weitere drei Karten werden offen auf den Tisch gelegt.
+Danach geht es der Reihe nach im Uhrzeigersinn, angefangen beim Nebenmann des Gebers.\n
+\n
+<b>Während des Spiels</b> ist pro Zug eine von vier möglichen Aktionen erlaubt:\n
+- <b>Eine Karte tauschen</b> mit einer der Tischkarten\n
+- <b>Alle Karten tauschen</b> mit allen Tischkarten\n
+- <b>Schieben</b> nichts machen\n
+- <b>Zu machen</b>, alle anderen Spieler sind noch einmal an der Reihe, danach ist das Spiel beendet.\n
+\n
+<b>Ziel des Spiels</b> ist es, möglichst viele Punkte auf der Hand zu haben.
+        Dabei werden jeweils die Karten einer Farbe gezählt.
+        Zahlenkarten zählen jeweils ihren Wert,
+        Bube Dame und König zählen 10 Punkte und das Ass 11 Punkte.
+        Ein Sonderfall ist es, wenn man 3 Karten mit gleichem Bild auf der Hand hat,
+        diese Kombination zählt 30 1/2 Punkte. Ein weiterer Sonderfall sind drei Asse auf der Hand,
+        diese zählen 33 Punkte.\n
+<b>Gewonnen</b> hat am Ende der Spieler mit den meisten Punkten.</string>
+<string name="become_visible">Sichtbar werden</string>
 
 </resources>

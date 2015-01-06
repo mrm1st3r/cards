@@ -1,4 +1,4 @@
-package com.github.mrm1st3r.btutil;
+package com.github.mrm1st3r.connection;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,7 +34,7 @@ public class BufferedBluetoothConnection extends BluetoothConnection {
 		}
 		in = tmpIn;
 		out = tmpOut;
-		connection = sock;
+		super.setSocket(sock);
 	}
 
 	public void write(byte[] data) throws IOException {

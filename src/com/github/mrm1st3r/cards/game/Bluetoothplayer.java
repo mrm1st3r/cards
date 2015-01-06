@@ -1,7 +1,7 @@
 package com.github.mrm1st3r.cards.game;
 
-import com.github.mrm1st3r.btutil.AsyncBluetoothConnection;
-import com.github.mrm1st3r.btutil.OnMessageReceivedHandler;
+import com.github.mrm1st3r.connection.AsyncBluetoothConnection;
+import com.github.mrm1st3r.connection.OnMessageReceivedHandler;
 
 public class Bluetoothplayer extends Player{
 	
@@ -32,7 +32,7 @@ public class Bluetoothplayer extends Player{
 	}
 
 	/**
-	 * Getter für {@link #conn}
+	 * Getter fï¿½r {@link #conn}
 	 * 
 	 * @return {@link #conn}
 	 */

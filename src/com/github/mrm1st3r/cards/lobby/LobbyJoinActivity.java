@@ -23,15 +23,15 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.github.mrm1st3r.btutil.AsyncBluetoothConnection;
-import com.github.mrm1st3r.btutil.BluetoothConnection;
-import com.github.mrm1st3r.btutil.BtUtil;
-import com.github.mrm1st3r.btutil.OnConnectHandler;
-import com.github.mrm1st3r.btutil.ResultAction;
 import com.github.mrm1st3r.cards.Cards;
 import com.github.mrm1st3r.cards.R;
-import com.github.mrm1st3r.cards.connection.ClientThread;
+import com.github.mrm1st3r.connection.AsyncBluetoothConnection;
+import com.github.mrm1st3r.connection.BluetoothConnection;
+import com.github.mrm1st3r.connection.ClientThread;
+import com.github.mrm1st3r.connection.OnConnectionChangeHandler;
+import com.github.mrm1st3r.connection.bluetooth.BluetoothUtil;
 import com.github.mrm1st3r.util.HashMapAdapter;
+import com.github.mrm1st3r.util.ResultAction;
 
 public class LobbyJoinActivity extends Activity {
 
@@ -75,7 +75,7 @@ public class LobbyJoinActivity extends Activity {
 		setContentView(R.layout.activity_lobby_join);
 
 		// go back to start if bluetooth is not supported
-		if (!BtUtil.isSupported()) {
+		if (!BluetoothUtil.isSupported()) {
 			Toast.makeText(this, getString(
 					R.string.bluetooth_not_supported), Toast.LENGTH_LONG)
 					.show();
@@ -84,7 +84,7 @@ public class LobbyJoinActivity extends Activity {
 		
 		btnRefresh = (Button) findViewById(R.id.btnRefresh);
 		
-		BtUtil.enable(this, new ResultAction() {
+		BluetoothUtil.enable(this, new ResultAction() {
 
 			@Override
 			public void onSuccess() {
@@ -128,7 +128,7 @@ public class LobbyJoinActivity extends Activity {
 	protected void onActivityResult(int reqCode, int resultCode, Intent data) {
 		super.onActivityResult(reqCode, resultCode, data);
 
-		if (BtUtil.onActivityResult(this, reqCode, resultCode, data)) {
+		if (BluetoothUtil.onActivityResult(this, reqCode, resultCode, data)) {
 			// Bluetooth results should be covered by BtUtil.
 			return;
 		}
@@ -218,7 +218,7 @@ public class LobbyJoinActivity extends Activity {
 		});
 		dlgJoin.show();
 		
-		conn = new ClientThread(this, dev, new OnConnectHandler() {
+		conn = new ClientThread(this, dev, new OnConnectionChangeHandler() {
 			@Override
 			public void onConnect(BluetoothConnection conn) {
 				AsyncBluetoothConnection asConn = (AsyncBluetoothConnection) conn;
@@ -228,13 +228,10 @@ public class LobbyJoinActivity extends Activity {
 				((Cards)getApplication()).connections.clear();
 				((Cards)getApplication()).connections.put(asConn, null);
 				cancelSearch();
-				runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						Intent intent = new Intent(LobbyJoinActivity.this, LobbyActivity.class);
-						startActivity(intent);
-					}
-				});
+
+				Intent intent = new Intent(LobbyJoinActivity.this, LobbyActivity.class);
+				startActivity(intent);
+				finish();
 			}
 			@Override
 			public void onConnectionFailed(BluetoothDevice dev) {
@@ -256,7 +253,7 @@ public class LobbyJoinActivity extends Activity {
 	}
 
 	@Override
-	public void onBackPressed() {
+	public final void onBackPressed() {
 		super.onBackPressed();
 		cancelSearch();
 	}

@@ -11,21 +11,23 @@ import android.util.Log;
 import android.view.Menu;
 import android.widget.ArrayAdapter;
 
-import com.github.mrm1st3r.btutil.AsyncBluetoothConnection;
-import com.github.mrm1st3r.btutil.BluetoothConnection;
-import com.github.mrm1st3r.btutil.OnDisconnectHandler;
-import com.github.mrm1st3r.btutil.OnMessageReceivedHandler;
 import com.github.mrm1st3r.cards.Cards;
 import com.github.mrm1st3r.cards.MainActivity;
 import com.github.mrm1st3r.cards.R;
 import com.github.mrm1st3r.cards.ingame.Gameclient;
+import com.github.mrm1st3r.connection.AsyncBluetoothConnection;
+import com.github.mrm1st3r.connection.BluetoothConnection;
+import com.github.mrm1st3r.connection.OnConnectionChangeHandler;
+import com.github.mrm1st3r.connection.OnMessageReceivedHandler;
 
 public class LobbyActivity extends Activity {
 
 	private static final String TAG = LobbyActivity.class.getSimpleName();
 	
+	public static final String EXTRA_PLAYER_LIST = "EXTRA_PLAYER_LIST";
+	
 	private AsyncBluetoothConnection connection = null;
-	private LinkedList<String> players = new LinkedList<String>();
+	private LinkedList<String> playerList = new LinkedList<String>();
 	private ArrayAdapter<String> playerListAdapter;
 	private String name;
 	
@@ -34,7 +36,7 @@ public class LobbyActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_lobby);
 		playerListAdapter = new ArrayAdapter<String>(
-				this, android.R.layout.simple_list_item_1, players);
+				this, android.R.layout.simple_list_item_1, playerList);
 		LobbyFragment lobFrag = (LobbyFragment)getFragmentManager().
 				findFragmentById(R.id.player_list);
 		lobFrag.setAdapter(playerListAdapter);
@@ -58,13 +60,15 @@ public class LobbyActivity extends Activity {
 						String name = msg.substring(5);
 						Log.d(TAG, "received: " + msg + ", name: " + name);
 						if (msg.startsWith("join")) {
-							players.add(name);
+							playerList.add(name);
 							playerListAdapter.notifyDataSetChanged();
 						} else if (msg.startsWith("left")) {
-							players.remove(name);
+							playerList.remove(name);
 							playerListAdapter.notifyDataSetChanged();
 						} else if (msg.equals("start")) {
-							Intent intent = new Intent(LobbyActivity.this, Gameclient.class);
+							Intent intent = new Intent(LobbyActivity.this,
+									Gameclient.class);
+							intent.putExtra(EXTRA_PLAYER_LIST, playerList);
 							startActivity(intent);
 						}
 						
@@ -72,7 +76,7 @@ public class LobbyActivity extends Activity {
 				});
 			}
 		});
-		connection.setOnDisconnectHandler(new OnDisconnectHandler() {
+		connection.setOnDisconnectHandler(new OnConnectionChangeHandler() {
 			@Override
 			public void onDisconnect(BluetoothConnection conn) {
 				Intent i = new Intent(LobbyActivity.this, LobbyJoinActivity.class);
@@ -87,7 +91,7 @@ public class LobbyActivity extends Activity {
 			connection.close();
 			connection = null;
 		}
-		players.clear();
+		playerList.clear();
 	}
 
 	@Override
