@@ -1,4 +1,4 @@
-package com.github.mrm1st3r.connection;
+package com.github.mrm1st3r.connection.bluetooth;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -10,6 +10,8 @@ import android.content.Context;
 import android.util.Log;
 
 import com.github.mrm1st3r.cards.R;
+import com.github.mrm1st3r.connection.BluetoothConnection;
+import com.github.mrm1st3r.connection.OnConnectionChangeHandler;
 
 public class ServerThread extends Thread {
 	
@@ -80,7 +82,7 @@ public class ServerThread extends Thread {
 		} catch (IOException e) {
 			Log.w(TAG, e);
 		}*/
-		BluetoothConnection conn = new AsyncBluetoothConnection(sock, null);
+		SimpleBluetoothConnection conn = new SimpleBluetoothConnection(sock, null);
 		conn.start();
 		handler.onConnect(conn);
 	}

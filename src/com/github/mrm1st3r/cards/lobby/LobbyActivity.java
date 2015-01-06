@@ -15,10 +15,11 @@ import com.github.mrm1st3r.cards.Cards;
 import com.github.mrm1st3r.cards.MainActivity;
 import com.github.mrm1st3r.cards.R;
 import com.github.mrm1st3r.cards.ingame.Gameclient;
-import com.github.mrm1st3r.connection.AsyncBluetoothConnection;
-import com.github.mrm1st3r.connection.BluetoothConnection;
+import com.github.mrm1st3r.connection.AsynchronousConnection;
 import com.github.mrm1st3r.connection.OnConnectionChangeHandler;
-import com.github.mrm1st3r.connection.OnMessageReceivedHandler;
+import com.github.mrm1st3r.connection.OnReceivedHandler;
+import com.github.mrm1st3r.connection.ThreadedConnection;
+import com.github.mrm1st3r.connection.bluetooth.SimpleBluetoothConnection;
 
 public class LobbyActivity extends Activity {
 
@@ -26,7 +27,7 @@ public class LobbyActivity extends Activity {
 	
 	public static final String EXTRA_PLAYER_LIST = "EXTRA_PLAYER_LIST";
 	
-	private AsyncBluetoothConnection connection = null;
+	private SimpleBluetoothConnection connection = null;
 	private LinkedList<String> playerList = new LinkedList<String>();
 	private ArrayAdapter<String> playerListAdapter;
 	private String name;
@@ -42,7 +43,7 @@ public class LobbyActivity extends Activity {
 		lobFrag.setAdapter(playerListAdapter);
 		
 		// get connection to host from application
-		connection = (AsyncBluetoothConnection) ((Cards) getApplication()).connections.keySet().iterator().next();
+		connection = (SimpleBluetoothConnection) ((Cards) getApplication()).connections.keySet().iterator().next();
 
 		SharedPreferences pref = getSharedPreferences(getString(R.string.pref_file), Context.MODE_PRIVATE);
 		name = pref.getString(MainActivity.PREF_PLAYER_NAME, "");
@@ -51,9 +52,10 @@ public class LobbyActivity extends Activity {
 		connection.write("join " + name);
 		
 		// register new receive handler for incoming data
-		connection.setReceiveHandler(new OnMessageReceivedHandler() {
+		connection.setOnReceivedHandler(new OnReceivedHandler<String>() {
 			@Override
-			public void onMessageReceived(final String msg) {
+			public void onReceived(final AsynchronousConnection<String> conn,
+					final String msg) {
 				LobbyActivity.this.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
@@ -76,9 +78,9 @@ public class LobbyActivity extends Activity {
 				});
 			}
 		});
-		connection.setOnDisconnectHandler(new OnConnectionChangeHandler() {
+		connection.setOnConnectionChangeHandler(new OnConnectionChangeHandler() {
 			@Override
-			public void onDisconnect(BluetoothConnection conn) {
+			public void onDisconnect(ThreadedConnection conn) {
 				Intent i = new Intent(LobbyActivity.this, LobbyJoinActivity.class);
 				startActivity(i);
 			}

@@ -1,4 +1,4 @@
-package com.github.mrm1st3r.connection;
+package com.github.mrm1st3r.connection.bluetooth;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -10,9 +10,11 @@ import android.content.Context;
 import android.util.Log;
 
 import com.github.mrm1st3r.cards.R;
+import com.github.mrm1st3r.connection.BluetoothConnection;
+import com.github.mrm1st3r.connection.OnConnectionChangeHandler;
 
 
-public class ClientThread extends Thread {
+public class ClientThread extends ConnectThread {
 
 	private static final String TAG = ClientThread.class.getSimpleName();
 	private boolean closing = false;
@@ -66,16 +68,19 @@ public class ClientThread extends Thread {
 		}
 
 		// Do work to manage the connection (in a separate thread)
-		BluetoothConnection conn = new AsyncBluetoothConnection(mmSocket, null);
+		SimpleBluetoothConnection conn = new SimpleBluetoothConnection(mmSocket, null);
 		conn.start();
 		handler.onConnect(conn);
 	}
 
-	public void cancel() {
+	@Override
+	public final void cancel() {
 		try {
 			closing = true;
 			mmSocket.close();
-		} catch (IOException e) { }
+		} catch (IOException e) {
+			Log.d(TAG, e.toString());
+		}
 	}
 
 }

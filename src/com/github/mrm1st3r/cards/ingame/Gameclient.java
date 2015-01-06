@@ -4,23 +4,26 @@ import android.os.Bundle;
 
 import com.github.mrm1st3r.cards.Cards;
 import com.github.mrm1st3r.cards.R;
-import com.github.mrm1st3r.connection.AsyncBluetoothConnection;
-import com.github.mrm1st3r.connection.OnMessageReceivedHandler;
+import com.github.mrm1st3r.connection.AsynchronousConnection;
+import com.github.mrm1st3r.connection.OnReceivedHandler;
+import com.github.mrm1st3r.connection.bluetooth.SimpleBluetoothConnection;
 
 public class Gameclient extends GameActivity{
 
-	AsyncBluetoothConnection connection = null;
+	SimpleBluetoothConnection connection = null;
 	
 	@Override
 	public void onCreate(Bundle bun) {
 		super.onCreate(bun);
 		setContentView(R.layout.activity_game);
 		
-		connection = (AsyncBluetoothConnection) ((Cards) getApplication()).connections.keySet().iterator().next();
+		connection = (SimpleBluetoothConnection) ((Cards) getApplication()).
+				connections.keySet().iterator().next();
 
-		connection.setReceiveHandler(new OnMessageReceivedHandler() {
+		connection.setOnReceivedHandler(new OnReceivedHandler<String>() {
 			@Override
-			public void onMessageReceived(final String msg) {
+			public void onReceived(final AsynchronousConnection<String> conn,
+					final String msg) {
 				// logik
 				Gameclient.this.runOnUiThread(new Runnable() {
 					@Override

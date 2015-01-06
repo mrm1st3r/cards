@@ -15,7 +15,7 @@ public abstract class OnConnectionChangeHandler {
 	 * A new connection was established.
 	 * @param conn new established connection
 	 */
-	public void onConnect(final BluetoothConnection conn) {
+	public void onConnect(final ThreadedConnection conn) {
 		
 	}
 
@@ -30,7 +30,7 @@ public abstract class OnConnectionChangeHandler {
 	 * A connection was disconnected.
 	 * @param conn connection that was disconnected
 	 */
-	public void onDisconnect(final BluetoothConnection conn) {
+	public void onDisconnect(final ThreadedConnection conn) {
 		
 	}
 }

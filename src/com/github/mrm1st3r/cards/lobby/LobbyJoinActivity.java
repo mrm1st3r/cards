@@ -25,11 +25,11 @@ import android.widget.Toast;
 
 import com.github.mrm1st3r.cards.Cards;
 import com.github.mrm1st3r.cards.R;
-import com.github.mrm1st3r.connection.AsyncBluetoothConnection;
-import com.github.mrm1st3r.connection.BluetoothConnection;
-import com.github.mrm1st3r.connection.ClientThread;
 import com.github.mrm1st3r.connection.OnConnectionChangeHandler;
+import com.github.mrm1st3r.connection.ThreadedConnection;
 import com.github.mrm1st3r.connection.bluetooth.BluetoothUtil;
+import com.github.mrm1st3r.connection.bluetooth.ClientThread;
+import com.github.mrm1st3r.connection.bluetooth.SimpleBluetoothConnection;
 import com.github.mrm1st3r.util.HashMapAdapter;
 import com.github.mrm1st3r.util.ResultAction;
 
@@ -220,8 +220,8 @@ public class LobbyJoinActivity extends Activity {
 		
 		conn = new ClientThread(this, dev, new OnConnectionChangeHandler() {
 			@Override
-			public void onConnect(BluetoothConnection conn) {
-				AsyncBluetoothConnection asConn = (AsyncBluetoothConnection) conn;
+			public void onConnect(ThreadedConnection conn) {
+				SimpleBluetoothConnection asConn = (SimpleBluetoothConnection) conn;
 				Log.d(TAG, "joining lobby " + asConn.getDeviceName());
 				asConn.pause();
 				dlgJoin.dismiss();

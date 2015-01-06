@@ -1,8 +1,10 @@
-package com.github.mrm1st3r.connection;
+package com.github.mrm1st3r.connection.bluetooth;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
+import com.github.mrm1st3r.connection.BluetoothConnection;
 
 import android.bluetooth.BluetoothSocket;
 import android.util.Log;

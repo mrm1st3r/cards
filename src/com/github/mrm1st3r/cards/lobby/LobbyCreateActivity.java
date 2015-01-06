@@ -23,12 +23,14 @@ import com.github.mrm1st3r.cards.Cards;
 import com.github.mrm1st3r.cards.MainActivity;
 import com.github.mrm1st3r.cards.R;
 import com.github.mrm1st3r.cards.ingame.Gamemaster;
-import com.github.mrm1st3r.connection.AsyncBluetoothConnection;
+import com.github.mrm1st3r.connection.AsynchronousConnection;
 import com.github.mrm1st3r.connection.BluetoothConnection;
 import com.github.mrm1st3r.connection.OnConnectionChangeHandler;
-import com.github.mrm1st3r.connection.OnMessageReceivedHandler;
-import com.github.mrm1st3r.connection.ServerThread;
+import com.github.mrm1st3r.connection.OnReceivedHandler;
+import com.github.mrm1st3r.connection.ThreadedConnection;
 import com.github.mrm1st3r.connection.bluetooth.BluetoothUtil;
+import com.github.mrm1st3r.connection.bluetooth.ServerThread;
+import com.github.mrm1st3r.connection.bluetooth.SimpleBluetoothConnection;
 import com.github.mrm1st3r.util.HashMapAdapter;
 import com.github.mrm1st3r.util.ResultAction;
 
@@ -39,9 +41,9 @@ public class LobbyCreateActivity extends Activity {
 
 	private ServerThread serv = null;
 
-	private HashMap<BluetoothConnection, String> playerList=
-			new HashMap<BluetoothConnection, String>();
-	private HashMapAdapter<BluetoothConnection, String> playerListAdapter = null;
+	private HashMap<SimpleBluetoothConnection, String> playerList=
+			new HashMap<SimpleBluetoothConnection, String>();
+	private HashMapAdapter<SimpleBluetoothConnection, String> playerListAdapter = null;
 	
 	private Button btnStart = null;
 
@@ -86,7 +88,7 @@ public class LobbyCreateActivity extends Activity {
 	
 	private void createLobby() {
 		btnStart = (Button) findViewById(R.id.btnStart);
-		playerListAdapter = new HashMapAdapter<BluetoothConnection, String>(
+		playerListAdapter = new HashMapAdapter<SimpleBluetoothConnection, String>(
 				LobbyCreateActivity.this, playerList) {
 			@Override
 			public View getView(int pos, View convertView,
@@ -113,7 +115,7 @@ public class LobbyCreateActivity extends Activity {
 		
 		serv = new ServerThread(LobbyCreateActivity.this, new OnConnectionChangeHandler() {
 			@Override
-			public void onConnect(final BluetoothConnection conn) {
+			public void onConnect(final ThreadedConnection conn) {
 				clientConnected(conn);
 			}
 			@Override
@@ -125,13 +127,13 @@ public class LobbyCreateActivity extends Activity {
 
 	}
 
-	private void clientConnected(BluetoothConnection conn) {
+	private void clientConnected(ThreadedConnection conn) {
 		// new connection for each player
-		final AsyncBluetoothConnection asConn = (AsyncBluetoothConnection) conn;
+		final SimpleBluetoothConnection asConn = (SimpleBluetoothConnection) conn;
 		
-		asConn.setReceiveHandler(new OnMessageReceivedHandler() {
+		asConn.setOnReceivedHandler(new OnReceivedHandler<String>() {
 			@Override
-			public void onMessageReceived(final String msg) {
+			public void onReceived(final AsynchronousConnection<String> conn, final String msg) {
 				
 				// send player list to new player
 				for (String player : playerList.values()) {
@@ -160,14 +162,14 @@ public class LobbyCreateActivity extends Activity {
 				});
 				
 				// send new player name to other players
-				for (BluetoothConnection c : playerList.keySet()) {
-					((AsyncBluetoothConnection)c).write(msg);
+				for (SimpleBluetoothConnection c : playerList.keySet()) {
+					c.write(msg);
 				}
 			}
 		});
-		asConn.setOnDisconnectHandler(new OnConnectionChangeHandler() {
+		asConn.setOnConnectionChangeHandler(new OnConnectionChangeHandler() {
 			@Override
-			public void onDisconnect(BluetoothConnection conn) {
+			public void onDisconnect(final ThreadedConnection conn) {
 				playerList.remove(asConn);
 				LobbyCreateActivity.this.runOnUiThread(new Runnable() {
 					@Override
@@ -181,8 +183,8 @@ public class LobbyCreateActivity extends Activity {
 					}
 				});
 				// send leave note to other player
-				for (BluetoothConnection c : playerList.keySet()) {
-					((AsyncBluetoothConnection)c).write("left " + playerList.get(conn));
+				for (SimpleBluetoothConnection c : playerList.keySet()) {
+					c.write("left " + playerList.get(conn));
 				}
 			}
 		});
@@ -192,10 +194,9 @@ public class LobbyCreateActivity extends Activity {
 		((Cards)getApplication()).connections = playerList;
 		
 		// send start command to clients and pause connections
-		for (BluetoothConnection conn : playerList.keySet()) {
-			AsyncBluetoothConnection asConn = (AsyncBluetoothConnection)conn;
-			asConn.write("start");
-			asConn.pause();
+		for (SimpleBluetoothConnection conn : playerList.keySet()) {
+			conn.write("start");
+			conn.pause();
 		}
 		// stop listening for new connections.
 		serv.cancel();
@@ -208,7 +209,7 @@ public class LobbyCreateActivity extends Activity {
 		if (serv != null) {
 			serv.cancel();
 		}
-		for (BluetoothConnection conn : playerList.keySet()) {
+		for (SimpleBluetoothConnection conn : playerList.keySet()) {
 			conn.close();
 		}
 		playerList.clear();

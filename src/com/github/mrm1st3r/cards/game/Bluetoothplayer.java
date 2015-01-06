@@ -1,22 +1,24 @@
 package com.github.mrm1st3r.cards.game;
 
-import com.github.mrm1st3r.connection.AsyncBluetoothConnection;
-import com.github.mrm1st3r.connection.OnMessageReceivedHandler;
+import com.github.mrm1st3r.connection.AsynchronousConnection;
+import com.github.mrm1st3r.connection.OnReceivedHandler;
+import com.github.mrm1st3r.connection.bluetooth.SimpleBluetoothConnection;
 
 public class Bluetoothplayer extends Player{
 	
 	/**
 	 * Connection des Spielers
 	 */
-	AsyncBluetoothConnection conn;
+	SimpleBluetoothConnection connection;
 
-	public Bluetoothplayer(String n, int m, AsyncBluetoothConnection conn) {
+	public Bluetoothplayer(String n, int m, SimpleBluetoothConnection conn) {
 		super(n, m);
 		setConn(conn);
 		
-		conn.setReceiveHandler(new OnMessageReceivedHandler() {
+		conn.setOnReceivedHandler(new OnReceivedHandler<String>() {
 			@Override
-			public void onMessageReceived(String msg) {
+			public void onReceived(final AsynchronousConnection<String> conn,
+					final String msg) {
 				
 				// tu was
 				synchronized (game.playerLock) {
@@ -28,25 +30,25 @@ public class Bluetoothplayer extends Player{
 
 	@Override
 	public void connect(String msg){
-		conn.write(msg);
+		connection.write(msg);
 	}
 
 	/**
-	 * Getter f�r {@link #conn}
+	 * Getter f�r {@link #connection}
 	 * 
-	 * @return {@link #conn}
+	 * @return {@link #connection}
 	 */
-	public AsyncBluetoothConnection getConn() {
-		return conn;
+	public SimpleBluetoothConnection getConn() {
+		return connection;
 	}
 
 	/**
-	 * Setter f�r {@link #conn}
+	 * Setter f�r {@link #connection}
 	 * 
-	 * @param conn um {@link #conn} zu definieren
+	 * @param conn um {@link #connection} zu definieren
 	 */
-	public void setConn(AsyncBluetoothConnection conn) {
-		this.conn = conn;
+	public void setConn(SimpleBluetoothConnection conn) {
+		this.connection = conn;
 	}
 	
 }
