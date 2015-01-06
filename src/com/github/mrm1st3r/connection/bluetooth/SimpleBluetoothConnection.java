@@ -10,7 +10,6 @@ import android.bluetooth.BluetoothSocket;
 import android.util.Log;
 
 import com.github.mrm1st3r.connection.AsynchronousConnection;
-import com.github.mrm1st3r.connection.BluetoothConnection;
 import com.github.mrm1st3r.connection.OnConnectionChangeHandler;
 import com.github.mrm1st3r.connection.OnReceivedHandler;
 import com.github.mrm1st3r.connection.ThreadedConnection;
@@ -24,7 +23,9 @@ import com.github.mrm1st3r.connection.ThreadedConnection;
  * @author Lukas Taake
  * @version 1.1.0
  */
-public class SimpleBluetoothConnection extends ThreadedConnection implements AsynchronousConnection<String> {
+public class SimpleBluetoothConnection
+extends ThreadedConnection
+implements AsynchronousConnection<String> {
 
 	/**
 	 * Tag for logging.
@@ -63,7 +64,7 @@ public class SimpleBluetoothConnection extends ThreadedConnection implements Asy
 
 	/**
 	 * Create a new connection without any handlers.
-	 * @param sock raw connection to use
+	 * @param sock Socket to use
 	 */
 	public SimpleBluetoothConnection(final BluetoothSocket sock) {
 		this(sock, null, null);
@@ -71,7 +72,7 @@ public class SimpleBluetoothConnection extends ThreadedConnection implements Asy
 
 	/**
 	 * Create a new connection with only a message handler.
-	 * @param sock raw connection to use.
+	 * @param sock Socket to use
 	 * @param inHand message handler
 	 */
 	public SimpleBluetoothConnection(final BluetoothSocket sock,
@@ -80,14 +81,15 @@ public class SimpleBluetoothConnection extends ThreadedConnection implements Asy
 	}
 
 	/**
-	 * Create a new connection.
-	 * @param sock underlying socket connection
+	 * Create a new connection with receive and connection handler.
+	 * @param sock Socket to use
 	 * @param inHand message handler
 	 * @param dcHand disconnect handler
 	 */
 	public SimpleBluetoothConnection(final BluetoothSocket sock,
 			final OnReceivedHandler<String> inHand,
 			final OnConnectionChangeHandler dcHand) {
+
 		BufferedReader tmpIn = null;
 		PrintWriter tmpOut = null;
 
@@ -106,10 +108,6 @@ public class SimpleBluetoothConnection extends ThreadedConnection implements Asy
 		connectionHandler = dcHand;
 	}
 
-	/**
-	 * 
-	 * @param newHand
-	 */
 	@Override
 	public final void setOnReceivedHandler(
 			final OnReceivedHandler<String> newHand) {
@@ -121,10 +119,10 @@ public class SimpleBluetoothConnection extends ThreadedConnection implements Asy
 			final OnConnectionChangeHandler newHand) {
 		connectionHandler = newHand;
 	}
-	
+
 	@Override
 	protected final void onRun() {
-		
+
 	}
 
 	@Override
@@ -197,8 +195,8 @@ public class SimpleBluetoothConnection extends ThreadedConnection implements Asy
 		out.println(str);
 		out.flush();
 	}
-	
+
 	public void close() {
-		
+
 	}
 }

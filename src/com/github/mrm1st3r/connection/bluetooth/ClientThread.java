@@ -6,75 +6,113 @@ import java.util.UUID;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.content.Context;
 import android.util.Log;
 
-import com.github.mrm1st3r.cards.R;
-import com.github.mrm1st3r.connection.BluetoothConnection;
 import com.github.mrm1st3r.connection.OnConnectionChangeHandler;
 
-
+/**
+ * Helper thread to establish a bluetooth connection as a client.
+ * 
+ * Using a separate thread to establish a new bluetooth connection
+ * is useful, because {@link BluetoothSocket#connect()} will block
+ * as long as it takes to finish connecting (what might include
+ * a confirmative user input).
+ * 
+ * @author Lukas 'mrm1st3r' Taake
+ * @version 1.1.0
+ */
 public class ClientThread extends ConnectThread {
 
+	/**
+	 * Debug tag.
+	 */
 	private static final String TAG = ClientThread.class.getSimpleName();
+	/**
+	 * Closing flag.
+	 */
 	private boolean closing = false;
+	/**
+	 * Socket that is opened while connecting.
+	 */
 	private final BluetoothSocket mmSocket;
+	/**
+	 * Remote device that should be connected to.
+	 */
 	private final BluetoothDevice mmDevice;
 
-	private OnConnectionChangeHandler handler = null;
+	/**
+	 * Create a new client thread for a given remote device and service UUID.
+	 * @param dev Remote device to connect to
+	 * @param uuid Service UUID that is also used by server application
+	 */
+	public ClientThread(final BluetoothDevice dev, final UUID uuid) {
 
-	public ClientThread(Context context, BluetoothDevice dev,
-			OnConnectionChangeHandler connHandler) {
-
-		handler = connHandler;
-		// Use a temporary object that is later assigned to mmSocket,
-		// because mmSocket is final
 		BluetoothSocket tmp = null;
-		mmDevice = dev;
 
-		// Get a BluetoothSocket to connect with the given BluetoothDevice
 		try {
-			// MY_UUID is the app's UUID string, also used by the server code
-			tmp = mmDevice.createRfcommSocketToServiceRecord(UUID.fromString(
-					context.getString(
-							R.string.bt_uuid)));
+			tmp = dev.createRfcommSocketToServiceRecord(uuid);
 		} catch (IOException e) {
 			Log.w(TAG, e);
 		}
-		mmSocket = tmp;
 
+		mmSocket = tmp;
+		mmDevice = dev;
+	}
+
+	/**
+	 * Create a new client thread for a given remote device and service UUID
+	 * and register a callback handler.
+	 * @param dev Remote device to connect to
+	 * @param uuid Service UUID that is also used by server application
+	 * @param connHandler callback handler to be registered
+	 */
+	public ClientThread(final BluetoothDevice dev, final UUID uuid,
+			final OnConnectionChangeHandler connHandler) {
+		this(dev, uuid);
+		setOnConnectionChangeHandler(connHandler);
 	}
 
 	@Override
-	public void run() {
-		// Cancel discovery because it will slow down the connection
+	public final void run() {
+		
+		// Cancel discovery as is would slow down the connection
 		BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
 
 		try {
-			// Connect the device through the socket. This will block
-			// until it succeeds or throws an exception
+			// Try to connect to the remote device
 			mmSocket.connect();
-		} catch (IOException connectException) {
+		} catch (Exception connectException) {
+
+			// Don't react if the connection was ment to be closed
 			if (closing) {
 				return;
 			}
+
 			Log.w(TAG, connectException);
-			handler.onConnectionFailed(mmDevice);
-			// Unable to connect; close the socket and get out
+			if (getHandler() != null) {
+				getHandler().onConnectionFailed(mmDevice);
+			}
+
 			try {
 				mmSocket.close();
-			} catch (IOException closeException) { }
+			} catch (IOException closeException) {
+				Log.d(TAG, "Exception during closing...");
+			}
 			return;
 		}
 
-		// Do work to manage the connection (in a separate thread)
-		SimpleBluetoothConnection conn = new SimpleBluetoothConnection(mmSocket, null);
+		// Create a new asynchronous connection object for the
+		// established connection
+		SimpleBluetoothConnection conn =
+				new SimpleBluetoothConnection(mmSocket, null);
 		conn.start();
-		handler.onConnect(conn);
+		if (getHandler() != null) {
+			getHandler().onConnect(conn);
+		}
 	}
 
 	@Override
-	public final void cancel() {
+	public final void close() {
 		try {
 			closing = true;
 			mmSocket.close();

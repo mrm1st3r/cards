@@ -1,6 +1,7 @@
 package com.github.mrm1st3r.cards.lobby;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
@@ -113,7 +114,9 @@ public class LobbyCreateActivity extends Activity {
 				findFragmentById(R.id.player_list);
 		lobFrag.setAdapter(playerListAdapter);
 		
-		serv = new ServerThread(LobbyCreateActivity.this, new OnConnectionChangeHandler() {
+		serv = new ServerThread(getString(R.string.app_name),
+				UUID.fromString(getString(R.string.bt_uuid)),
+				new OnConnectionChangeHandler() {
 			@Override
 			public void onConnect(final ThreadedConnection conn) {
 				clientConnected(conn);
@@ -199,7 +202,7 @@ public class LobbyCreateActivity extends Activity {
 			conn.pause();
 		}
 		// stop listening for new connections.
-		serv.cancel();
+		serv.close();
 		
 		Intent intent = new Intent(this, Gamemaster.class);
 		startActivity(intent);
@@ -207,7 +210,7 @@ public class LobbyCreateActivity extends Activity {
 
 	private void cancelLobby() {
 		if (serv != null) {
-			serv.cancel();
+			serv.close();
 		}
 		for (SimpleBluetoothConnection conn : playerList.keySet()) {
 			conn.close();

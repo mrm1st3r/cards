@@ -6,36 +6,63 @@ import java.util.UUID;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
-import android.content.Context;
 import android.util.Log;
 
-import com.github.mrm1st3r.cards.R;
-import com.github.mrm1st3r.connection.BluetoothConnection;
 import com.github.mrm1st3r.connection.OnConnectionChangeHandler;
 
-public class ServerThread extends Thread {
-	
+/**
+ * Helper thread to create a {@link BluetoothServerSocket} and
+ * wait for incoming client connections.
+ * 
+ * Using a separate thread to wait for new bluetooth connections
+ * is useful, because {@link BluetoothServerSocket#accept()} will block
+ * until a new connection is established.
+ * 
+ * @author Lukas 'mrm1st3r' Taake
+ * @version 1.1.0
+ */
+public class ServerThread extends ConnectThread {
+
+	/**
+	 * Debug tag.
+	 */
 	private static final String TAG = ServerThread.class.getSimpleName();
-
+	/**
+	 * Socket to listen for incoming connections.
+	 */
 	private final BluetoothServerSocket mmServerSocket;
-	private Context context = null;
+	/**
+	 * Closing flag.
+	 */
 	private boolean closing = false;
-	private OnConnectionChangeHandler handler = null;
 
-	public ServerThread(final Context con, OnConnectionChangeHandler connHandler) {
-		context = con;
-		handler = connHandler;
-		// Use a temporary object that is later assigned to mmServerSocket,
-		// because mmServerSocket is final
+	/**
+	 * Create a new server thread and listen with a given service name
+	 * and UUID and register a callback handler.
+	 * @param name Service name
+	 * @param uuid Service UUID
+	 * @param handler callback handler to be registered
+	 */
+	public ServerThread(final String name, final UUID uuid,
+			final OnConnectionChangeHandler handler) {
+
+		this(name, uuid);
+		setOnConnectionChangeHandler(handler);
+	}
+
+	/**
+	 * Create a new server thread and listen with a given service name
+	 * and UUID.
+	 * @param name Service name
+	 * @param uuid Service UUID
+	 */
+	public ServerThread(final String name, final UUID uuid) {
+
 		BluetoothServerSocket tmp = null;
 		try {
 			// open bluetooth server-socket
 			tmp = BluetoothAdapter.getDefaultAdapter().
-					listenUsingRfcommWithServiceRecord(
-							context.getString(R.string.app_name),
-							UUID.fromString(
-									context.getString(
-											R.string.bt_uuid)));
+					listenUsingRfcommWithServiceRecord(name, uuid);
 		} catch (IOException e) {
 			Log.w(TAG, e);
 		}
@@ -43,52 +70,43 @@ public class ServerThread extends Thread {
 	}
 
 	@Override
-	public void run() {
-		if (mmServerSocket == null) {
-			return;
-		}
-		BluetoothSocket socket = null;
-		// Keep listening until exception occurs or a socket is returned
+	public final void run() {
+
+		Log.d(TAG, "start listening for incoming connections");
+
 		while (true) {
+			BluetoothSocket socket = null;
+
 			try {
-				Log.d(TAG, "waiting for connection");
 				socket = mmServerSocket.accept();
-				Log.d(TAG, "Incoming connection... " + socket);
-			} catch (IOException e) {
-				if (closing) {
-					return;
+				SimpleBluetoothConnection conn = 
+						new SimpleBluetoothConnection(socket, null);
+
+				Log.d(TAG, "incoming connection from "
+						+ socket.getRemoteDevice().getName());
+
+				if (getHandler() != null) {
+					getHandler().onConnect(conn);
 				}
+			} catch (Exception e) {
+				// catch all exceptions to also get NullPointers if creating
+				// mmServerSocket failed
+
+				if (closing) {
+					break;
+				}
+
 				Log.w(TAG, e);
+				if (getHandler() != null) {
+					getHandler().onConnectionFailed(null);
+				}
 				break;
 			}
-			// If a connection was accepted
-			if (socket != null) {
-				manageConnectedSocket(socket);
-			}
 		}
 	}
 
-	private void manageConnectedSocket(BluetoothSocket sock) {
-		Log.d(TAG, sock.getRemoteDevice().getAddress());
-		/*try {
-			//PrintWriter out = new PrintWriter(sock.getOutputStream());
-			//out.println("test 123");
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		try {
-			sock.close();
-		} catch (IOException e) {
-			Log.w(TAG, e);
-		}*/
-		SimpleBluetoothConnection conn = new SimpleBluetoothConnection(sock, null);
-		conn.start();
-		handler.onConnect(conn);
-	}
-
-	/** Will cancel the listening socket, and cause the thread to finish */
-	public void cancel() {
+	@Override
+	public final void close() {
 		try {
 			closing = true;
 			mmServerSocket.close();
@@ -96,5 +114,4 @@ public class ServerThread extends Thread {
 			Log.w(TAG, e);
 		}
 	}
-
 }

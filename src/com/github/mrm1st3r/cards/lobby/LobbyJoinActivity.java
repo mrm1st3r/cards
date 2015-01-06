@@ -1,6 +1,8 @@
 package com.github.mrm1st3r.cards.lobby;
 
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.UUID;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -29,6 +31,7 @@ import com.github.mrm1st3r.connection.OnConnectionChangeHandler;
 import com.github.mrm1st3r.connection.ThreadedConnection;
 import com.github.mrm1st3r.connection.bluetooth.BluetoothUtil;
 import com.github.mrm1st3r.connection.bluetooth.ClientThread;
+import com.github.mrm1st3r.connection.bluetooth.ConnectThread;
 import com.github.mrm1st3r.connection.bluetooth.SimpleBluetoothConnection;
 import com.github.mrm1st3r.util.HashMapAdapter;
 import com.github.mrm1st3r.util.ResultAction;
@@ -209,16 +212,20 @@ public class LobbyJoinActivity extends Activity {
 		dlgJoin.setCanceledOnTouchOutside(false);
 		dlgJoin.setMessage(getResources().getString(R.string.joining));
 		dlgJoin.setButton(ProgressDialog.BUTTON_NEGATIVE, 
-				getResources().getString(R.string.cancel), new DialogInterface.OnClickListener() {
+				getResources().getString(R.string.cancel),
+				new DialogInterface.OnClickListener() {
 					
 					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						conn.cancel();
+					public void onClick(final DialogInterface dialog, 
+							final int which) {
+							conn.close();
 					}
 		});
 		dlgJoin.show();
 		
-		conn = new ClientThread(this, dev, new OnConnectionChangeHandler() {
+		conn = new ClientThread(dev, 
+				UUID.fromString(getString(R.string.bt_uuid)),
+				new OnConnectionChangeHandler() {
 			@Override
 			public void onConnect(ThreadedConnection conn) {
 				SimpleBluetoothConnection asConn = (SimpleBluetoothConnection) conn;
@@ -242,7 +249,9 @@ public class LobbyJoinActivity extends Activity {
 				runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						Toast.makeText(LobbyJoinActivity.this, getResources().getString(R.string.connection_failed), Toast.LENGTH_SHORT).show();
+						Toast.makeText(LobbyJoinActivity.this, getResources().
+								getString(R.string.connection_failed),
+								Toast.LENGTH_SHORT).show();
 						mDeviceAdapter.notifyDataSetChanged();
 					}
 				});
