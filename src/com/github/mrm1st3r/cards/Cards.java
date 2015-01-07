@@ -4,7 +4,6 @@ import java.util.HashMap;
 
 import android.app.Application;
 
-import com.github.mrm1st3r.connection.BluetoothConnection;
 import com.github.mrm1st3r.connection.bluetooth.SimpleBluetoothConnection;
 
 public class Cards extends Application {

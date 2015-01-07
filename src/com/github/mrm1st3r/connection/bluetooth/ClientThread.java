@@ -74,7 +74,7 @@ public class ClientThread extends ConnectThread {
 
 	@Override
 	public final void run() {
-		
+
 		// Cancel discovery as is would slow down the connection
 		BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
 
@@ -83,12 +83,13 @@ public class ClientThread extends ConnectThread {
 			mmSocket.connect();
 		} catch (Exception connectException) {
 
-			// Don't react if the connection was ment to be closed
+			// Don't react if the connection was meant to be closed
 			if (closing) {
 				return;
 			}
 
 			Log.w(TAG, connectException);
+
 			if (getHandler() != null) {
 				getHandler().onConnectionFailed(mmDevice);
 			}
@@ -105,7 +106,7 @@ public class ClientThread extends ConnectThread {
 		// established connection
 		SimpleBluetoothConnection conn =
 				new SimpleBluetoothConnection(mmSocket, null);
-		conn.start();
+
 		if (getHandler() != null) {
 			getHandler().onConnect(conn);
 		}

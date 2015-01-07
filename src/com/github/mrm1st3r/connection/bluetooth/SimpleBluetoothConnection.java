@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.bluetooth.BluetoothSocket;
 import android.util.Log;
@@ -46,14 +45,6 @@ implements AsynchronousConnection<String> {
 	 */
 	private OnReceivedHandler<String> messageHandler;
 	/**
-	 * Handler that is called, when the connection get's lost.
-	 */
-	private OnConnectionChangeHandler connectionHandler;
-	/**
-	 * Indicator for pausing the connection.
-	 */
-	private AtomicBoolean pausing = new AtomicBoolean(false);
-	/**
 	 * Buffer for data that is read while connection gets paused.
 	 */
 	private String buffer = null;
@@ -67,28 +58,6 @@ implements AsynchronousConnection<String> {
 	 * @param sock Socket to use
 	 */
 	public SimpleBluetoothConnection(final BluetoothSocket sock) {
-		this(sock, null, null);
-	}
-
-	/**
-	 * Create a new connection with only a message handler.
-	 * @param sock Socket to use
-	 * @param inHand message handler
-	 */
-	public SimpleBluetoothConnection(final BluetoothSocket sock,
-			final OnReceivedHandler<String> inHand) {
-		this(sock, inHand, null);
-	}
-
-	/**
-	 * Create a new connection with receive and connection handler.
-	 * @param sock Socket to use
-	 * @param inHand message handler
-	 * @param dcHand disconnect handler
-	 */
-	public SimpleBluetoothConnection(final BluetoothSocket sock,
-			final OnReceivedHandler<String> inHand,
-			final OnConnectionChangeHandler dcHand) {
 
 		BufferedReader tmpIn = null;
 		PrintWriter tmpOut = null;
@@ -104,8 +73,31 @@ implements AsynchronousConnection<String> {
 		in = tmpIn;
 		out = tmpOut;
 		socket = sock;
-		messageHandler = inHand;
-		connectionHandler = dcHand;
+	}
+
+	/**
+	 * Create a new connection with only a message handler.
+	 * @param sock Socket to use
+	 * @param inHand message handler
+	 */
+	public SimpleBluetoothConnection(final BluetoothSocket sock,
+			final OnReceivedHandler<String> inHand) {
+		this(sock);
+		setOnReceivedHandler(inHand);
+	}
+
+	/**
+	 * Create a new connection with receive and connection handler.
+	 * @param sock Socket to use
+	 * @param inHand message handler
+	 * @param dcHand disconnect handler
+	 */
+	public SimpleBluetoothConnection(final BluetoothSocket sock,
+			final OnReceivedHandler<String> inHand,
+			final OnConnectionChangeHandler dcHand) {
+		this(sock);
+		setOnReceivedHandler(inHand);
+		setOnConnectionChangeHandler(dcHand);
 	}
 
 	@Override
@@ -114,89 +106,50 @@ implements AsynchronousConnection<String> {
 		messageHandler = newHand;
 	}
 
+
+
 	@Override
-	public final void setOnConnectionChangeHandler(
-			final OnConnectionChangeHandler newHand) {
-		connectionHandler = newHand;
+	protected final void onRun() throws IOException {
+		String str = in.readLine();
+		Log.d(TAG, "incoming: " + str);
+		if (str == null) {
+			return;
+		}
+		if (isPaused()) {
+			buffer = str;
+			return;
+		}
+		if (messageHandler != null) {
+			messageHandler.onReceived(this, str);
+		}
 	}
-
 	@Override
-	protected final void onRun() {
-
-	}
-
-	@Override
-	public final void run() {
-		String str;
-		while (true) {
-			synchronized (pausing) {
-				if (pausing.get()) {
-					try {
-						pausing.wait();
-						// received message while paused
-						if (buffer != null && messageHandler != null) {
-							messageHandler.onReceived(this, buffer);
-							buffer = null;
-						}
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			}
-			try {
-				str = in.readLine();
-				Log.d(TAG, "incoming: " + str);
-				if (str == null) {
-					continue;
-				}
-				if (pausing.get()) {
-					buffer = str;
-					continue;
-				}
-				if (messageHandler != null) {
-					messageHandler.onReceived(this, str);
-				}
-			} catch (IOException e) {
-				if (pausing.get()) {
-					Log.w(TAG, "connection error while paused");
-					// error might 
-					continue;
-				}
-
-				close();
-
-				if (connectionHandler != null) {
-					connectionHandler.onDisconnect(this);
-				}
-				break;
-			}
+	protected final void onResume() {
+		if (buffer != null && messageHandler != null) {
+			messageHandler.onReceived(this, buffer);
+			buffer = null;
 		}
 	}
 
-	public void pause() {
-		synchronized (pausing) {
-			pausing.set(true);
-		}
-	}
-
-	public void unpause() {
-		synchronized (pausing) {
-			pausing.set(false);
-			pausing.notify();
-		}
-	}
-
-	public String getDeviceName() {
+	/**
+	 * @return The remote devices name
+	 */
+	public final String getDeviceName() {
 		return socket.getRemoteDevice().getName();
 	}
 
-	public void write(String str) {
+	@Override
+	public final void write(final String str) {
 		out.println(str);
 		out.flush();
 	}
 
-	public void close() {
-
-	}
+	@Override
+	public final void close() {
+		try {
+			socket.close();
+		} catch (IOException e) {
+			Log.w(TAG, e);
+		}
+	}	
 }

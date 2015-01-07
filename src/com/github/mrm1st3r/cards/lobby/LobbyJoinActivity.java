@@ -150,7 +150,7 @@ public class LobbyJoinActivity extends Activity {
 							ViewGroup parent) {
 						TextView rowView;
 						if (convertView == null) {
-						LayoutInflater inflater = (LayoutInflater) context
+						LayoutInflater inflater = (LayoutInflater) getContext()
 								.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 						rowView = (TextView) inflater.inflate(
 								android.R.layout.simple_list_item_1, parent, false);

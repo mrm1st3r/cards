@@ -25,7 +25,6 @@ import com.github.mrm1st3r.cards.MainActivity;
 import com.github.mrm1st3r.cards.R;
 import com.github.mrm1st3r.cards.ingame.Gamemaster;
 import com.github.mrm1st3r.connection.AsynchronousConnection;
-import com.github.mrm1st3r.connection.BluetoothConnection;
 import com.github.mrm1st3r.connection.OnConnectionChangeHandler;
 import com.github.mrm1st3r.connection.OnReceivedHandler;
 import com.github.mrm1st3r.connection.ThreadedConnection;
@@ -96,7 +95,7 @@ public class LobbyCreateActivity extends Activity {
 					ViewGroup parent) {
 				TextView rowView;
 				if (convertView == null) {
-					LayoutInflater inflater = (LayoutInflater) context
+					LayoutInflater inflater = (LayoutInflater) getContext()
 							.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 					rowView = (TextView) inflater.inflate(
 							android.R.layout.simple_list_item_1, parent, false);
@@ -120,10 +119,6 @@ public class LobbyCreateActivity extends Activity {
 			@Override
 			public void onConnect(final ThreadedConnection conn) {
 				clientConnected(conn);
-			}
-			@Override
-			public void onConnectionFailed(BluetoothDevice dev) {
-				
 			}
 		});
 		serv.start();
