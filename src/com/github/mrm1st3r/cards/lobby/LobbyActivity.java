@@ -12,7 +12,6 @@ import android.view.Menu;
 import android.widget.ArrayAdapter;
 
 import com.github.mrm1st3r.cards.Cards;
-import com.github.mrm1st3r.cards.MainActivity;
 import com.github.mrm1st3r.cards.R;
 import com.github.mrm1st3r.cards.ingame.Gameclient;
 import com.github.mrm1st3r.connection.AsynchronousConnection;
@@ -21,96 +20,146 @@ import com.github.mrm1st3r.connection.OnReceivedHandler;
 import com.github.mrm1st3r.connection.ThreadedConnection;
 import com.github.mrm1st3r.connection.bluetooth.SimpleBluetoothConnection;
 
+/**
+ * This activity shows all players who are connected in this lobby
+ * and will start the actual game activity when receiving the
+ * appropriate command from the game host.
+ * 
+ * @author Lukas 'mrm1st3r' Taake
+ *
+ */
 public class LobbyActivity extends Activity {
 
+	/**
+	 * Debug tag.
+	 */
 	private static final String TAG = LobbyActivity.class.getSimpleName();
-	
+	/**
+	 * Used as a extra field to hand over the player list to the game activity.
+	 */
 	public static final String EXTRA_PLAYER_LIST = "EXTRA_PLAYER_LIST";
-	
-	private SimpleBluetoothConnection connection = null;
+	/**
+	 * Bluetooth connection to game host.
+	 */
+	private SimpleBluetoothConnection conn = null;
+	/**
+	 * List of all connected players.
+	 */
 	private LinkedList<String> playerList = new LinkedList<String>();
+	/**
+	 * Adapter for {@link #playerList}.
+	 */
 	private ArrayAdapter<String> playerListAdapter;
+	/**
+	 * Local player name.
+	 */
 	private String name;
 	
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	protected final void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_lobby);
+		
+		// initialize user interface
+		
 		playerListAdapter = new ArrayAdapter<String>(
 				this, android.R.layout.simple_list_item_1, playerList);
-		LobbyFragment lobFrag = (LobbyFragment)getFragmentManager().
+		LobbyFragment lobFrag = (LobbyFragment) getFragmentManager().
 				findFragmentById(R.id.player_list);
 		lobFrag.setAdapter(playerListAdapter);
 		
 		// get connection to host from application
-		connection = (SimpleBluetoothConnection) ((Cards) getApplication()).connections.keySet().iterator().next();
+		conn = ((Cards) getApplication()).getConnections().keySet().
+				iterator().next();
 
-		SharedPreferences pref = getSharedPreferences(getString(R.string.pref_file), Context.MODE_PRIVATE);
-		name = pref.getString(MainActivity.PREF_PLAYER_NAME, "");
+		SharedPreferences pref = getSharedPreferences(
+				Cards.PREF_FILE, Context.MODE_PRIVATE);
+		name = pref.getString(Cards.PREF_PLAYER_NAME, "");
 
 		// send own name to host
-		connection.write("join " + name);
+		conn.write("join " + name);
 		
 		// register new receive handler for incoming data
-		connection.setOnReceivedHandler(new OnReceivedHandler<String>() {
+		conn.setOnReceivedHandler(new OnReceivedHandler<String>() {
 			@Override
-			public void onReceived(final AsynchronousConnection<String> conn,
+			public void onReceived(final AsynchronousConnection<String> ac,
 					final String msg) {
-				LobbyActivity.this.runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						String name = msg.substring(5);
-						Log.d(TAG, "received: " + msg + ", name: " + name);
-						if (msg.startsWith("join")) {
-							playerList.add(name);
-							playerListAdapter.notifyDataSetChanged();
-						} else if (msg.startsWith("left")) {
-							playerList.remove(name);
-							playerListAdapter.notifyDataSetChanged();
-						} else if (msg.equals("start")) {
-							Intent intent = new Intent(LobbyActivity.this,
-									Gameclient.class);
-							intent.putExtra(EXTRA_PLAYER_LIST, playerList);
-							startActivity(intent);
-						}
-						
-					}
-				});
+				handleIncomingMessage(msg);
 			}
 		});
-		connection.setOnConnectionChangeHandler(new OnConnectionChangeHandler() {
+
+		conn.setOnConnectionChangeHandler(new OnConnectionChangeHandler() {
 			@Override
-			public void onDisconnect(ThreadedConnection conn) {
-				Intent i = new Intent(LobbyActivity.this, LobbyJoinActivity.class);
-				startActivity(i);
+			public void onDisconnect(final ThreadedConnection tc) {
+				onBackPressed();
 			}
 		});
-		connection.unpause();
+		conn.unpause();
 	}
-	
+
+	/**
+	 * Handle incoming messages.
+	 * @param msg incoming mesage
+	 */
+	private void handleIncomingMessage(final String msg) {
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				String[] set = msg.split(" ");
+
+				if (set[0].equals("join")) {
+					playerList.add(set[1]);
+					playerListAdapter.notifyDataSetChanged();
+					
+				} else if (set[0].equals("left")) {
+					playerList.remove(set[0]);
+					playerListAdapter.notifyDataSetChanged();
+					
+				} else if (set[0].equals("start")) {
+					
+					Intent intent = new Intent(LobbyActivity.this,
+							Gameclient.class);
+					intent.putExtra(EXTRA_PLAYER_LIST, playerList);
+					startActivity(intent);
+					finish();
+				} else if (set[0].equals("quit")) {
+					onBackPressed();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Close connection to game host and unregister connection change handler
+	 * to prevent any double quitting.
+	 */
 	private void leaveLobby() {
-		if (connection != null) {
-			connection.close();
-			connection = null;
+		Log.d(TAG, "leaving lobby");
+		
+		conn.setOnConnectionChangeHandler(null);
+		
+		if (conn != null) {
+			conn.close();
+			conn = null;
 		}
 		playerList.clear();
 	}
 
 	@Override
-	public void onDestroy() {
+	public final void onDestroy() {
 		super.onDestroy();
 		leaveLobby();
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
+	public final boolean onCreateOptionsMenu(final Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.lobby, menu);
 		return true;
 	}
 
 	@Override
-	public void onBackPressed() {
+	public final void onBackPressed() {
 		super.onBackPressed();
 		leaveLobby();
 	}

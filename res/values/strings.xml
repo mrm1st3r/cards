@@ -13,9 +13,7 @@
 Spielkarten von Charles Esquiaqui</string>
     <string name="title_activity_lobby_create">Neues Spiel</string>
     <string name="title_activity_lobby_join">Spiel beitreten</string>
-    <string name="pref_file">com.github.mrm1st3r.cards.preferences</string>
     <string name="bluetooth_not_supported">Bluetooth nicht vom Gerät unterstützt</string>
-    <string name="bt_uuid">1dbb8dc0-6f38-11e4-9803-0800200c9a66</string>
     <string name="refresh">Aktualisieren</string>
     <string name="lobbyName">Lobby Name:</string>
     <string name="title_activity_lobby">Lobby</string>
@@ -50,5 +48,6 @@ Danach geht es der Reihe nach im Uhrzeigersinn, angefangen beim Nebenmann des Ge
         diese zählen 33 Punkte.\n
 <b>Gewonnen</b> hat am Ende der Spieler mit den meisten Punkten.</string>
 <string name="become_visible">Sichtbar werden</string>
+<string name="refresh_failed">Fehler beim Aktualisieren</string>
 
 </resources>
