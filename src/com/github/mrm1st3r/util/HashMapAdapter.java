@@ -6,32 +6,62 @@ import java.util.Iterator;
 import android.content.Context;
 import android.widget.BaseAdapter;
 
+/**
+ * Base adapter for HashMap based lists.
+ * @author Lukas 'mrm1st3r' Taake
+ *
+ * @param <K> key data type
+ * @param <V> value data type
+ */
 public abstract class HashMapAdapter<K, V> extends BaseAdapter {
-	
-	private HashMap<K, V> mData = null;
-	protected Context context;
 
-	public HashMapAdapter(Context c, HashMap<K, V> data) {
+	/**
+	 * Wrapped HashMap.
+	 */
+	private HashMap<K, V> mData = null;
+	/**
+	 * Current application context.
+	 */
+	private Context context;
+
+	/**
+	 * Create a new HashMapAdapter.
+	 * @param c application context
+	 * @param data data structure to be used
+	 */
+	public HashMapAdapter(final Context c, final HashMap<K, V> data) {
 		mData  = data;
 		context = c;
 	}
 
 	@Override
-	public int getCount() {
+	public final int getCount() {
 		return mData.size();
 	}
 
 	@Override
-	public V getItem(int position) {
+	public final V getItem(final int position) {
 		return mData.get(getKey(position));
 	}
 
 	@Override
-	public long getItemId(int arg0) {
-		return arg0;
+	public final long getItemId(final int position) {
+		return position;
 	}
 
-	protected K getKey(int pos) {
+	/**
+	 * @return The current set application context
+	 */
+	public final Context getContext() {
+		return context;
+	}
+
+	/**
+	 * Get the key for a key-value pair.
+	 * @param pos The pairs position inside the data structure
+	 * @return The key
+	 */
+	protected final K getKey(final int pos) {
 		Iterator<K> it = mData.keySet().iterator();
 		K key = null;
 		for (int i = 0; i <= pos; i++) {

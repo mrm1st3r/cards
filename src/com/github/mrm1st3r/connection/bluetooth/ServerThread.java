@@ -95,11 +95,13 @@ public class ServerThread extends ConnectThread {
 				if (closing) {
 					break;
 				}
-
+				close();
 				Log.w(TAG, e);
+
 				if (getHandler() != null) {
 					getHandler().onConnectionFailed(null);
 				}
+
 				break;
 			}
 		}
