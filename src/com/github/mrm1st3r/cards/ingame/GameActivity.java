@@ -18,9 +18,7 @@ public abstract class GameActivity extends Activity {
 	String[] table = new String[3];
 	String bg = "card_backside";
 	String checkedTable = null;
-	View vTable = null;
 	String checkedHand = null;
-	View vHand = null;
 
 	@Override
 	protected void onCreate(Bundle bun) {
@@ -34,10 +32,10 @@ public abstract class GameActivity extends Activity {
 			active();
 		} else if (parts[0] == "inactive") {
 			inactive();
-		} else if (parts[0] == "lost") {
-			lost();
 		} else if (parts[0] == "nextround") {
 			nextRound();
+		} else if (parts[0] == "nextroundchoice") {
+			nextRoundChoice();
 		} else if (parts[0] == "takechoice") {
 			takeChoice(parts[1], parts[2], parts[3]);
 		} else if (parts[0] == "hand") {
@@ -72,15 +70,16 @@ public abstract class GameActivity extends Activity {
 		switchButton(R.id.btn_allcards, false);
 		switchButton(R.id.btn_push, false);
 	}
-
-	private void lost() {
+	
+	private void nextRound(){
 		inactive();
 		table = null;
 		hand = null;
 		showTable();
+		showHand();
 	}
 	
-	private void nextRound(){
+	private void nextRoundChoice(){
 		alertBox(
 				"Ihre Wahl",
 				"Nächste Runde",
@@ -201,27 +200,52 @@ public abstract class GameActivity extends Activity {
 	}
 	
 	public void img_table(View view) {
-		String resName = getResourceNameFromClassByID(R.drawable.class, R.drawable.);
-
+		switch(view.getId()){
+		case R.id.img_table0:
+			checkedTable = table[0];
+			break;
+		case R.id.img_table1:
+			checkedTable = table[1];
+			break;
+		case R.id.img_table2:
+			checkedTable = table[2];
+			break;
+		}
 	}
 
 	public void img_hand(View view) {
-		sendMessage("swapall");
+		switch(view.getId()){
+		case R.id.img_hand0:
+			checkedHand = hand[0];
+			break;
+		case R.id.img_hand1:
+			checkedHand = hand[1];
+			break;
+		case R.id.img_hand2:
+			checkedHand = hand[2];
+			break;
+		}
 	}
 
 	public void btn_1card(View view) {
-		
+		if(checkedTable != null && checkedHand != null){
+			inactive();
+			sendMessage("swap " + checkedHand + " " + checkedTable);
+		}
 	}
 
 	public void btn_allcards(View view) {
+		inactive();
 		sendMessage("swapall");
 	}
 
 	public void btn_knock(View view) {
+		inactive();
 		sendMessage("close");
 	}
 
 	public void btn_push(View view) {
+		inactive();
 		sendMessage("push");
 	}
 	

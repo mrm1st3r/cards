@@ -8,7 +8,7 @@ import java.util.Random;
  * @author Sergius Maier
  * @version 0.8
  */
-public class Gameplay {
+public abstract class Gameplay {
 
 	public final Object playerLock = new Object();
 
@@ -152,7 +152,7 @@ public class Gameplay {
 		random.nextInt();
 		for (int i = 0; i < n; i++) {
 			int change = i + random.nextInt(n - i);
-			swapCards(c, i, change);
+			swapCards(c, c, i, change);
 		}
 	}
 
@@ -166,10 +166,10 @@ public class Gameplay {
 	 * @param change
 	 *            Index der 2. Karte
 	 */
-	private static void swapCards(Card[] c, int i, int change) {
-		Card helper = c[i];
-		c[i] = c[change];
-		c[change] = helper;
+	protected static void swapCards(Card[] one, Card[] two, int i, int change) {
+		Card helper = one[i];
+		one[i] = two[change];
+		two[change] = helper;
 	}
 
 	/**
@@ -288,4 +288,6 @@ public class Gameplay {
 	private void setMax(int max) {
 		this.max = max;
 	}
+	
+	public abstract void checkMessage(String msg);
 }

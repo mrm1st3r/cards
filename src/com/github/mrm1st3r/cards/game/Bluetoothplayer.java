@@ -19,9 +19,8 @@ public class Bluetoothplayer extends Player{
 			@Override
 			public void onReceived(final AsynchronousConnection<String> conn,
 					final String msg) {
-				
-				// tu was
 				synchronized (game.playerLock) {
+					game.checkMessage(msg);
 					game.playerLock.notify();
 				}
 			}

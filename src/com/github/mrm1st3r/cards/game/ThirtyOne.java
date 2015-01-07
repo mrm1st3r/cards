@@ -2,6 +2,8 @@ package com.github.mrm1st3r.cards.game;
 
 import java.util.Random;
 
+import com.github.mrm1st3r.cards.R;
+
 /**
  * Erweitert die Klasse "Gameplay".<br>
  * Hauptklasse f�r das Spiel "ThirtyOne" / Schwimmen.
@@ -308,8 +310,25 @@ public class ThirtyOne extends Gameplay {
 		this.stopped = stopped;
 	}
 
-	public void checkMessage(String string) {
-		// TODO Auto-generated method stub
-		
+	public void checkMessage(String msg) {
+		String[] parts = msg.split(" ");
+		if (parts[0] == "swap") {
+			swapCards(table, players[currP].hand, Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
+		} else if (parts[0] == "swapall") {
+			for(int i = 0; i < hmax; i++){
+				swapCards(table, players[currP].hand, i, i);
+			}
+		} else if (parts[0] == "close") {
+			nextRound();
+		} else if (parts[0] == "push") {
+			nextRoundChoice();
+		} else if (parts[0] == "choice") {
+			takeChoice(parts[1], parts[2], parts[3]);
+		} else if (parts[0] == "nextround") {
+			hand[0] = parts[1];
+			hand[1] = parts[2];
+			hand[2] = parts[3];
+			showHand();
+		}
 	}
 }
