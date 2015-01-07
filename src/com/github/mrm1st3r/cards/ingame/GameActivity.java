@@ -201,7 +201,7 @@ public abstract class GameActivity extends Activity {
 	}
 	
 	public void img_table(View view) {
-		String resName = getResourceNameFromClassByID(R.drawable.class, R.drawable.imagename);
+		String resName = getResourceNameFromClassByID(R.drawable.class, R.drawable.);
 
 	}
 
