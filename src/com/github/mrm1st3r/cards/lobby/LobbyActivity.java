@@ -91,10 +91,15 @@ public class LobbyActivity extends Activity {
 		conn.setOnConnectionChangeHandler(new OnConnectionChangeHandler() {
 			@Override
 			public void onDisconnect(final ThreadedConnection tc) {
-				onBackPressed();
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						onBackPressed();
+					}
+				});
 			}
 		});
-		conn.unpause();
+		conn.start();
 	}
 
 	/**
@@ -136,9 +141,8 @@ public class LobbyActivity extends Activity {
 	private void leaveLobby() {
 		Log.d(TAG, "leaving lobby");
 		
-		conn.setOnConnectionChangeHandler(null);
-		
 		if (conn != null) {
+			conn.setOnConnectionChangeHandler(null);
 			conn.close();
 			conn = null;
 		}

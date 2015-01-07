@@ -224,9 +224,7 @@ public class LobbyCreateActivity extends Activity {
 		});
 		
 		// send leave note to remaining player
-		for (SimpleBluetoothConnection c : playerList.keySet()) {
-			c.write("left " + leftPlayer);
-		}
+		broadcast("left " + leftPlayer);
 	}
 
 	/**
@@ -250,9 +248,7 @@ public class LobbyCreateActivity extends Activity {
 			playerList.put(conn, set[1]);
 			
 			// send new player name to other players
-			for (SimpleBluetoothConnection c : playerList.keySet()) {
-				c.write(msg);
-			}
+			broadcast(msg);
 			
 			runOnUiThread(new Runnable() {
 				@Override
@@ -273,6 +269,17 @@ public class LobbyCreateActivity extends Activity {
 	}
 
 	/**
+	 * Send a message to all connected clients.
+	 * @param msg Message to send
+	 */
+	private void broadcast(final String msg) {
+		for (SimpleBluetoothConnection c : playerList.keySet()) {
+			if (c != null) {
+				c.write(msg);
+			}
+		}
+	}
+	/**
 	 * Close the server thread, notify all connected clients and
 	 * start the actual game.
 	 * @param v Calling user interface element
@@ -280,6 +287,8 @@ public class LobbyCreateActivity extends Activity {
 	public final void start(final View v) {
 		((Cards) getApplication()).setConnections(playerList);
 
+		playerList.remove(null);
+		
 		// send start command to clients and pause connections
 		for (SimpleBluetoothConnection conn : playerList.keySet()) {
 			conn.write("start");
@@ -299,6 +308,7 @@ public class LobbyCreateActivity extends Activity {
 		if (serv != null) {
 			serv.close();
 		}
+		playerList.remove(null);
 		for (SimpleBluetoothConnection conn : playerList.keySet()) {
 			conn.write("quit");
 			conn.close();
