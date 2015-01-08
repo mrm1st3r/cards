@@ -36,6 +36,8 @@ public abstract class GameActivity extends Activity {
 			lastround();
 		} else if (parts[0] == "nextround") {
 			nextRound();
+		} else if (parts[0] == "newgame") {
+			newGameChoice();
 		} else if (parts[0] == "nextroundchoice") {
 			nextRoundChoice();
 		} else if (parts[0] == "takechoice") {
@@ -100,9 +102,14 @@ public abstract class GameActivity extends Activity {
 		showHand();
 	}
 
-	private void nextRoundChoice() {
-		alertBox("Ihre Wahl", "Nächste Runde", "Ja", "Nein", "nextround yes",
+	private void newGameChoice() {
+		alertBox("Ihre Wahl", "Neues Spiel", "Ja", "Nein", "nextround yes",
 				"nextround no");
+	}
+	
+	private void nextRoundChoice() {
+		alertBox("Ihre Wahl", "Nächste Runde", "Ja", "Nein", "newgame yes",
+				"newgame no");
 	}
 
 	private void takeChoice() {
