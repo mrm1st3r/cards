@@ -11,8 +11,8 @@ public class Bluetoothplayer extends Player{
 	 */
 	SimpleBluetoothConnection connection;
 
-	public Bluetoothplayer(String n, int m, SimpleBluetoothConnection conn) {
-		super(n, m);
+	public Bluetoothplayer(String n, int m, int l, SimpleBluetoothConnection conn) {
+		super(n, m, l);
 		setConn(conn);
 		
 		conn.setOnReceivedHandler(new OnReceivedHandler<String>() {

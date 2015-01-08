@@ -49,11 +49,23 @@ public abstract class GameActivity extends Activity {
 			table[2] = parts[3];
 			showTable();
 		} else if (parts[0] == "msg") {
-			changeText(R.id.lbl_message, parts[1]);
+			String str = "";
+			for(String s: parts){
+				if (s != "msg"){
+					str = str + s;
+				}
+			}
+			changeText(R.id.lbl_message, str);
 		} else if (parts[0] == "score") {
 			changeText(R.id.lbl_score1, parts[1]);
 		} else if (parts[0] == "life") {
 			changeText(R.id.lbl_life1, parts[1]);
+		} else if (parts[0] == "players") {
+			changeText(R.id.lbl_rival0, parts[1]);
+			if (parts[2] != null)
+				changeText(R.id.lbl_rival1, parts[2]);
+			if (parts[3] != null)
+				changeText(R.id.lbl_rival2, parts[3]);
 		}
 	}
 
@@ -70,20 +82,18 @@ public abstract class GameActivity extends Activity {
 		switchButton(R.id.btn_allcards, false);
 		switchButton(R.id.btn_push, false);
 	}
-	
-	private void nextRound(){
+
+	private void nextRound() {
 		inactive();
 		table = null;
 		hand = null;
 		showTable();
 		showHand();
 	}
-	
-	private void nextRoundChoice(){
-		alertBox(
-				"Ihre Wahl",
-				"Nächste Runde",
-				"Ja", "Nein", "nextround 0", "nextround 1");
+
+	private void nextRoundChoice() {
+		alertBox("Ihre Wahl", "Nächste Runde", "Ja", "Nein", "nextround 0",
+				"nextround 1");
 	}
 
 	private void takeChoice(String str0, String str1, String str2) {
@@ -157,7 +167,8 @@ public abstract class GameActivity extends Activity {
 		}
 	}
 
-	private void alertBox(String title, String msg, String yes, String no, final String yesMsg, final String noMsg) {
+	private void alertBox(String title, String msg, String yes, String no,
+			final String yesMsg, final String noMsg) {
 		final Context context = this;
 		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
 				context);
@@ -193,14 +204,14 @@ public abstract class GameActivity extends Activity {
 		Button btn = (Button) findViewById(b);
 		btn.setEnabled(s);
 	}
-	
-	private void changeText(int view, String text){
+
+	private void changeText(int view, String text) {
 		final TextView textViewToChange = (TextView) findViewById(view);
 		textViewToChange.setText(text);
 	}
-	
+
 	public void img_table(View view) {
-		switch(view.getId()){
+		switch (view.getId()) {
 		case R.id.img_table0:
 			checkedTable = table[0];
 			break;
@@ -214,7 +225,7 @@ public abstract class GameActivity extends Activity {
 	}
 
 	public void img_hand(View view) {
-		switch(view.getId()){
+		switch (view.getId()) {
 		case R.id.img_hand0:
 			checkedHand = hand[0];
 			break;
@@ -228,7 +239,7 @@ public abstract class GameActivity extends Activity {
 	}
 
 	public void btn_1card(View view) {
-		if(checkedTable != null && checkedHand != null){
+		if (checkedTable != null && checkedHand != null) {
 			inactive();
 			sendMessage("swap " + checkedHand + " " + checkedTable);
 		}
@@ -248,6 +259,6 @@ public abstract class GameActivity extends Activity {
 		inactive();
 		sendMessage("push");
 	}
-	
+
 	public abstract void sendMessage(String msg);
 }

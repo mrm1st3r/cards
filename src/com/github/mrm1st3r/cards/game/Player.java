@@ -40,9 +40,10 @@ public abstract class Player {
 	 * @param m		max. Anzahl Karten, die der Spieler in der Hand haben kann
 	 * @param conn	Verbindung zum Client
 	 */
-	public Player(String n, int m) {
+	public Player(String n, int m, int l) {
 		setName(n);
 		setMax(m);
+		setLife(l);
 		setHand(new Card[max]);
 	}
 

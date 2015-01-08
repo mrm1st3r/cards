@@ -11,17 +11,17 @@ public class Localplayer extends Player {
 	 * @param m
 	 * @param conn
 	 */
-	public Localplayer(String n, int m, GameActivity conn) {
-		super(n, m);
-		setConn(conn);
+	public Localplayer(String n, int m, int l, GameActivity ga) {
+		super(n, m, l);
+		setGameAct(ga);
 	}
 
-	public GameActivity getConn() {
+	public GameActivity getGameAct() {
 		return gameAct;
 	}
 
-	public void setConn(GameActivity conn) {
-		this.gameAct = conn;
+	public void setGameAct(GameActivity ga) {
+		this.gameAct = ga;
 	}
 
 	@Override

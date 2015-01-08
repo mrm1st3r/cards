@@ -104,15 +104,6 @@
         android:layout_alignTop="@+id/img_table1"
         android:src="@drawable/card_backside" />
 
-    <TextView
-        android:id="@+id/lbl_message"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/img_table0"
-        android:layout_alignLeft="@+id/lbl_rival0"
-        android:text="Tischname"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
     <Button
         android:id="@+id/btn_push"
         style="?android:attr/buttonStyleSmall"
@@ -197,6 +188,15 @@
         android:layout_alignLeft="@+id/lbl_life0"
         android:layout_below="@+id/lbl_life0"
         android:text="0"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <TextView
+        android:id="@+id/lbl_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/lbl_rival0"
+        android:layout_below="@+id/lbl_rival0"
+        android:text="Tischname"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
 </RelativeLayout>
