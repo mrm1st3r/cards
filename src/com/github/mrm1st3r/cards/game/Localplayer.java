@@ -1,26 +1,26 @@
 package com.github.mrm1st3r.cards.game;
 
-import com.github.mrm1st3r.cards.ingame.GameActivity;
+import com.github.mrm1st3r.cards.ingame.*;
 
 public class Localplayer extends Player {
 	
-	GameActivity gameAct;
+	Gamemaster gameAct;
 
 	/**
 	 * @param n
 	 * @param m
 	 * @param conn
 	 */
-	public Localplayer(String n, int m, int l, GameActivity ga) {
+	public Localplayer(String n, int m, int l, Gamemaster ga) {
 		super(n, m, l);
 		setGameAct(ga);
 	}
 
-	public GameActivity getGameAct() {
+	public Gamemaster getGameAct() {
 		return gameAct;
 	}
 
-	public void setGameAct(GameActivity ga) {
+	public void setGameAct(Gamemaster  ga) {
 		this.gameAct = ga;
 	}
 
@@ -33,4 +33,8 @@ public class Localplayer extends Player {
 			}
 		});
 	}	
+	
+	public void newGame(){
+		gameAct.newGame();
+	}
 }

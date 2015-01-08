@@ -25,8 +25,10 @@ public class ThirtyOne extends Gameplay {
 	 * Zustand, der angibt, wer geklopft hat
 	 */
 	int stopped;
-	Card[] choice;
+	Card[] choice = new Card[hmax];
 	boolean playing = true;
+	boolean lastrd = true;
+
 	/**
 	 * Konstruktor der Klasse "ThirtyOne".
 	 * 
@@ -47,14 +49,14 @@ public class ThirtyOne extends Gameplay {
 		game();
 	}
 
-	private void game(){
-		while(playing){
+	private void game() {
+		while (playing) {
 			startRound();
 			playRound();
 			endRound();
 		}
 	}
-	
+
 	/**
 	 * Start einer Runde.<br>
 	 * Es werden Karten an alle Spieler ausgeteilt.<br>
@@ -66,9 +68,10 @@ public class ThirtyOne extends Gameplay {
 		Player p;
 		String play = "players";
 		String str;
+		lastrd = true;
 		/*
-		 * creates the list of opponents individual for every player
-		 * and send it to them
+		 * creates the list of opponents individual for every player and send it
+		 * to them
 		 */
 		for (int i = 0; i < max; i++) {
 			p = players[i];
@@ -80,7 +83,9 @@ public class ThirtyOne extends Gameplay {
 				j = nextPlayer(j);
 			}
 			p.connect(str);
+			p.connect("inactive");
 		}
+		updateMessage("Der Dealer ist dabei sich zu entscheiden");
 		for (int i = 0; i < max; i++) {
 			if (i != dealer && players[i].getLife() >= 0) {
 				p = players[i];
@@ -94,10 +99,16 @@ public class ThirtyOne extends Gameplay {
 		}
 		p = players[dealer];
 		currP = dealer;
-		p.setHand(choice());
-		currP = dealer;
-		currP = nextPlayer(currP);
-		game();
+		choice();
+		p.connect("updateHand " + p.hand[0] + " " + p.hand[1] + " " + p.hand[2]);
+		p.connect("takechoice");
+		synchronized (playerLock) {
+			try {
+				playerLock.wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	/**
@@ -106,30 +117,31 @@ public class ThirtyOne extends Gameplay {
 	 * kommen die anderen Spieler noch mal an die Reihe.
 	 */
 	private void playRound() {
-		int temp = 0;
 		while (stopped > max) {
-			// temp = turn();
+			updateMessage(players[currP].getName() + " ist an der Reihe");
 			players[currP].connect("active");
 			synchronized (playerLock) {
 				try {
 					playerLock.wait();
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
-			if (temp != max) {
-				stopped = temp;
-			}
-			updateScore(players[currP]);
 			currP = nextPlayer(currP);
 		}
-		do {
-			// lastTurn();
-			updateScore(players[currP]);
-			currP = nextPlayer(currP);
-		} while (currP != stopped);
-		endRound();
+		if (lastrd) {
+			do {
+				players[currP].connect("lastround");
+				synchronized (playerLock) {
+					try {
+						playerLock.wait();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+				currP = nextPlayer(currP);
+			} while (currP != stopped);
+		}
 	}
 
 	/**
@@ -143,39 +155,72 @@ public class ThirtyOne extends Gameplay {
 		updateScores();
 		float result = 0;
 		Player p;
-		int temp = max;
+		Player[] oldPlayers = players;
+		int alive = max;
 		for (int i = 0; i < max; i++) {
 			p = players[i];
-			result = Math.min(result, p.getScore());
+			if (p.getLife() >= 0) {
+				result = Math.min(result, p.getScore());
+			}
 		}
 		for (int i = 0; i < max; i++) {
 			p = players[i];
-			if (p.getScore() == result) {
+			if (p.getLife() >= 0 && p.getScore() == result) {
 				if (p.getLife() > 0) {
 					p.decreaseLife();
-				} else {
-					players[i] = null;
-					temp--;
 				}
+			}
+			if (p.getLife() < 0) {
+				alive--;
 			}
 		}
-		if (temp == 1) {
-			// winner();
-		} else if (temp == 0) {
-			// draw();
-		} else {
-			Player[] tempP = new Player[temp];
-			int j = 0;
-			for (int i = 0; i < max; i++) {
-				if (players[i] != null) {
-					tempP[j] = players[i];
-					j++;
+		if (alive == 1) {
+			p = null;
+			int i = 0;
+			while (p == null) {
+				if (players[i].getLife() >= 0) {
+					p = players[i];
+				}
+				i++;
+			}
+			updateMessage(p.getName() + " hat gewonnen");
+			playing = false;
+			players[0].connect("newgame");
+			synchronized (playerLock) {
+				try {
+					playerLock.wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
 			}
-			players = tempP;
-			max = temp;
-			dealer = nextPlayer(dealer);
-			startRound();
+		} else if (alive == 0) {
+			String str = "Unentschieden zwischen";
+			p = null;
+			for (int i = 0; i < max; i++) {
+				p = oldPlayers[i];
+				if (p.getLife() >= 0) {
+					str = str + " " + p.getName();
+				}
+			}
+			updateMessage(str);
+			playing = false;
+			players[0].connect("newgame");
+			synchronized (playerLock) {
+				try {
+					playerLock.wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		} else {
+			players[0].connect("nextround");
+			synchronized (playerLock) {
+				try {
+					playerLock.wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 
@@ -186,10 +231,10 @@ public class ThirtyOne extends Gameplay {
 	 * 
 	 * @return Hand, f�r die sich der Dealer entschieden hat
 	 */
-	private void choiceResult(int i) {
-		if (i == 0) {
+	private void choiceResult(String str) {
+		if (str == "hand") {
 			table = choice;
-		} else if (i == 1) {
+		} else {
 			table = players[dealer].getHand();
 			players[dealer].setHand(choice);
 			updateHand();
@@ -200,7 +245,7 @@ public class ThirtyOne extends Gameplay {
 	private void choice() {
 		choice = new Card[hmax];
 		for (int i = 0; i < hmax; i++) {
-			choice[i] = takeCard();	
+			choice[i] = takeCard();
 		}
 		giveHand(players[dealer]);
 	}
@@ -247,7 +292,9 @@ public class ThirtyOne extends Gameplay {
 	 */
 	public void updateScores() {
 		for (Player p : players) {
-			updateScore(p);
+			if (p.getLife() >= 0) {
+				updateScore(p);
+			}
 		}
 	}
 
@@ -304,6 +351,10 @@ public class ThirtyOne extends Gameplay {
 		result = Math.max(result, spades);
 		result = Math.max(result, clover);
 		result = Math.max(result, same);
+		if (result >= 31) {
+			lastrd = false;
+			stopped = currP;
+		}
 		return result;
 	}
 
@@ -371,30 +422,32 @@ public class ThirtyOne extends Gameplay {
 					Integer.parseInt(parts[2]));
 			updateTables();
 			updateHand();
-			currP = nextPlayer(currP);
 		} else if (parts[0] == "swapall") {
 			for (int i = 0; i < hmax; i++) {
 				swapCards(table, players[currP].hand, i, i);
 			}
 			updateTables();
 			updateHand();
-			currP = nextPlayer(currP);
 		} else if (parts[0] == "close") {
 			setStopped(currP);
-			currP = nextPlayer(currP);
 		} else if (parts[0] == "push") {
-			currP = nextPlayer(currP);
 		} else if (parts[0] == "choice") {
-			choiceResult(Integer.parseInt(parts[1]));
+			choiceResult(parts[1]);
 			currP = nextPlayer(dealer);
 		} else if (parts[0] == "nextround") {
-			int i = Integer.parseInt(parts[1]);
-			if (i == 0) {
+			if (parts[1] == "yes") {
 				for (int j = 0; j < max; j++) {
 					players[j].connect("nextround");
 				}
 				dealer = nextPlayer(dealer);
-				startRound();
+			} else {
+				playing = false;
+			}
+		} else if (parts[0] == "newgame"){
+			if (parts[1] == "yes") {
+				((Localplayer)players[0]).newGame();
+			} else {
+				playing = false;
 			}
 		}
 	}
@@ -418,9 +471,11 @@ public class ThirtyOne extends Gameplay {
 			str = str + " " + p.hand[i].getImage();
 		}
 		p.connect(str);
+		updateScore(p);
+		p.connect("score " + p.getScore());
 	}
-	
-	private void updateMessage(String msg){
+
+	private void updateMessage(String msg) {
 		for (int i = 0; i < max; i++) {
 			Player p = players[i];
 			p.connect("msg " + msg);

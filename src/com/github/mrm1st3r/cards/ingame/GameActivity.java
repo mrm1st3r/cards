@@ -32,12 +32,14 @@ public abstract class GameActivity extends Activity {
 			active();
 		} else if (parts[0] == "inactive") {
 			inactive();
+		} else if (parts[0] == "lastround") {
+			lastround();
 		} else if (parts[0] == "nextround") {
 			nextRound();
 		} else if (parts[0] == "nextroundchoice") {
 			nextRoundChoice();
 		} else if (parts[0] == "takechoice") {
-			takeChoice(parts[1], parts[2], parts[3]);
+			takeChoice();
 		} else if (parts[0] == "hand") {
 			hand[0] = parts[1];
 			hand[1] = parts[2];
@@ -82,6 +84,13 @@ public abstract class GameActivity extends Activity {
 		switchButton(R.id.btn_allcards, false);
 		switchButton(R.id.btn_push, false);
 	}
+	
+	private void lastround() {
+		switchButton(R.id.btn_knock, false);
+		switchButton(R.id.btn_1card, true);
+		switchButton(R.id.btn_allcards, true);
+		switchButton(R.id.btn_push, true);
+	}
 
 	private void nextRound() {
 		inactive();
@@ -92,19 +101,16 @@ public abstract class GameActivity extends Activity {
 	}
 
 	private void nextRoundChoice() {
-		alertBox("Ihre Wahl", "Nächste Runde", "Ja", "Nein", "nextround 0",
-				"nextround 1");
+		alertBox("Ihre Wahl", "Nächste Runde", "Ja", "Nein", "nextround yes",
+				"nextround no");
 	}
 
-	private void takeChoice(String str0, String str1, String str2) {
-		hand[0] = str0;
-		hand[1] = str1;
-		hand[2] = str2;
+	private void takeChoice() {
 		showHand();
 		alertBox(
 				"Ihre Wahl",
 				"Wollen Sie die Karten auf der Hand behalten oder mit den verdeckten Karten auf dem Tisch spielen",
-				"Hand", "Tisch", "choise 0", "choice 1");
+				"Hand", "Tisch", "choise hand", "choice table");
 	}
 
 	private void showTable() {
@@ -261,4 +267,5 @@ public abstract class GameActivity extends Activity {
 	}
 
 	public abstract void sendMessage(String msg);
+	public abstract void newGame();
 }
