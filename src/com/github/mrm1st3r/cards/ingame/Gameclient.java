@@ -40,4 +40,8 @@ public class Gameclient extends GameActivity{
 	public void sendMessage(String msg) {
 		connection.write(msg);		
 	}
+
+	@Override
+	public void newGame() {		
+	}
 }
