@@ -31,7 +31,7 @@ public class Cards extends Application {
 	/**
 	 * Contains all currently active bluetooth connections.
 	 */
-	public HashMap<SimpleBluetoothConnection, String> connections =
+	private HashMap<SimpleBluetoothConnection, String> connections =
 			new HashMap<SimpleBluetoothConnection, String>();
 
 	/**

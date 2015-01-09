@@ -13,7 +13,7 @@ import android.widget.ArrayAdapter;
 
 import com.github.mrm1st3r.cards.Cards;
 import com.github.mrm1st3r.cards.R;
-import com.github.mrm1st3r.cards.ingame.Gameclient;
+import com.github.mrm1st3r.cards.game.ui.Gameclient;
 import com.github.mrm1st3r.connection.AsynchronousConnection;
 import com.github.mrm1st3r.connection.OnConnectionChangeHandler;
 import com.github.mrm1st3r.connection.OnReceivedHandler;

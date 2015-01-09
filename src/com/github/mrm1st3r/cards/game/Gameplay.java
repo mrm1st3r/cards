@@ -1,6 +1,6 @@
 package com.github.mrm1st3r.cards.game;
 
-import java.util.Random;
+import java.util.LinkedList;
 
 /**
  * Grundger�st f�r alle Kartenspiele der App.
@@ -13,146 +13,55 @@ public abstract class Gameplay {
 	public final Object playerLock = new Object();
 
 	/**
-	 * Array mit allen aktiven Spielern
+	 * Array mit allen aktiven Spielern.
 	 */
-	Player[] players;
+	protected Player[] players;
 	/**
-	 * Deck/ Stapel
+	 * Deck/ Stapel.
 	 */
-	Card[] cards;
+	private LinkedList<Card> cards;
+	
+	private CardValue[] cardDeckType;
 	/**
-	 * Index des Spielers, der an der Reihe ist
+	 * Index des Spielers, der an der Reihe ist.
 	 */
-	int currP;
+	protected int currP;
 	/**
-	 * Anzahl der aktiven Spieler
+	 * Anzahl der aktiven Spieler.
 	 */
-	int max;
+	protected int playerCount;
+
 	/**
-	 * Index der obersten Karte auf dem Deck/ Stapel
+	 * Index des Kartengebers.
 	 */
-	int last;
-	/**
-	 * Index des Kartengebers
-	 */
-	int dealer;
+	protected int dealer;
 
 	/**
 	 * Konstruktor der Klasse "Gameplay".<br>
 	 * Die Anzahl der aktiven Spieler wird festgelegt.<br>
 	 * Ein Kartendeck wird erstellt und durchgemischt.
 	 * 
-	 * @param m
-	 *            Anzahl teilnehmender Spieler
-	 * @param n
-	 *            Anzahl Karten
+	 * @param pPlayerCount Anzahl teilnehmender Spieler
+	 * @param pCardDeck Anzahl Karten
 	 */
-	public Gameplay(int m, int n) {
-		setMax(m);
-		setPlayers(new Player[max]);
-		createCards(n);
-		mixCards(cards);
+	public Gameplay(final int pPlayerCount, final CardValue[] pCardDeck) {
+		playerCount = pPlayerCount;
+		cardDeckType = pCardDeck;
+		players = new Player[playerCount];
 	}
 
 	/**
-	 * Ein Kartendeck wird erstellt.
-	 * 
-	 * @param m
-	 *            Anzahl der Karten im Deck
+	 * Create a new card deck.
+	 * @param values Card values to use
 	 */
-	public void createCards(int m) {
-		last = m - 1;
-		int index = m / 4;
-		cards = new Card[m];
-		for (int i = 0; i < 4; i++) {
-			int s = 14;
-			Card c = null;
-			String name = "";
-			int value = 0;
-			for (int j = index; j > 0; j--) {
-				switch (s) {
-				case 14:
-					name = "ace";
-					value = 11;
-					s = 13;
-					break;
-				case 13:
-					name = "king";
-					value = 10;
-					s = 12;
-					break;
-				case 12:
-					name = "queen";
-					s = 11;
-					break;
-				case 11:
-					name = "jack";
-					s = 10;
-					break;
-				case 10:
-					name = "10";
-					s = 9;
-					break;
-				case 9:
-					name = "9";
-					value = 9;
-					s = 8;
-					break;
-				case 8:
-					name = "8";
-					value = 8;
-					s = 7;
-					break;
-				case 7:
-					name = "7";
-					value = 7;
-					s = 6;
-					break;
-				case 6:
-					name = "6";
-					value = 6;
-					s = 5;
-					break;
-				case 5:
-					name = "5";
-					value = 5;
-					s = 4;
-					break;
-				case 4:
-					name = "4";
-					value = 4;
-					s = 3;
-					break;
-				case 3:
-					name = "3";
-					value = 3;
-					s = 2;
-					break;
-				case 2:
-					name = "2";
-					value = 2;
-					s = 1;
-					break;
-				}
-				c = new Card(name, i, value);
-				cards[i * index + j - 1] = c;
+	protected final void createCardDeck() {
+		
+		cards = new LinkedList<Card>();
+		
+		for (CardColor color : CardColor.values()) {
+			for (CardValue value : cardDeckType) {
+				cards.add(new Card(color, value));
 			}
-		}
-	}
-
-	/**
-	 * Mischt ein Kartenstapel durch.
-	 * 
-	 * @param c
-	 *            Array mit Karten (Deck/ Stapel)
-	 */
-	public static void mixCards(Card[] c) {
-		int n = c.length;
-		Random random = new Random();
-		random.nextInt();
-		for (int i = 0; i < n; i++) {
-			int change = i + random.nextInt(n - i);
-			swapCards(c, c, i, change);
 		}
 	}
 
@@ -172,41 +81,22 @@ public abstract class Gameplay {
 		two[change] = helper;
 	}
 
-	/**
-	 * Die i-te Karte wird aus dem Deck entfernt.
-	 * 
-	 * @param i
-	 *            Index der zuentfernenden Karte
-	 */
-	public void removeCard(int i) {
-		cards[i] = null;
-	}
 
 	/**
 	 * Die oberste Karte vom Deck/ Stapel wird entfernt und zur�ckgegegeben.
 	 * 
 	 * @return oberste Karte des Decks/ Stapels
 	 */
-	public Card takeCard() {
-		if (cards[last] != null) {
-			Card temp = cards[last];
-			removeCard(last);
-			last--;
-			return temp;
-		} else {
+	public final Card takeCard() {
+		if (cards.size() == 0) {
 			return null;
 		}
-	}
-
-	/**
-	 * Gibt die Karten des Decks/Stapels auf der Konsole aus.
-	 */
-	public void printCards() {
-		int i = 1;
-		for (Card c : cards) {
-			System.out.print(i + " " + c.toString() + "\n");
-			i++;
-		}
+		
+		int num = (int) Math.random() * cards.size();
+		Card c = cards.get(num);
+		cards.remove(num);
+		
+		return c;
 	}
 
 	/**
@@ -219,13 +109,11 @@ public abstract class Gameplay {
 	 */
 	public boolean addPlayer(Player p) {
 		int i = 0;
-		while (players[i] != null && i < max - 1
-				) {
+		while (players[i] != null && i < playerCount - 1) {
 			i++;
 		}
 		if (players[i] == null) {
 			players[i] = p;
-			p.setGame(this);
 			return true;
 		} else {
 			return false;
@@ -271,22 +159,12 @@ public abstract class Gameplay {
 	}
 
 	/**
-	 * Getter f�r {@link #max}
+	 * Getter f�r {@link #playerCount}
 	 * 
-	 * @return {@link #max}
+	 * @return {@link #playerCount}
 	 */
 	public int getMax() {
-		return max;
-	}
-
-	/**
-	 * Setter f�r {@link #max}
-	 * 
-	 * @param max
-	 *            um {@link #max} zu definieren
-	 */
-	private void setMax(int max) {
-		this.max = max;
+		return playerCount;
 	}
 	
 	public abstract void checkMessage(String msg);

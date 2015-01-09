@@ -7,9 +7,11 @@ import com.github.mrm1st3r.connection.bluetooth.SimpleBluetoothConnection;
 public class Bluetoothplayer extends Player{
 	
 	/**
-	 * Connection des Spielers
+	 * Connection des Spielers.
 	 */
-	SimpleBluetoothConnection connection;
+	private SimpleBluetoothConnection connection;
+	
+	private Object lock = new Object();
 
 	public Bluetoothplayer(String n, int m, int l, SimpleBluetoothConnection conn) {
 		super(n, m, l);
@@ -19,16 +21,16 @@ public class Bluetoothplayer extends Player{
 			@Override
 			public void onReceived(final AsynchronousConnection<String> conn,
 					final String msg) {
-				synchronized (game.playerLock) {
-					game.checkMessage(msg);
-					game.playerLock.notify();
+				synchronized (lock) {
+					// game.checkMessage(msg);
+					lock.notify();
 				}
 			}
 		});
 	}
 
 	@Override
-	public void connect(String msg){
+	public void sendMessage(String msg){
 		connection.write(msg);
 	}
 

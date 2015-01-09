@@ -55,7 +55,7 @@
                 android:value="com.github.mrm1st3r.cards.LobbyJoinActivity" />
         </activity>
         <activity
-            android:name=".ingame.Gamemaster"
+            android:name="com.github.mrm1st3r.cards.game.ui.Gamemaster"
             android:label="@string/title_activity_game" 
             android:parentActivityName="com.github.mrm1st3r.cards.MainActivity" >
             <meta-data
@@ -63,7 +63,7 @@
                 android:value="com.github.mrm1st3r.cards.MainActivity" />
         </activity>
         <activity
-            android:name=".ingame.Gameclient"
+            android:name="com.github.mrm1st3r.cards.game.ui.Gameclient"
             android:label="@string/title_activity_game" 
             android:parentActivityName="com.github.mrm1st3r.cards.MainActivity" >
             <meta-data

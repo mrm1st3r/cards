@@ -1,9 +1,8 @@
 package com.github.mrm1st3r.cards.game;
 
-import com.github.mrm1st3r.connection.bluetooth.SimpleBluetoothConnection;
 
 /**
- * Kartenspieler
+ * This class describes a card player.
  * 
  * @author Sergius Maier
  * @version 0.8
@@ -11,189 +10,144 @@ import com.github.mrm1st3r.connection.bluetooth.SimpleBluetoothConnection;
 public abstract class Player {
 
 	/**
-	 * Spielername
+	 * The players name.
 	 */
-	String name;
+	private String name;
 	/**
-	 * Spielerleben
+	 * The number of lifes the player has left.
 	 */
-	int life = 0;
+	private int lifes = 0;
 	/**
-	 * aktuelle Punkte des Spielers
+	 * The number of points the player has reached so far.
 	 */
-	float score = 0;
+	private float score = 0;
 	/**
-	 * max. Anzahl von Karten die ein Spieler in der Hand haben kann
+	 * The players hand cards.
 	 */
-	int max;
-	/**
-	 * Array mit den Karten des Spielers
-	 */
-	Card[] hand;
-	
-	Gameplay game;
+	private Card[] handCards;
 
 	/**
-	 * Konstruktor der Klasse "Player".
+	 * Construct a new player.
 	 * 
-	 * @param n		Name des Spielers
-	 * @param m		max. Anzahl Karten, die der Spieler in der Hand haben kann
-	 * @param conn	Verbindung zum Client
+	 * @param pName The players name
+	 * @param pHandSize	Maximum number of hand cards
+	 * @param pLifes Number of lifes to start with
 	 */
-	public Player(String n, int m, int l) {
-		setName(n);
-		setMax(m);
-		setLife(l);
-		setHand(new Card[max]);
+	public Player(final String pName, final int pHandSize, final int pLifes) {
+		setName(pName);
+		setLifes(pLifes);
+		setHand(new Card[pHandSize]);
 	}
 
 	/**
-	 * Ein freier Platz in der Hand des Spieler wird gesucht.<br>
-	 * Anschlie�end wird die Karte "c" an diese Stelle eingef�gt.
+	 * Add a new card to the players hand.
 	 * 
-	 * @param c	zueinf�gende Karte
-	 * @return	True/False, je nachdem, ob das Einf�gen funktioniert hat oder nicht
+	 * @param c	New hand card
+	 * @return	true on success, false otherwise
 	 */
-	public boolean add2Hand(Card c) {
-		int i = 0;
-		while (hand[i] != null && i < max - 1) {
-			i++;
+	public final boolean addToHand(final Card c) {
+
+		for (int i = 0; i < handCards.length; i++) {
+			if (handCards[i] == null) {
+				handCards[i] = c;
+				return true;
+			}
 		}
-		if (hand[i] != null) {
-			insertIntoHand(i, c);
-			return true;
-		} else {
-			return false;
+
+		return false;
+	}
+
+	/**
+	 * Remove a card from the players hand.
+	 * 
+	 * @param c Card to remove
+	 * @return true on success, false otherwise
+	 */
+	public final boolean removeFromHand(final Card c) {
+		for (int i = 0; i < handCards.length; i++) {
+			if (handCards[i].equals(c)) {
+				handCards[i] = null;
+				return true;
+			}
 		}
+		return false;
 	}
 
 	/**
-	 * Karte "c" wird an der i-ten Stelle in die Hand des Spielers eingef�gt.
-	 * 
-	 * @param i	Index f�r die Stelle in der Hand
-	 * @param c	zueinf�gende Karte
+	 * Send a message to the player.
+	 * @param msg Message to send
 	 */
-	private void insertIntoHand(int i, Card c) {
-		hand[i] = c;
-	}
+	public abstract void sendMessage(String msg);
 
 	/**
-	 * Entfernt die Karte an der i-ten Stelle der Hand des Spielers.
-	 * 
-	 * @param i	Index f�r die Stelle in der Hand
+	 * @return The players name
 	 */
-	public void removeFromHand(int i) {
-		hand[i] = null;
-	}
-	
-	/**
-	 * Baut die Verbindung zum Bluetoothger�t auf und sendet eine Nachricht.
-	 */
-	public abstract void connect(String msg);
-
-	/**
-	 * Getter f�r {@link #name}
-	 * 
-	 * @return {@link #name}
-	 */
-	public String getName() {
+	public final String getName() {
 		return name;
 	}
 
 	/**
-	 * Setter f�r {@link #name}
-	 * 
-	 * @param name um {@link #name} zu definieren
+	 * Change the players name.
+	 * @param pName New player name
 	 */
-	public void setName(String name) {
-		this.name = name;
+	public final void setName(final String pName) {
+		this.name = pName;
 	}
 
 	/**
-	 * Getter f�r {@link #score}
-	 * 
-	 * @return {@link #score}
+	 * @return The players current score
 	 */
-	public float getScore() {
+	public final float getScore() {
 		return score;
 	}
 
 	/**
-	 * Setter f�r {@link #score}
-	 * 
-	 * @param score um {@link #score} zu definieren
+	 * Update the players score.
+	 * @param pScore The new score
 	 */
-	public void setScore(float score) {
-		this.score = score;
+	public final void setScore(final float pScore) {
+		this.score = pScore;
 	}
 
 	/**
-	 * Getter f�r {@link #max}
-	 * 
-	 * @return {@link #max}
+	 * @return The players current hand cards
 	 */
-	public int getMax() {
-		return max;
+	public final Card[] getHand() {
+		return handCards;
 	}
 
 	/**
-	 * Setter f�r {@link #max}
-	 * 
-	 * @param max um {@link #max} zu definieren
+	 * Give the player new hand cards.
+	 * @param hand New hand cards
 	 */
-	private void setMax(int max) {
-		this.max = max;
+	public final void setHand(final Card[] hand) {
+		this.handCards = hand;
 	}
 
 	/**
-	 * Getter f�r {@link #hand}
-	 * 
-	 * @return {@link #hand}
+	 * @return The players current lifes
 	 */
-	public Card[] getHand() {
-		return hand;
+	public final int getLifes() {
+		return lifes;
 	}
 
 	/**
-	 * Setter f�r {@link #hand}
-	 * 
-	 * @param hand um {@link #hand} zu definieren
+	 * Update the players lifes.
+	 * @param pLifes New number of lifes
 	 */
-	public void setHand(Card[] hand) {
-		this.hand = hand;
+	public final void setLifes(final int pLifes) {
+		lifes = pLifes;
 	}
 
 	/**
-	 * Getter f�r {@link #life}
-	 * 
-	 * @return {@link #life}
+	 * Decrease the number of lifes by one.
 	 */
-	public int getLife() {
-		return life;
-	}
-
-	/**
-	 * Setter f�r {@link #life}
-	 * 
-	 * @param life um {@link #life} zu definieren
-	 */
-	public void setLife(int life) {
-		this.life = life;
-	}
-	
-	/**
-	 * Verringert das Leben um eins.
-	 */
-	public void decreaseLife() {
-		this.life--;
-	}
-	
-	public void setGame(Gameplay g) {
-		game = g;
+	public final void decreaseLife() {
+		lifes--;
 	}
 
 	@Override
-	public String toString() {
-		return name + " hat " + score + " Punkte";
+	public final String toString() {
+		return name + " has " + score + " points and " + lifes + " lifes";
 	}
 }

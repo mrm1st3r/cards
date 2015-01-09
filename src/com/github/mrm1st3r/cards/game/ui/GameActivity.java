@@ -1,10 +1,11 @@
-package com.github.mrm1st3r.cards.ingame;
+package com.github.mrm1st3r.cards.game.ui;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -14,6 +15,8 @@ import com.github.mrm1st3r.cards.R;
 
 public abstract class GameActivity extends Activity {
 
+	private static final String TAG = GameActivity.class.getSimpleName();
+	
 	String[] hand = new String[3];
 	String[] table = new String[3];
 	String bg = "card_backside";
@@ -27,6 +30,9 @@ public abstract class GameActivity extends Activity {
 	}
 
 	public void checkMessage(String msg) {
+		
+		Log.d(TAG, "Check incoming message: " + msg);
+		
 		String[] parts = msg.split(" ");
 		if (parts[0] == "active") {
 			active();

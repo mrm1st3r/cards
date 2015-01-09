@@ -1,4 +1,4 @@
-package com.github.mrm1st3r.cards.ingame;
+package com.github.mrm1st3r.cards.game.ui;
 
 import android.os.Bundle;
 
@@ -18,7 +18,7 @@ public class Gameclient extends GameActivity{
 		setContentView(R.layout.activity_game);
 		
 		connection = (SimpleBluetoothConnection) ((Cards) getApplication()).
-				connections.keySet().iterator().next();
+				getConnections().keySet().iterator().next();
 
 		connection.setOnReceivedHandler(new OnReceivedHandler<String>() {
 			@Override

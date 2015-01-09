@@ -1,6 +1,6 @@
 package com.github.mrm1st3r.cards.game;
 
-import com.github.mrm1st3r.cards.ingame.*;
+import com.github.mrm1st3r.cards.game.ui.*;
 
 public class Localplayer extends Player {
 	
@@ -25,7 +25,7 @@ public class Localplayer extends Player {
 	}
 
 	@Override
-	public void connect(final String msg){
+	public void sendMessage(final String msg){
 		gameAct.runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
