@@ -1,58 +1,78 @@
 package com.github.mrm1st3r.cards.game;
 
-import java.util.Random;
-
 import android.util.Log;
 
 /**
- * Erweitert die Klasse "Gameplay".<br>
- * Hauptklasse f�r das Spiel "ThirtyOne" / Schwimmen.
+ * This class describes the game rules and sequence for the game "Schwimmen".
  * 
  * @author Sergius Maier
  * @version 0.8
  */
 public class ThirtyOne extends Gameplay {
 
+	/**
+	 * Debug tag.
+	 */
 	private static final String TAG = ThirtyOne.class.getSimpleName();
-	
+	/**
+	 * Number of lifes for each player to start with.
+	 */
 	public static final int MAX_LIFES = 3;
 	/**
-	 * max. Anzahl der Karten, die ein Spieler in der Hand haben darf.
+	 * Number of cards that each player holds in hand and lay on the table.
 	 */
-	int hmax = 3;
+	public static final int HAND_SIZE = 3;
 	/**
-	 * Karten auf dem Tisch
+	 * Maximum number of points that can be reached.
 	 */
-	Card[] table = new Card[hmax];
+	public static final int POINTS_MAX = 33;
 	/**
-	 * Zustand, der angibt, wer geklopft hat
+	 * Number of points that is achieved with three cards of the same value.
 	 */
-	int stopped;
-	Card[] choice = new Card[hmax];
-	boolean playing = true;
-	boolean lastrd = true;
+	public static final double POINTS_TRIPLE = 30.5;
+	/**
+	 * The number of points needed to instantly win a round.
+	 */
+	public static final int POINTS_WIN = 31;
+	/**
+	 * All cards laying openly on the table.
+	 */
+	private Card[] table = new Card[HAND_SIZE];
+	/**
+	 * The player who has closed the round.
+	 */
+	private Player stopper = null;
+	/**
+	 * The player who has won the round.
+	 */
+	private Player winner = null;
+	/**
+	 * The hidden cards that the dealer will get if he refuses
+	 * his hand cards. If the dealer accepts his hand cards, these
+	 * will become the table cards.
+	 */
+	private Card[] choice = new Card[HAND_SIZE];
+	/**
+	 * Flag to indicate if the game is still in progress.
+	 */
+	private boolean playing = true;
 
 	/**
-	 * Konstruktor der Klasse "ThirtyOne".
-	 * 
-	 * @param m
-	 *            Anzahl an Spielern
+	 * Construct a new game of "Schwimmen".
+	 * @param pPlayerCount Number of players to begin with
 	 */
-	public ThirtyOne(int m) {
-		super(m, CardValue.getSkatDeck());
-		setStopped(m + 1);
+	public ThirtyOne(final int pPlayerCount) {
+		super(pPlayerCount, CardValue.getSkatDeck());
 	}
 
 	/**
-	 * Ein Dealer wird per Zufall festgelegt und die erste Runde wird gestartet.
+	 * Set a random player to be the dealer and start the game.
 	 */
-	public void start() {
-		Random ran = new Random();
-		dealer = ran.nextInt(playerCount);
-		game();
-	}
+	public final void start() {
 
-	private void game() {
+		// the host is always dealer in the first round
+		setDealer(getHostPlayer());
+
 		while (playing) {
 			startRound();
 			playRound();
@@ -61,103 +81,86 @@ public class ThirtyOne extends Gameplay {
 	}
 
 	/**
-	 * Start einer Runde.<br>
-	 * Es werden Karten an alle Spieler ausgeteilt.<br>
-	 * Der Dealer bekommt die M�glichkeit sich zwischen zwei H�nden zu
-	 * entscheiden.<br>
-	 * Der n�chste wird festgelegt und das Spiel gestartet.
+	 * The start of a game round.<br>
+	 * All players receive their hand cards and the dealer has to choose
+	 * between two card sets of which he sees only one.
 	 */
-	public void startRound() {
-		Player p;
+	public final void startRound() {
 		String play = "players";
-		String str;
-		lastrd = true;
-		/*
-		 * creates the list of opponents individual for every player and send it
-		 * to them
-		 */
-		for (int i = 0; i < playerCount; i++) {
-			p = players[i];
-			int j = i;
-			j = nextPlayer(i);
-			str = play;
+
+		for (Player p : getPlayers()) {
 			p.setLifes(MAX_LIFES);
-			Log.d(TAG, i + " / " + j);
-			while (j != i) {
-				Log.d(TAG, "opponent player: " + p.getName());
-				str = str + " " + p.getName();
-				j = nextPlayer(j);
+			p.setHand(new Card[HAND_SIZE]);
+			
+		}
+		stopper = null;
+		winner = null;
+		createCardDeck();
+		
+		// send the list of opponents to each player
+		for (Player p : getPlayers()) {
+			Player next = nextPlayerFor(p);
+			String str = play;
+
+			while (!next.equals(p)) {
+				str += " " + next.getName();
+				next = nextPlayerFor(next);
 			}
 			p.sendMessage(str);
 			p.sendMessage("inactive");
 		}
-		
-		createCardDeck();
-		
+
 		updateMessage("Der Dealer ist dabei sich zu entscheiden");
-		for (int i = 0; i < playerCount; i++) {
-			
-			if (i != dealer && players[i].getLifes() >= 0) {
-			
-				p = players[i];
-				
+		for (Player p : getPlayers()) {
+
+			if (p.getLifes() >= 0) {
+
 				giveHand(p);
-				
+
 				Card[] hand = p.getHand();
-				
-				p.sendMessage("hand " + hand[0] + " " + hand[1] + " "
-						+ hand[2]);
-				updateScore(p);
-				p.sendMessage("score " + p.getScore());
+
+				p.sendMessage("hand " + hand[0].getImageName()
+						+ " " + hand[1].getImageName() + " "
+						+ hand[2].getImageName());
 				p.sendMessage("life " + p.getLifes());
 			}
 		}
-		p = players[dealer];
-		currP = dealer;
+		Player dealer = getDealer();
+		setCurrentPlayer(dealer);
 		choice();
-		p.sendMessage("hand " + p.getHand()[0].getImageName()
-				+ " " + p.getHand()[1].getImageName()
-				+ " " + p.getHand()[2].getImageName());
-		p.sendMessage("takechoice");
-		synchronized (playerLock) {
+
+		dealer.sendMessage("takechoice");
+		synchronized (dealer.getLock()) {
 			try {
-				playerLock.wait();
+				dealer.getLock().wait();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
+		
+		updateScores();
 	}
 
 	/**
-	 * Spielablauf.<br>
+	 * Game sequence.<br>
 	 * Alle Spieler sind nach einander dran bis einer die Runde beendet. Danach
 	 * kommen die anderen Spieler noch mal an die Reihe.
 	 */
 	private void playRound() {
-		while (stopped > playerCount) {
-			updateMessage(players[currP].getName() + " ist an der Reihe");
-			players[currP].sendMessage("active");
-			synchronized (playerLock) {
+		Player p = getCurrentPlayer();
+
+		while (!p.equals(stopper) && winner == null) {
+			updateMessage(p.getName() + " ist an der Reihe");
+			p.sendMessage("active");
+			synchronized (p.getLock()) {
 				try {
-					playerLock.wait();
+					p.getLock().wait();
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
-			currP = nextPlayer(currP);
-		}
-		if (lastrd) {
-			do {
-				players[currP].sendMessage("lastround");
-				synchronized (playerLock) {
-					try {
-						playerLock.wait();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
-				currP = nextPlayer(currP);
-			} while (currP != stopped);
+			p = nextPlayerFor(p);
+			setCurrentPlayer(p);
 		}
 	}
 
@@ -168,75 +171,59 @@ public class ThirtyOne extends Gameplay {
 	 * es werden die Spieler aus dem Spiel genommen, die keine Leben mehr haben
 	 * und es wird eine neue Runde gestartet.
 	 */
-	public void endRound() {
+	public final void endRound() {
 		updateScores();
-		float result = 0;
-		Player p;
-		Player[] oldPlayers = players;
-		int alive = playerCount;
-		for (int i = 0; i < playerCount; i++) {
-			p = players[i];
+		float minScore = POINTS_MAX;
+
+		// search for the lowest score in this round
+		for (Player p : getPlayers()) {
 			if (p.getLifes() >= 0) {
-				result = Math.min(result, p.getScore());
+				minScore = Math.min(minScore, p.getScore());
 			}
 		}
-		for (int i = 0; i < playerCount; i++) {
-			p = players[i];
-			if (p.getLifes() >= 0 && p.getScore() == result) {
+
+		for (Player p : getPlayers()) {
+			if (p.getLifes() >= 0 && p.getScore() == minScore) {
 				if (p.getLifes() > 0) {
 					p.decreaseLife();
 				}
 			}
-			if (p.getLifes() < 0) {
-				alive--;
-			}
 		}
+
+		int alive = countLivingPlayers();
+		Player host = getHostPlayer();
+
 		if (alive == 1) {
-			p = null;
-			int i = 0;
-			while (p == null) {
-				if (players[i].getLifes() >= 0) {
-					p = players[i];
+			for (Player p : getPlayers()) {
+				if (p.getLifes() >= 0) {
+					updateMessage(p.getName() + " hat gewonnen");
+					break;
 				}
-				i++;
 			}
-			updateMessage(p.getName() + " hat gewonnen");
+
 			playing = false;
-			players[0].sendMessage("newgame");
-			synchronized (playerLock) {
-				try {
-					playerLock.wait();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
+			host.sendMessage("newgame");
+
 		} else if (alive == 0) {
 			String str = "Unentschieden zwischen";
-			p = null;
-			for (int i = 0; i < playerCount; i++) {
-				p = oldPlayers[i];
+
+			for (Player p : getPlayers()) {
 				if (p.getLifes() >= 0) {
-					str = str + " " + p.getName();
+					str += " " + p.getName();
 				}
 			}
 			updateMessage(str);
 			playing = false;
-			players[0].sendMessage("newgame");
-			synchronized (playerLock) {
-				try {
-					playerLock.wait();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
+			host.sendMessage("newgame");
 		} else {
-			players[0].sendMessage("nextround");
-			synchronized (playerLock) {
-				try {
-					playerLock.wait();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+			host.sendMessage("nextroundchoice");
+		}
+
+		synchronized (host.getLock()) {
+			try {
+				host.getLock().wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
 		}
 	}
@@ -245,44 +232,27 @@ public class ThirtyOne extends Gameplay {
 	 * Dem Dealer wird die M�glichkeit gegeben sich zwischen zwei H�nden zu
 	 * entscheiden. Die Hand f�r die er sich nicht entschieden hat wird auf
 	 * den Tisch gelegt.
-	 * 
-	 * @return Hand, f�r die sich der Dealer entschieden hat
+	 * @param str Choice made by the dealer
 	 */
-	private void choiceResult(String str) {
-		if (str == "hand") {
+	private void choiceResult(final String str) {
+		if (str.equals("hand")) {
 			table = choice;
 		} else {
-			table = players[dealer].getHand();
-			players[dealer].setHand(choice);
-			updateHand();
+			table = getDealer().getHand();
+			getDealer().setHand(choice);
+			updateHand(getDealer());
 		}
 		updateTables();
 	}
 
+	/**
+	 * 
+	 */
 	private void choice() {
-		choice = new Card[hmax];
-		for (int i = 0; i < hmax; i++) {
+		choice = new Card[HAND_SIZE];
+		for (int i = 0; i < HAND_SIZE; i++) {
 			choice[i] = takeCard();
 		}
-		giveHand(players[dealer]);
-	}
-
-	/**
-	 * Determines the next current player.
-	 * 
-	 * @param p
-	 *            current player
-	 * @return next player
-	 */
-	private int nextPlayer(int p) {
-		int temp = p + 1;
-		if (temp >= playerCount) {
-			temp = 0;
-		}
-		if (players[temp].getLifes() < 0) {
-			temp = nextPlayer(temp);
-		}
-		return temp;
 	}
 
 	/**
@@ -292,23 +262,24 @@ public class ThirtyOne extends Gameplay {
 	 * @param p
 	 *            Spieler
 	 */
-	public void giveHand(Player p) {
-		boolean temp = true;
-		for (int i = 0; i < hmax; i++) {
-			temp = p.addToHand(takeCard());
-			//if (temp) {
-			//	i = hmax;
-			//}
+	public final void giveHand(final Player p) {
+
+		for (int i = 0; i < HAND_SIZE; i++) {
+			p.addToHand(takeCard());
 		}
 	}
 
 	/**
 	 * Aktualisiert die Punkte aller Spieler.
 	 */
-	public void updateScores() {
-		for (Player p : players) {
+	public final void updateScores() {
+		for (Player p : getPlayers()) {
 			if (p.getLifes() >= 0) {
 				updateScore(p);
+				p.sendMessage("score " + p.getScore());
+				if (p.getScore() >= POINTS_WIN) {
+					winner = p;
+				}
 			}
 		}
 	}
@@ -319,182 +290,149 @@ public class ThirtyOne extends Gameplay {
 	 * @param p
 	 *            Spieler
 	 */
-	public void updateScore(Player p) {
+	public final void updateScore(final Player p) {
 		Card[] hand = p.getHand();
-		p.setScore(calcScore(hand));
-	}
 
-	/**
-	 * Kalkuliert den Punktestand aus der Hand, die �bergeben wurde.
-	 * 
-	 * @param c
-	 *            Hand, von der die Punkte ermittelt werden soll
-	 * @return kalkulierte Punktezahl
-	 */
-	private float calcScore(Card[] c) {
+		if (hand[0] == null) {
+			return;
+		}
+		
 		float hearts = 0;
 		float diamonds = 0;
 		float spades = 0;
-		float clover = 0;
-		float same = 0;
-		float result = 0;
-		for (int i = 0; i < c.length; i++) {
-			switch (c[i].getColor()) {
-			case HEARTS:
-				hearts += c[i].getIntValue();
-				break;
-			case DIAMONDS:
-				diamonds += c[i].getIntValue();
-				break;
-			case SPADES:
-				spades += c[i].getIntValue();
-				break;
-			case CLUBS:
-				clover += c[i].getIntValue();
-				break;
+		float clubs = 0;
+
+		float score = 0;
+
+		// check for three same values
+
+		if (hand[0].getValue() == hand[1].getValue()
+				&& hand[0].getValue() == hand[2].getValue()) {
+
+			if (hand[0].getValue() == CardValue.ACE) {
+				score = POINTS_MAX;
+			} else {
+				score = (float) POINTS_TRIPLE;
 			}
-		}
-		if (c[0].getValue() == c[1].getValue()
-				&& c[0].getValue() == c[2].getValue()) {
-			same = (float) 30.5;
-			if (c[0].getValue() == CardValue.ACE) {
-				result = 33;
-			}
-		}
-		result = Math.max(result, hearts);
-		result = Math.max(result, diamonds);
-		result = Math.max(result, spades);
-		result = Math.max(result, clover);
-		result = Math.max(result, same);
-		if (result >= 31) {
-			lastrd = false;
-			stopped = currP;
-		}
-		return result;
-	}
+		} else {
 
-	/**
-	 * Getter f�r {@link #hmax}
-	 * 
-	 * @return {@link #hmax}
-	 */
-	public int getHmax() {
-		return hmax;
-	}
-
-	/**
-	 * Setter f�r {@link #hmax}
-	 * 
-	 * @param hmax
-	 *            um {@link #hmax} zu definieren
-	 */
-	public void setHmax(int hmax) {
-		this.hmax = hmax;
-	}
-
-	/**
-	 * Getter f�r {@link #table}
-	 * 
-	 * @return {@link #table}
-	 */
-	public Card[] getTable() {
-		return table;
-	}
-
-	/**
-	 * Setter f�r {@link #table}
-	 * 
-	 * @param table
-	 *            um {@link #table} zu definieren
-	 */
-	public void setTable(Card[] table) {
-		this.table = table;
-	}
-
-	/**
-	 * Getter f�r {@link #stopped}
-	 * 
-	 * @return {@link #stopped}
-	 */
-	public int getStopped() {
-		return stopped;
-	}
-
-	/**
-	 * Setter f�r {@link #stopped}
-	 * 
-	 * @param stopped
-	 *            um {@link #stopped} zu definieren
-	 */
-	public void setStopped(int stopped) {
-		this.stopped = stopped;
-	}
-
-	public void checkMessage(String msg) {
-		String[] parts = msg.split(" ");
-		if (parts[0] == "swap") {
-			swapCards(players[currP].getHand(), table, Integer.parseInt(parts[1]),
-					Integer.parseInt(parts[2]));
-			updateTables();
-			updateHand();
-		} else if (parts[0] == "swapall") {
-			for (int i = 0; i < hmax; i++) {
-				swapCards(table, players[currP].getHand(), i, i);
-			}
-			updateTables();
-			updateHand();
-		} else if (parts[0] == "close") {
-			setStopped(currP);
-		} else if (parts[0] == "push") {
-		} else if (parts[0] == "choice") {
-			choiceResult(parts[1]);
-			currP = nextPlayer(dealer);
-		} else if (parts[0] == "nextround") {
-			if (parts[1] == "yes") {
-				for (int j = 0; j < playerCount; j++) {
-					players[j].sendMessage("nextround");
+			for (Card c : hand) {
+				switch (c.getColor()) {
+				case HEARTS:
+					hearts += c.getIntValue();
+					break;
+				case DIAMONDS:
+					diamonds += c.getIntValue();
+					break;
+				case SPADES:
+					spades += c.getIntValue();
+					break;
+				case CLUBS:
+					clubs += c.getIntValue();
+					break;
+				default:
+					break;
 				}
-				dealer = nextPlayer(dealer);
+			}
+
+			score = Math.max(score, hearts);
+			score = Math.max(score, diamonds);
+			score = Math.max(score, spades);
+			score = Math.max(score, clubs);
+		}
+		p.setScore(score);
+	}
+
+	@Override
+	public final void checkMessage(final String msg) {
+		
+		Log.d(TAG, "game receiving: " + msg);
+
+		String[] parts = msg.split(" ");
+		Player current = getCurrentPlayer();
+		
+		if (parts[0] .equals("swap")) {
+			int handPos = Integer.parseInt(parts[1]);
+			int tablePos = Integer.parseInt(parts[2]);
+			
+			Card temp = current.getHandCard(handPos);
+			current.getHand()[handPos] = table[tablePos];
+			table[tablePos] = temp;
+
+			updateTables();
+			updateHand(current);
+		} else if (parts[0].equals("swapall")) {
+			Card[] temp = current.getHand();
+			current.setHand(table);
+			table = temp;
+			
+			updateTables();
+			updateHand(current);
+		} else if (parts[0].equals("close")) {
+			if (stopper == null) {
+				stopper = current;
+			}
+		} else if (parts[0].equals("push")) {
+			Log.i(TAG, current.getName() + " has pushed");
+
+		} else if (parts[0].equals("choice")) {
+			choiceResult(parts[1]);
+			setCurrentPlayer(nextPlayerFor(getDealer()));
+		} else if (parts[0].equals("nextround")) {
+			if (parts[1].equals("yes")) {
+				for (Player p : getPlayers()) {
+					p.sendMessage("nextround");
+				}
+				setDealer(nextPlayerFor(getDealer()));
 			} else {
 				playing = false;
 			}
-		} else if (parts[0] == "newgame"){
-			if (parts[1] == "yes") {
-				((Localplayer)players[0]).newGame();
-			} else {
+		} else if (parts[0].equals("newgame")) {
+			if (parts[1].equals("no")) {
 				playing = false;
-			}
+			} // no action needed if yes
 		}
 	}
 
+
+
+	/**
+	 * Send a broadcast to all players to update the cards on the table.
+	 */
 	private void updateTables() {
 		String str = "table";
-		for (int i = 0; i < hmax; i++) {
-			str = str + " " + table[i].getImageName();
+		for (Card c : table) {
+			str = str + " " + c.getImageName();
 		}
-		for (int i = 0; i < playerCount; i++) {
-			Player p = players[i];
+		Log.d(TAG, str);
+		for (Player p : getPlayers()) {
 			p.sendMessage(str);
 		}
 	}
 
-	private void updateHand() {
-		updateScore(players[currP]);
+	/**
+	 * Send a message to the current player with his new hand cards.
+	 * @param p The player who should receive new hand cards
+	 */
+	private void updateHand(final Player p) {
+		updateScore(p);
 		String str = "hand";
-		Player p = players[currP];
-		for (int i = 0; i < hmax; i++) {
-			str = str + " " + p.getHand()[i].getImageName();
+		
+		for (Card c : p.getHand()) {
+			str = str + " " + c.getImageName();
 		}
 		p.sendMessage(str);
-		updateScore(p);
+
 		p.sendMessage("score " + p.getScore());
 	}
 
-	private void updateMessage(String msg) {
-		for (int i = 0; i < playerCount; i++) {
-			Player p = players[i];
+	/**
+	 * Send a broadcast with a text message to all players.
+	 * @param msg Message to send
+	 */
+	private void updateMessage(final String msg) {
+		for (Player p : getPlayers()) {
 			p.sendMessage("msg " + msg);
 		}
 	}
-
 }

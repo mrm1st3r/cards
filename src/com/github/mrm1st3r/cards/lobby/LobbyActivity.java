@@ -13,7 +13,7 @@ import android.widget.ArrayAdapter;
 
 import com.github.mrm1st3r.cards.Cards;
 import com.github.mrm1st3r.cards.R;
-import com.github.mrm1st3r.cards.game.ui.Gameclient;
+import com.github.mrm1st3r.cards.game.ui.ClientGameActivity;
 import com.github.mrm1st3r.connection.AsynchronousConnection;
 import com.github.mrm1st3r.connection.OnConnectionChangeHandler;
 import com.github.mrm1st3r.connection.OnReceivedHandler;
@@ -123,8 +123,9 @@ public class LobbyActivity extends Activity {
 				} else if (set[0].equals("start")) {
 					
 					Intent intent = new Intent(LobbyActivity.this,
-							Gameclient.class);
+							ClientGameActivity.class);
 					intent.putExtra(EXTRA_PLAYER_LIST, playerList);
+					conn.setOnConnectionChangeHandler(null);
 					startActivity(intent);
 					finish();
 				} else if (set[0].equals("quit")) {
@@ -152,7 +153,7 @@ public class LobbyActivity extends Activity {
 	@Override
 	public final void onDestroy() {
 		super.onDestroy();
-		leaveLobby();
+		//leaveLobby();
 	}
 
 	@Override

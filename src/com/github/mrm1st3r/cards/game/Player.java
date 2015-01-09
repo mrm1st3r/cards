@@ -25,6 +25,10 @@ public abstract class Player {
 	 * The players hand cards.
 	 */
 	private Card[] handCards;
+	/**
+	 * Lock used when waiting for player input.
+	 */
+	private Object lock = new Object();
 
 	/**
 	 * Construct a new player.
@@ -125,6 +129,15 @@ public abstract class Player {
 	}
 
 	/**
+	 * Get a specified hand card.
+	 * @param pos Position of the request card in the players hand
+	 * @return The requested card
+	 */
+	public final Card getHandCard(final int pos) {
+		return handCards[pos];
+	}
+
+	/**
 	 * @return The players current lifes
 	 */
 	public final int getLifes() {
@@ -144,6 +157,13 @@ public abstract class Player {
 	 */
 	public final void decreaseLife() {
 		lifes--;
+	}
+
+	/**
+	 * @return This players lock object
+	 */
+	public final Object getLock() {
+		return lock;
 	}
 
 	@Override
