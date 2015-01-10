@@ -21,7 +21,7 @@ import android.widget.Toast;
 
 import com.github.mrm1st3r.cards.Cards;
 import com.github.mrm1st3r.cards.R;
-import com.github.mrm1st3r.cards.game.ui.Gamemaster;
+import com.github.mrm1st3r.cards.game.ui.HostGameActivity;
 import com.github.mrm1st3r.connection.AsynchronousConnection;
 import com.github.mrm1st3r.connection.OnConnectionChangeHandler;
 import com.github.mrm1st3r.connection.OnReceivedHandler;
@@ -297,7 +297,7 @@ public class LobbyCreateActivity extends Activity {
 		// stop listening for new connections.
 		serv.close();
 
-		Intent intent = new Intent(this, Gamemaster.class);
+		Intent intent = new Intent(this, HostGameActivity.class);
 		startActivity(intent);
 	}
 

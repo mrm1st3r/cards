@@ -3,61 +3,59 @@ package com.github.mrm1st3r.cards.game;
 import java.util.LinkedList;
 
 /**
- * Grundger�st f�r alle Kartenspiele der App.
+ * This abstract class describes the general functions of a card game.
  * 
  * @author Sergius Maier
  * @version 0.8
  */
 public abstract class Gameplay {
 
-	public final Object playerLock = new Object();
-
 	/**
-	 * Array mit allen aktiven Spielern.
+	 * The maximum number of players in this game.
+	 * (In most cases this is the number of players who start the game)
 	 */
-	protected Player[] players;
+	private final int maxPlayerCount;
 	/**
-	 * Deck/ Stapel.
+	 * All currently connected players.
+	 */
+	private LinkedList<Player> playerList;
+	/**
+	 * The current deck of hidden cards left.
 	 */
 	private LinkedList<Card> cards;
-	
-	private CardValue[] cardDeckType;
 	/**
-	 * Index des Spielers, der an der Reihe ist.
+	 * The type of card deck that will be used for the game.
 	 */
-	protected int currP;
+	private final CardValue[] cardDeckType;
 	/**
-	 * Anzahl der aktiven Spieler.
+	 * The player whose turn it is.
 	 */
-	protected int playerCount;
+	private Player activePlayer;
+	/**
+	 * The player who is dealer for this round.
+	 */
+	private Player dealer;
 
 	/**
-	 * Index des Kartengebers.
-	 */
-	protected int dealer;
-
-	/**
-	 * Konstruktor der Klasse "Gameplay".<br>
-	 * Die Anzahl der aktiven Spieler wird festgelegt.<br>
-	 * Ein Kartendeck wird erstellt und durchgemischt.
+	 * Construct a new game.
 	 * 
-	 * @param pPlayerCount Anzahl teilnehmender Spieler
-	 * @param pCardDeck Anzahl Karten
+	 * @param pPlayerCount Number of players for this game
+	 * @param pCardDeck The type of card deck that is used
 	 */
 	public Gameplay(final int pPlayerCount, final CardValue[] pCardDeck) {
-		playerCount = pPlayerCount;
 		cardDeckType = pCardDeck;
-		players = new Player[playerCount];
+		maxPlayerCount = pPlayerCount;
+		playerList = new LinkedList<Player>();
 	}
 
 	/**
-	 * Create a new card deck.
-	 * @param values Card values to use
+	 * Create a new, ordered card deck that contains all values
+	 * set in {@link #cardDeckType} in all four colors.
 	 */
 	protected final void createCardDeck() {
-		
+
 		cards = new LinkedList<Card>();
-		
+
 		for (CardColor color : CardColor.values()) {
 			for (CardValue value : cardDeckType) {
 				cards.add(new Card(color, value));
@@ -66,106 +64,146 @@ public abstract class Gameplay {
 	}
 
 	/**
-	 * Vertauscht 2 Karten eines Kartenstapels mit einander.
+	 * Take a random card from the ordered card deck.
 	 * 
-	 * @param c
-	 *            Kartenstapel
-	 * @param i
-	 *            Index der 1. Karte
-	 * @param change
-	 *            Index der 2. Karte
-	 */
-	protected static void swapCards(Card[] one, Card[] two, int i, int change) {
-		Card helper = one[i];
-		one[i] = two[change];
-		two[change] = helper;
-	}
-
-
-	/**
-	 * Die oberste Karte vom Deck/ Stapel wird entfernt und zur�ckgegegeben.
-	 * 
-	 * @return oberste Karte des Decks/ Stapels
+	 * @return The taken card, or null if there are no cards left on the deck
 	 */
 	public final Card takeCard() {
 		if (cards.size() == 0) {
 			return null;
 		}
-		
-		int num = (int) Math.random() * cards.size();
+
+		int num = (int) (Math.random() * cards.size());
 		Card c = cards.get(num);
 		cards.remove(num);
-		
+
 		return c;
 	}
 
 	/**
-	 * F�gt einen Spieler hinzu.
+	 * Add a new player to the game.
 	 * 
-	 * @param p
-	 *            hinzuzuf�gender Spieler
-	 * @return True/False, je nachdem, ob das Einf�gen funktioniert hat oder
-	 *         nicht
+	 * @param p The player to be added
+	 * @return true on success, false when the maximum number
+	 * of players was already reached before
 	 */
-	public boolean addPlayer(Player p) {
-		int i = 0;
-		while (players[i] != null && i < playerCount - 1) {
-			i++;
-		}
-		if (players[i] == null) {
-			players[i] = p;
-			return true;
-		} else {
+	public final boolean addPlayer(final Player p) {
+		if (playerList.size() == maxPlayerCount) {
 			return false;
 		}
+
+		playerList.add(p);
+		return true;
 	}
 
 	/**
-	 * Getter f�r {@link #players}
-	 * 
-	 * @return {@link #players}
+	 * @return All players currently in the game
 	 */
-	public Player[] getPlayers() {
-		return players;
+	public final LinkedList<Player> getPlayers() {
+		return playerList;
 	}
 
 	/**
-	 * Setter f�r {@link #players}
-	 * 
-	 * @param players
-	 *            um {@link #players} zu definieren
+	 * @return The player whose turn it is
 	 */
-	public void setPlayers(Player[] players) {
-		this.players = players;
+	public final Player getCurrentPlayer() {
+		return activePlayer;
 	}
 
 	/**
-	 * Getter f�r {@link #currP}
-	 * 
-	 * @return {@link #currP}
+	 * Set a new active player.
+	 * @param pPlayer New player
 	 */
-	public int getCurrP() {
-		return currP;
+	public final void setCurrentPlayer(final Player pPlayer) {
+		if (!playerList.contains(pPlayer)) {
+			throw new IllegalArgumentException(
+					"Active player was not found in player list");
+		}
+
+		this.activePlayer = pPlayer;
 	}
 
 	/**
-	 * Setter f�r {@link #currP}
-	 * 
-	 * @param currP
-	 *            um {@link #currP} zu definieren
+	 * @return The player who is currently dealer
 	 */
-	public void setCurrP(int currP) {
-		this.currP = currP;
+	public final Player getDealer() {
+		return dealer;
 	}
 
 	/**
-	 * Getter f�r {@link #playerCount}
-	 * 
-	 * @return {@link #playerCount}
+	 * Set a player to be the new dealer.
+	 * @param pDealer New dealer
 	 */
+<<<<<<< HEAD
 	public int getPlayerCount() {
 		return playerCount;
+=======
+	public final void setDealer(final Player pDealer) {
+		if (!playerList.contains(pDealer)) {
+			throw new IllegalArgumentException(
+					"Dealer was not found in player list");
+		}
+
+		dealer = pDealer;
+>>>>>>> 095ad206f97354132a8fe1775b1f858e93777d58
 	}
-	
+
+	/**
+	 * Get the player who is to make his turn after the given player.
+	 * @param p The player whose next to search
+	 * @return The next player
+	 */
+	protected final Player nextPlayerFor(final Player p) {
+		int nextPos = playerList.indexOf(p) + 1;
+		if (nextPos == playerList.size()) {
+			nextPos = 0;
+		}
+		
+		Player next = playerList.get(nextPos);
+		
+		if (next.getLifes() > 0) {
+			return next;
+		} else {
+			return nextPlayerFor(next);
+		}
+	}
+
+	/**
+	 * @return The maximum number of players in this game
+	 */
+	public final int getMaxPlayerCount() {
+		return maxPlayerCount;
+	}
+
+	/**
+	 * @return The number of living players left
+	 */
+	public final int countLivingPlayers() {
+		int num = 0;
+		for (Player p : getPlayers()) {
+			if (p.getLifes() >= 0) {
+				num++;
+			}
+		}
+		return num;
+	}
+
+	/**
+	 * @return The player at the local host device
+	 */
+	public final LocalPlayer getHostPlayer() {
+		for (Player p : getPlayers()) {
+			if (p.getClass().equals(LocalPlayer.class)) {
+				return (LocalPlayer) p;
+			}
+		}
+		
+		return null;
+	}
+
+	/**
+	 * Handle an incoming message.
+	 * @param msg Incoming message
+	 */
 	public abstract void checkMessage(String msg);
 }

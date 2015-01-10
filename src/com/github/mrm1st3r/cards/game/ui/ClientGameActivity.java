@@ -3,19 +3,26 @@ package com.github.mrm1st3r.cards.game.ui;
 import android.os.Bundle;
 
 import com.github.mrm1st3r.cards.Cards;
-import com.github.mrm1st3r.cards.R;
 import com.github.mrm1st3r.connection.AsynchronousConnection;
 import com.github.mrm1st3r.connection.OnReceivedHandler;
 import com.github.mrm1st3r.connection.bluetooth.SimpleBluetoothConnection;
 
-public class Gameclient extends GameActivity{
+/**
+ * This is the user interface started on the client devices
+ * which only receives it's information from the host.
+ * @author Sergius Maier
+ *
+ */
+public class ClientGameActivity extends GameActivity {
 
-	SimpleBluetoothConnection connection = null;
+	/**
+	 * Bluetooth connection to the host.
+	 */
+	private SimpleBluetoothConnection connection = null;
 	
 	@Override
-	public void onCreate(Bundle bun) {
+	public final void onCreate(final Bundle bun) {
 		super.onCreate(bun);
-		setContentView(R.layout.activity_game);
 		
 		connection = (SimpleBluetoothConnection) ((Cards) getApplication()).
 				getConnections().keySet().iterator().next();
@@ -24,11 +31,11 @@ public class Gameclient extends GameActivity{
 			@Override
 			public void onReceived(final AsynchronousConnection<String> conn,
 					final String msg) {
-				// logik
-				Gameclient.this.runOnUiThread(new Runnable() {
+
+				ClientGameActivity.this.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						checkMessage(msg);// auf die Oberfläche zugreifen
+						checkMessage(msg);
 					}
 				});
 			}
@@ -37,11 +44,7 @@ public class Gameclient extends GameActivity{
 	}
 
 	@Override
-	public void sendMessage(String msg) {
+	public final void sendMessage(final String msg) {
 		connection.write(msg);		
-	}
-
-	@Override
-	public void newGame() {		
 	}
 }

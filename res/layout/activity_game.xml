@@ -3,19 +3,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.github.mrm1st3r.cards.lobby.LobbyJoinActivity" >
-
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+    android:background="#449944"
+    tools:context="com.github.mrm1st3r.cards.lobby.GameActivity" >
 
     <ImageView
         android:id="@+id/img_rival0"
         android:layout_width="53dp"
         android:layout_height="56dp"
         android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
         android:src="@drawable/card_rival" />
 
     <ImageView
@@ -67,12 +66,14 @@
         android:layout_height="121dp"
         android:layout_alignParentRight="true"
         android:layout_alignTop="@+id/img_table1"
+        android:onClick="img_table"
         android:src="@drawable/card_backside" />
 
     <ImageView
         android:id="@+id/img_hand0"
         android:layout_width="99dp"
         android:layout_height="121dp"
+        android:onClick="img_hand"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:src="@drawable/card_backside" />
@@ -93,12 +94,14 @@
         android:layout_height="121dp"
         android:layout_below="@+id/lbl_rival1"
         android:layout_centerHorizontal="true"
+        android:onClick="img_table"
         android:layout_marginTop="36dp"
         android:src="@drawable/card_backside" />
 
     <ImageView
         android:id="@+id/img_table0"
         android:layout_width="99dp"
+        android:onClick="img_table"
         android:layout_height="121dp"
         android:layout_alignParentLeft="true"
         android:layout_alignTop="@+id/img_table1"
@@ -151,6 +154,7 @@
     <ImageView
         android:id="@+id/img_hand2"
         android:layout_width="99dp"
+        android:onClick="img_hand"
         android:layout_height="121dp"
         android:layout_alignParentBottom="true"
         android:layout_alignRight="@+id/lbl_rival1"
@@ -158,6 +162,7 @@
 
     <ImageView
         android:id="@+id/img_hand1"
+        android:onClick="img_hand"
         android:layout_width="99dp"
         android:layout_height="121dp"
         android:layout_alignParentBottom="true"

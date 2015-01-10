@@ -312,6 +312,6 @@ public class LobbyJoinActivity extends Activity {
 	@Override
 	protected final void onDestroy() {
 		super.onDestroy();
-		cancelSearch();
+		//cancelSearch();
 	}
 }

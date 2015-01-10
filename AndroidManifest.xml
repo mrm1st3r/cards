@@ -33,7 +33,8 @@
         <activity
             android:name=".lobby.LobbyCreateActivity"
             android:label="@string/title_activity_lobby_create"
-            android:parentActivityName=".MainActivity" >
+            android:parentActivityName=".MainActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.github.mrm1st3r.cards.MainActivity" />
@@ -49,23 +50,26 @@
         <activity
             android:name=".lobby.LobbyActivity"
             android:label="@string/title_activity_lobby"
-            android:parentActivityName=".LobbyJoinActivity" >
+            android:parentActivityName=".LobbyJoinActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.github.mrm1st3r.cards.LobbyJoinActivity" />
         </activity>
         <activity
-            android:name="com.github.mrm1st3r.cards.game.ui.Gamemaster"
+            android:name="com.github.mrm1st3r.cards.game.ui.HostGameActivity"
             android:label="@string/title_activity_game" 
-            android:parentActivityName="com.github.mrm1st3r.cards.MainActivity" >
+            android:parentActivityName="com.github.mrm1st3r.cards.MainActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.github.mrm1st3r.cards.MainActivity" />
         </activity>
         <activity
-            android:name="com.github.mrm1st3r.cards.game.ui.Gameclient"
+            android:name="com.github.mrm1st3r.cards.game.ui.ClientGameActivity"
             android:label="@string/title_activity_game" 
-            android:parentActivityName="com.github.mrm1st3r.cards.MainActivity" >
+            android:parentActivityName="com.github.mrm1st3r.cards.MainActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.github.mrm1st3r.cards.MainActivity" />
