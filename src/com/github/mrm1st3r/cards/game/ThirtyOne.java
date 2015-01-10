@@ -10,7 +10,7 @@ import android.util.Log;
  */
 public class ThirtyOne extends Gameplay {
 
-	/**
+/**
 	 * Debug tag.
 	 */
 	private static final String TAG = ThirtyOne.class.getSimpleName();
@@ -87,7 +87,6 @@ public class ThirtyOne extends Gameplay {
 	 */
 	public final void startRound() {
 		String play = "players";
-
 		for (Player p : getPlayers()) {
 			p.setLifes(MAX_LIFES);
 			p.setHand(new Card[HAND_SIZE]);
@@ -106,10 +105,9 @@ public class ThirtyOne extends Gameplay {
 				str += " " + next.getName();
 				next = nextPlayerFor(next);
 			}
-			p.sendMessage(str);
-			p.sendMessage("inactive");
+			p.connect(str);
+			p.connect("inactive");
 		}
-
 		updateMessage("Der Dealer ist dabei sich zu entscheiden");
 		for (Player p : getPlayers()) {
 
@@ -128,7 +126,6 @@ public class ThirtyOne extends Gameplay {
 		Player dealer = getDealer();
 		setCurrentPlayer(dealer);
 		choice();
-
 		dealer.sendMessage("takechoice");
 		synchronized (dealer.getLock()) {
 			try {
@@ -365,7 +362,6 @@ public class ThirtyOne extends Gameplay {
 			Card[] temp = current.getHand();
 			current.setHand(table);
 			table = temp;
-			
 			updateTables();
 			updateHand(current);
 		} else if (parts[0].equals("close")) {
@@ -417,7 +413,6 @@ public class ThirtyOne extends Gameplay {
 	private void updateHand(final Player p) {
 		updateScore(p);
 		String str = "hand";
-		
 		for (Card c : p.getHand()) {
 			str = str + " " + c.getImageName();
 		}
