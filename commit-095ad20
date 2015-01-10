@@ -1,0 +1,2299 @@
+commit 095ad206f97354132a8fe1775b1f858e93777d58
+Author: mrm1st3r <lukas.taake@gmail.com>
+Date:   Fri Jan 9 23:09:36 2015 +0100
+
+    Working game
+
+diff --git a/AndroidManifest.xml b/AndroidManifest.xml
+index 79bab09..974a287 100644
+--- a/AndroidManifest.xml
++++ b/AndroidManifest.xml
+@@ -33,7 +33,8 @@
+         <activity
+             android:name=".lobby.LobbyCreateActivity"
+             android:label="@string/title_activity_lobby_create"
+-            android:parentActivityName=".MainActivity" >
++            android:parentActivityName=".MainActivity"
++            android:configChanges="orientation|keyboardHidden|screenSize">
+             <meta-data
+                 android:name="android.support.PARENT_ACTIVITY"
+                 android:value="com.github.mrm1st3r.cards.MainActivity" />
+@@ -49,23 +50,26 @@
+         <activity
+             android:name=".lobby.LobbyActivity"
+             android:label="@string/title_activity_lobby"
+-            android:parentActivityName=".LobbyJoinActivity" >
++            android:parentActivityName=".LobbyJoinActivity"
++            android:configChanges="orientation|keyboardHidden|screenSize">
+             <meta-data
+                 android:name="android.support.PARENT_ACTIVITY"
+                 android:value="com.github.mrm1st3r.cards.LobbyJoinActivity" />
+         </activity>
+         <activity
+-            android:name="com.github.mrm1st3r.cards.game.ui.Gamemaster"
++            android:name="com.github.mrm1st3r.cards.game.ui.HostGameActivity"
+             android:label="@string/title_activity_game" 
+-            android:parentActivityName="com.github.mrm1st3r.cards.MainActivity" >
++            android:parentActivityName="com.github.mrm1st3r.cards.MainActivity"
++            android:configChanges="orientation|keyboardHidden|screenSize" >
+             <meta-data
+                 android:name="android.support.PARENT_ACTIVITY"
+                 android:value="com.github.mrm1st3r.cards.MainActivity" />
+         </activity>
+         <activity
+-            android:name="com.github.mrm1st3r.cards.game.ui.Gameclient"
++            android:name="com.github.mrm1st3r.cards.game.ui.ClientGameActivity"
+             android:label="@string/title_activity_game" 
+-            android:parentActivityName="com.github.mrm1st3r.cards.MainActivity" >
++            android:parentActivityName="com.github.mrm1st3r.cards.MainActivity"
++            android:configChanges="orientation|keyboardHidden|screenSize" >
+             <meta-data
+                 android:name="android.support.PARENT_ACTIVITY"
+                 android:value="com.github.mrm1st3r.cards.MainActivity" />
+diff --git a/res/layout/activity_game.xml b/res/layout/activity_game.xml
+index 8a95b0f..8ec5dbd 100644
+--- a/res/layout/activity_game.xml
++++ b/res/layout/activity_game.xml
+@@ -3,19 +3,18 @@
+     xmlns:tools="http://schemas.android.com/tools"
+     android:layout_width="match_parent"
+     android:layout_height="match_parent"
+-    tools:context="com.github.mrm1st3r.cards.lobby.LobbyJoinActivity" >
+-
+-    <Space
+-        android:layout_width="match_parent"
+-        android:layout_height="wrap_content" />
++    android:background="#449944"
++    tools:context="com.github.mrm1st3r.cards.lobby.GameActivity" >
+ 
+     <ImageView
+         android:id="@+id/img_rival0"
+         android:layout_width="53dp"
+         android:layout_height="56dp"
+         android:layout_alignParentLeft="true"
++        android:layout_alignParentStart="true"
+         android:layout_alignParentTop="true"
+         android:layout_marginLeft="16dp"
++        android:layout_marginStart="16dp"
+         android:src="@drawable/card_rival" />
+ 
+     <ImageView
+@@ -67,12 +66,14 @@
+         android:layout_height="121dp"
+         android:layout_alignParentRight="true"
+         android:layout_alignTop="@+id/img_table1"
++        android:onClick="img_table"
+         android:src="@drawable/card_backside" />
+ 
+     <ImageView
+         android:id="@+id/img_hand0"
+         android:layout_width="99dp"
+         android:layout_height="121dp"
++        android:onClick="img_hand"
+         android:layout_alignParentBottom="true"
+         android:layout_alignParentLeft="true"
+         android:src="@drawable/card_backside" />
+@@ -93,12 +94,14 @@
+         android:layout_height="121dp"
+         android:layout_below="@+id/lbl_rival1"
+         android:layout_centerHorizontal="true"
++        android:onClick="img_table"
+         android:layout_marginTop="36dp"
+         android:src="@drawable/card_backside" />
+ 
+     <ImageView
+         android:id="@+id/img_table0"
+         android:layout_width="99dp"
++        android:onClick="img_table"
+         android:layout_height="121dp"
+         android:layout_alignParentLeft="true"
+         android:layout_alignTop="@+id/img_table1"
+@@ -151,6 +154,7 @@
+     <ImageView
+         android:id="@+id/img_hand2"
+         android:layout_width="99dp"
++        android:onClick="img_hand"
+         android:layout_height="121dp"
+         android:layout_alignParentBottom="true"
+         android:layout_alignRight="@+id/lbl_rival1"
+@@ -158,6 +162,7 @@
+ 
+     <ImageView
+         android:id="@+id/img_hand1"
++        android:onClick="img_hand"
+         android:layout_width="99dp"
+         android:layout_height="121dp"
+         android:layout_alignParentBottom="true"
+diff --git a/res/values/strings.xml b/res/values/strings.xml
+index a8e8abb..564c6d0 100644
+--- a/res/values/strings.xml
++++ b/res/values/strings.xml
+@@ -8,7 +8,7 @@
+     <string name="new_game">Neues Spiel</string>
+     <string name="join_game">Spiel beitreten</string>
+     <string name="bot_game">Gegen den Computer</string>
+-    <string name="copyright_short">&#169; 2014 Sergius Maier, Lukas Taake\n
++    <string name="copyright_short">&#169; 2014, 2015 Sergius Maier, Lukas Taake\n
+ \n
+ Spielkarten von Charles Esquiaqui</string>
+     <string name="title_activity_lobby_create">Neues Spiel</string>
+diff --git a/src/com/github/mrm1st3r/cards/game/BluetoothPlayer.java b/src/com/github/mrm1st3r/cards/game/BluetoothPlayer.java
+new file mode 100644
+index 0000000..efcc8b4
+--- /dev/null
++++ b/src/com/github/mrm1st3r/cards/game/BluetoothPlayer.java
+@@ -0,0 +1,41 @@
++package com.github.mrm1st3r.cards.game;
++
++import com.github.mrm1st3r.connection.bluetooth.SimpleBluetoothConnection;
++
++/**
++ * This class describes a remote player connected via Bluetooth.
++ * @author Lukas 'mrm1st3r' Taake
++ *
++ */
++public class BluetoothPlayer extends Player {
++	
++	/**
++	 * The Bluetooth connection to the remote device.
++	 */
++	private SimpleBluetoothConnection connection;
++	/**
++	 * Construct a new remote player.
++	 * @param pName The player name
++	 * @param pHandSize The maximum number of hand cards
++	 * @param pLifes The number of lifes to begin with
++	 * @param pConn The remote connection
++	 */
++	public BluetoothPlayer(final String pName, final int pHandSize,
++			final int pLifes, final SimpleBluetoothConnection pConn) {
++
++		super(pName, pHandSize, pLifes);
++		connection = pConn;
++	}
++
++	@Override
++	public final void sendMessage(final String msg) {
++		connection.write(msg);
++	}
++
++	/**
++	 * @return The used Bluetooth connection to the remote device
++	 */
++	public final SimpleBluetoothConnection getConn() {
++		return connection;
++	}
++}
+diff --git a/src/com/github/mrm1st3r/cards/game/Bluetoothplayer.java b/src/com/github/mrm1st3r/cards/game/Bluetoothplayer.java
+deleted file mode 100644
+index 60f37b7..0000000
+--- a/src/com/github/mrm1st3r/cards/game/Bluetoothplayer.java
++++ /dev/null
+@@ -1,55 +0,0 @@
+-package com.github.mrm1st3r.cards.game;
+-
+-import com.github.mrm1st3r.connection.AsynchronousConnection;
+-import com.github.mrm1st3r.connection.OnReceivedHandler;
+-import com.github.mrm1st3r.connection.bluetooth.SimpleBluetoothConnection;
+-
+-public class Bluetoothplayer extends Player{
+-	
+-	/**
+-	 * Connection des Spielers.
+-	 */
+-	private SimpleBluetoothConnection connection;
+-	
+-	private Object lock = new Object();
+-
+-	public Bluetoothplayer(String n, int m, int l, SimpleBluetoothConnection conn) {
+-		super(n, m, l);
+-		setConn(conn);
+-		
+-		conn.setOnReceivedHandler(new OnReceivedHandler<String>() {
+-			@Override
+-			public void onReceived(final AsynchronousConnection<String> conn,
+-					final String msg) {
+-				synchronized (lock) {
+-					// game.checkMessage(msg);
+-					lock.notify();
+-				}
+-			}
+-		});
+-	}
+-
+-	@Override
+-	public void sendMessage(String msg){
+-		connection.write(msg);
+-	}
+-
+-	/**
+-	 * Getter fï¿½r {@link #connection}
+-	 * 
+-	 * @return {@link #connection}
+-	 */
+-	public SimpleBluetoothConnection getConn() {
+-		return connection;
+-	}
+-
+-	/**
+-	 * Setter fï¿½r {@link #connection}
+-	 * 
+-	 * @param conn um {@link #connection} zu definieren
+-	 */
+-	public void setConn(SimpleBluetoothConnection conn) {
+-		this.connection = conn;
+-	}
+-	
+-}
+diff --git a/src/com/github/mrm1st3r/cards/game/Gameplay.java b/src/com/github/mrm1st3r/cards/game/Gameplay.java
+index 0c39dc1..4dd9eef 100644
+--- a/src/com/github/mrm1st3r/cards/game/Gameplay.java
++++ b/src/com/github/mrm1st3r/cards/game/Gameplay.java
+@@ -3,61 +3,59 @@ package com.github.mrm1st3r.cards.game;
+ import java.util.LinkedList;
+ 
+ /**
+- * Grundgerï¿½st fï¿½r alle Kartenspiele der App.
++ * This abstract class describes the general functions of a card game.
+  * 
+  * @author Sergius Maier
+  * @version 0.8
+  */
+ public abstract class Gameplay {
+ 
+-	public final Object playerLock = new Object();
+-
+ 	/**
+-	 * Array mit allen aktiven Spielern.
++	 * The maximum number of players in this game.
++	 * (In most cases this is the number of players who start the game)
++	 */
++	private final int maxPlayerCount;
++	/**
++	 * All currently connected players.
+ 	 */
+-	protected Player[] players;
++	private LinkedList<Player> playerList;
+ 	/**
+-	 * Deck/ Stapel.
++	 * The current deck of hidden cards left.
+ 	 */
+ 	private LinkedList<Card> cards;
+-	
+-	private CardValue[] cardDeckType;
+ 	/**
+-	 * Index des Spielers, der an der Reihe ist.
++	 * The type of card deck that will be used for the game.
+ 	 */
+-	protected int currP;
++	private final CardValue[] cardDeckType;
+ 	/**
+-	 * Anzahl der aktiven Spieler.
++	 * The player whose turn it is.
+ 	 */
+-	protected int playerCount;
+-
++	private Player activePlayer;
+ 	/**
+-	 * Index des Kartengebers.
++	 * The player who is dealer for this round.
+ 	 */
+-	protected int dealer;
++	private Player dealer;
+ 
+ 	/**
+-	 * Konstruktor der Klasse "Gameplay".<br>
+-	 * Die Anzahl der aktiven Spieler wird festgelegt.<br>
+-	 * Ein Kartendeck wird erstellt und durchgemischt.
++	 * Construct a new game.
+ 	 * 
+-	 * @param pPlayerCount Anzahl teilnehmender Spieler
+-	 * @param pCardDeck Anzahl Karten
++	 * @param pPlayerCount Number of players for this game
++	 * @param pCardDeck The type of card deck that is used
+ 	 */
+ 	public Gameplay(final int pPlayerCount, final CardValue[] pCardDeck) {
+-		playerCount = pPlayerCount;
+ 		cardDeckType = pCardDeck;
+-		players = new Player[playerCount];
++		maxPlayerCount = pPlayerCount;
++		playerList = new LinkedList<Player>();
+ 	}
+ 
+ 	/**
+-	 * Create a new card deck.
+-	 * @param values Card values to use
++	 * Create a new, ordered card deck that contains all values
++	 * set in {@link #cardDeckType} in all four colors.
+ 	 */
+ 	protected final void createCardDeck() {
+-		
++
+ 		cards = new LinkedList<Card>();
+-		
++
+ 		for (CardColor color : CardColor.values()) {
+ 			for (CardValue value : cardDeckType) {
+ 				cards.add(new Card(color, value));
+@@ -66,106 +64,141 @@ public abstract class Gameplay {
+ 	}
+ 
+ 	/**
+-	 * Vertauscht 2 Karten eines Kartenstapels mit einander.
++	 * Take a random card from the ordered card deck.
+ 	 * 
+-	 * @param c
+-	 *            Kartenstapel
+-	 * @param i
+-	 *            Index der 1. Karte
+-	 * @param change
+-	 *            Index der 2. Karte
+-	 */
+-	protected static void swapCards(Card[] one, Card[] two, int i, int change) {
+-		Card helper = one[i];
+-		one[i] = two[change];
+-		two[change] = helper;
+-	}
+-
+-
+-	/**
+-	 * Die oberste Karte vom Deck/ Stapel wird entfernt und zurï¿½ckgegegeben.
+-	 * 
+-	 * @return oberste Karte des Decks/ Stapels
++	 * @return The taken card, or null if there are no cards left on the deck
+ 	 */
+ 	public final Card takeCard() {
+ 		if (cards.size() == 0) {
+ 			return null;
+ 		}
+-		
+-		int num = (int) Math.random() * cards.size();
++
++		int num = (int) (Math.random() * cards.size());
+ 		Card c = cards.get(num);
+ 		cards.remove(num);
+-		
++
+ 		return c;
+ 	}
+ 
+ 	/**
+-	 * Fï¿½gt einen Spieler hinzu.
++	 * Add a new player to the game.
+ 	 * 
+-	 * @param p
+-	 *            hinzuzufï¿½gender Spieler
+-	 * @return True/False, je nachdem, ob das Einfï¿½gen funktioniert hat oder
+-	 *         nicht
+-	 */
+-	public boolean addPlayer(Player p) {
+-		int i = 0;
+-		while (players[i] != null && i < playerCount - 1) {
+-			i++;
+-		}
+-		if (players[i] == null) {
+-			players[i] = p;
+-			return true;
+-		} else {
++	 * @param p The player to be added
++	 * @return true on success, false when the maximum number
++	 * of players was already reached before
++	 */
++	public final boolean addPlayer(final Player p) {
++		if (playerList.size() == maxPlayerCount) {
+ 			return false;
+ 		}
++
++		playerList.add(p);
++		return true;
+ 	}
+ 
+ 	/**
+-	 * Getter fï¿½r {@link #players}
+-	 * 
+-	 * @return {@link #players}
++	 * @return All players currently in the game
+ 	 */
+-	public Player[] getPlayers() {
+-		return players;
++	public final LinkedList<Player> getPlayers() {
++		return playerList;
+ 	}
+ 
+ 	/**
+-	 * Setter fï¿½r {@link #players}
+-	 * 
+-	 * @param players
+-	 *            um {@link #players} zu definieren
++	 * @return The player whose turn it is
+ 	 */
+-	public void setPlayers(Player[] players) {
+-		this.players = players;
++	public final Player getCurrentPlayer() {
++		return activePlayer;
+ 	}
+ 
+ 	/**
+-	 * Getter fï¿½r {@link #currP}
+-	 * 
+-	 * @return {@link #currP}
++	 * Set a new active player.
++	 * @param pPlayer New player
+ 	 */
+-	public int getCurrP() {
+-		return currP;
++	public final void setCurrentPlayer(final Player pPlayer) {
++		if (!playerList.contains(pPlayer)) {
++			throw new IllegalArgumentException(
++					"Active player was not found in player list");
++		}
++
++		this.activePlayer = pPlayer;
+ 	}
+ 
+ 	/**
+-	 * Setter fï¿½r {@link #currP}
+-	 * 
+-	 * @param currP
+-	 *            um {@link #currP} zu definieren
++	 * @return The player who is currently dealer
+ 	 */
+-	public void setCurrP(int currP) {
+-		this.currP = currP;
++	public final Player getDealer() {
++		return dealer;
+ 	}
+ 
+ 	/**
+-	 * Getter fï¿½r {@link #playerCount}
+-	 * 
+-	 * @return {@link #playerCount}
++	 * Set a player to be the new dealer.
++	 * @param pDealer New dealer
+ 	 */
+-	public int getMax() {
+-		return playerCount;
++	public final void setDealer(final Player pDealer) {
++		if (!playerList.contains(pDealer)) {
++			throw new IllegalArgumentException(
++					"Dealer was not found in player list");
++		}
++
++		dealer = pDealer;
+ 	}
+-	
++
++	/**
++	 * Get the player who is to make his turn after the given player.
++	 * @param p The player whose next to search
++	 * @return The next player
++	 */
++	protected final Player nextPlayerFor(final Player p) {
++		int nextPos = playerList.indexOf(p) + 1;
++		if (nextPos == playerList.size()) {
++			nextPos = 0;
++		}
++		
++		Player next = playerList.get(nextPos);
++		
++		if (next.getLifes() > 0) {
++			return next;
++		} else {
++			return nextPlayerFor(next);
++		}
++	}
++
++	/**
++	 * @return The maximum number of players in this game
++	 */
++	public final int getMaxPlayerCount() {
++		return maxPlayerCount;
++	}
++
++	/**
++	 * @return The number of living players left
++	 */
++	public final int countLivingPlayers() {
++		int num = 0;
++		for (Player p : getPlayers()) {
++			if (p.getLifes() >= 0) {
++				num++;
++			}
++		}
++		return num;
++	}
++
++	/**
++	 * @return The player at the local host device
++	 */
++	public final LocalPlayer getHostPlayer() {
++		for (Player p : getPlayers()) {
++			if (p.getClass().equals(LocalPlayer.class)) {
++				return (LocalPlayer) p;
++			}
++		}
++		
++		return null;
++	}
++
++	/**
++	 * Handle an incoming message.
++	 * @param msg Incoming message
++	 */
+ 	public abstract void checkMessage(String msg);
+ }
+\ No newline at end of file
+diff --git a/src/com/github/mrm1st3r/cards/game/LocalPlayer.java b/src/com/github/mrm1st3r/cards/game/LocalPlayer.java
+new file mode 100644
+index 0000000..48c862c
+--- /dev/null
++++ b/src/com/github/mrm1st3r/cards/game/LocalPlayer.java
+@@ -0,0 +1,47 @@
++package com.github.mrm1st3r.cards.game;
++
++import com.github.mrm1st3r.cards.game.ui.HostGameActivity;
++
++/**
++ * This class describes a local player.
++ * @author Sergius Maier
++ *
++ */
++public class LocalPlayer extends Player {
++
++	/**
++	 * The local user interface to interact with.
++	 */
++	private HostGameActivity userInterface;
++
++	/**
++	 * Construct a new local player.
++	 * @param pName The players name
++	 * @param pHandSize The maximum number of hand cards
++	 * @param pLifes The number of lifes to begin with
++	 * @param pUi The local user interface
++	 */
++	public LocalPlayer(final String pName, final int pHandSize,
++			final int pLifes, final HostGameActivity pUi) {
++		
++		super(pName, pHandSize, pLifes);
++		userInterface = pUi;
++	}
++
++	/**
++	 * @return The local user interface
++	 */
++	public final HostGameActivity getUserInterface() {
++		return userInterface;
++	}
++
++	@Override
++	public final void sendMessage(final String msg) {
++		userInterface.runOnUiThread(new Runnable() {
++			@Override
++			public void run() {
++				userInterface.checkMessage(msg);
++			}
++		});
++	}
++}
+diff --git a/src/com/github/mrm1st3r/cards/game/Localplayer.java b/src/com/github/mrm1st3r/cards/game/Localplayer.java
+deleted file mode 100644
+index 9a748e2..0000000
+--- a/src/com/github/mrm1st3r/cards/game/Localplayer.java
++++ /dev/null
+@@ -1,40 +0,0 @@
+-package com.github.mrm1st3r.cards.game;
+-
+-import com.github.mrm1st3r.cards.game.ui.*;
+-
+-public class Localplayer extends Player {
+-	
+-	Gamemaster gameAct;
+-
+-	/**
+-	 * @param n
+-	 * @param m
+-	 * @param conn
+-	 */
+-	public Localplayer(String n, int m, int l, Gamemaster ga) {
+-		super(n, m, l);
+-		setGameAct(ga);
+-	}
+-
+-	public Gamemaster getGameAct() {
+-		return gameAct;
+-	}
+-
+-	public void setGameAct(Gamemaster  ga) {
+-		this.gameAct = ga;
+-	}
+-
+-	@Override
+-	public void sendMessage(final String msg){
+-		gameAct.runOnUiThread(new Runnable() {
+-			@Override
+-			public void run() {
+-				gameAct.checkMessage(msg);
+-			}
+-		});
+-	}	
+-	
+-	public void newGame(){
+-		gameAct.newGame();
+-	}
+-}
+diff --git a/src/com/github/mrm1st3r/cards/game/Player.java b/src/com/github/mrm1st3r/cards/game/Player.java
+index 89d2626..b5e300b 100644
+--- a/src/com/github/mrm1st3r/cards/game/Player.java
++++ b/src/com/github/mrm1st3r/cards/game/Player.java
+@@ -25,6 +25,10 @@ public abstract class Player {
+ 	 * The players hand cards.
+ 	 */
+ 	private Card[] handCards;
++	/**
++	 * Lock used when waiting for player input.
++	 */
++	private Object lock = new Object();
+ 
+ 	/**
+ 	 * Construct a new player.
+@@ -125,6 +129,15 @@ public abstract class Player {
+ 	}
+ 
+ 	/**
++	 * Get a specified hand card.
++	 * @param pos Position of the request card in the players hand
++	 * @return The requested card
++	 */
++	public final Card getHandCard(final int pos) {
++		return handCards[pos];
++	}
++
++	/**
+ 	 * @return The players current lifes
+ 	 */
+ 	public final int getLifes() {
+@@ -146,6 +159,13 @@ public abstract class Player {
+ 		lifes--;
+ 	}
+ 
++	/**
++	 * @return This players lock object
++	 */
++	public final Object getLock() {
++		return lock;
++	}
++
+ 	@Override
+ 	public final String toString() {
+ 		return name + " has " + score + " points and " + lifes + " lifes";
+diff --git a/src/com/github/mrm1st3r/cards/game/ThirtyOne.java b/src/com/github/mrm1st3r/cards/game/ThirtyOne.java
+index cb67b3b..c9cf4ee 100644
+--- a/src/com/github/mrm1st3r/cards/game/ThirtyOne.java
++++ b/src/com/github/mrm1st3r/cards/game/ThirtyOne.java
+@@ -1,58 +1,78 @@
+ package com.github.mrm1st3r.cards.game;
+ 
+-import java.util.Random;
+-
+ import android.util.Log;
+ 
+ /**
+- * Erweitert die Klasse "Gameplay".<br>
+- * Hauptklasse fï¿½r das Spiel "ThirtyOne" / Schwimmen.
++ * This class describes the game rules and sequence for the game "Schwimmen".
+  * 
+  * @author Sergius Maier
+  * @version 0.8
+  */
+ public class ThirtyOne extends Gameplay {
+ 
++	/**
++	 * Debug tag.
++	 */
+ 	private static final String TAG = ThirtyOne.class.getSimpleName();
+-	
++	/**
++	 * Number of lifes for each player to start with.
++	 */
+ 	public static final int MAX_LIFES = 3;
+ 	/**
+-	 * max. Anzahl der Karten, die ein Spieler in der Hand haben darf.
++	 * Number of cards that each player holds in hand and lay on the table.
+ 	 */
+-	int hmax = 3;
++	public static final int HAND_SIZE = 3;
+ 	/**
+-	 * Karten auf dem Tisch
++	 * Maximum number of points that can be reached.
+ 	 */
+-	Card[] table = new Card[hmax];
++	public static final int POINTS_MAX = 33;
+ 	/**
+-	 * Zustand, der angibt, wer geklopft hat
++	 * Number of points that is achieved with three cards of the same value.
+ 	 */
+-	int stopped;
+-	Card[] choice = new Card[hmax];
+-	boolean playing = true;
+-	boolean lastrd = true;
++	public static final double POINTS_TRIPLE = 30.5;
++	/**
++	 * The number of points needed to instantly win a round.
++	 */
++	public static final int POINTS_WIN = 31;
++	/**
++	 * All cards laying openly on the table.
++	 */
++	private Card[] table = new Card[HAND_SIZE];
++	/**
++	 * The player who has closed the round.
++	 */
++	private Player stopper = null;
++	/**
++	 * The player who has won the round.
++	 */
++	private Player winner = null;
++	/**
++	 * The hidden cards that the dealer will get if he refuses
++	 * his hand cards. If the dealer accepts his hand cards, these
++	 * will become the table cards.
++	 */
++	private Card[] choice = new Card[HAND_SIZE];
++	/**
++	 * Flag to indicate if the game is still in progress.
++	 */
++	private boolean playing = true;
+ 
+ 	/**
+-	 * Konstruktor der Klasse "ThirtyOne".
+-	 * 
+-	 * @param m
+-	 *            Anzahl an Spielern
++	 * Construct a new game of "Schwimmen".
++	 * @param pPlayerCount Number of players to begin with
+ 	 */
+-	public ThirtyOne(int m) {
+-		super(m, CardValue.getSkatDeck());
+-		setStopped(m + 1);
++	public ThirtyOne(final int pPlayerCount) {
++		super(pPlayerCount, CardValue.getSkatDeck());
+ 	}
+ 
+ 	/**
+-	 * Ein Dealer wird per Zufall festgelegt und die erste Runde wird gestartet.
++	 * Set a random player to be the dealer and start the game.
+ 	 */
+-	public void start() {
+-		Random ran = new Random();
+-		dealer = ran.nextInt(playerCount);
+-		game();
+-	}
++	public final void start() {
++
++		// the host is always dealer in the first round
++		setDealer(getHostPlayer());
+ 
+-	private void game() {
+ 		while (playing) {
+ 			startRound();
+ 			playRound();
+@@ -61,103 +81,86 @@ public class ThirtyOne extends Gameplay {
+ 	}
+ 
+ 	/**
+-	 * Start einer Runde.<br>
+-	 * Es werden Karten an alle Spieler ausgeteilt.<br>
+-	 * Der Dealer bekommt die Mï¿½glichkeit sich zwischen zwei Hï¿½nden zu
+-	 * entscheiden.<br>
+-	 * Der nï¿½chste wird festgelegt und das Spiel gestartet.
++	 * The start of a game round.<br>
++	 * All players receive their hand cards and the dealer has to choose
++	 * between two card sets of which he sees only one.
+ 	 */
+-	public void startRound() {
+-		Player p;
++	public final void startRound() {
+ 		String play = "players";
+-		String str;
+-		lastrd = true;
+-		/*
+-		 * creates the list of opponents individual for every player and send it
+-		 * to them
+-		 */
+-		for (int i = 0; i < playerCount; i++) {
+-			p = players[i];
+-			int j = i;
+-			j = nextPlayer(i);
+-			str = play;
++
++		for (Player p : getPlayers()) {
+ 			p.setLifes(MAX_LIFES);
+-			Log.d(TAG, i + " / " + j);
+-			while (j != i) {
+-				Log.d(TAG, "opponent player: " + p.getName());
+-				str = str + " " + p.getName();
+-				j = nextPlayer(j);
++			p.setHand(new Card[HAND_SIZE]);
++			
++		}
++		stopper = null;
++		winner = null;
++		createCardDeck();
++		
++		// send the list of opponents to each player
++		for (Player p : getPlayers()) {
++			Player next = nextPlayerFor(p);
++			String str = play;
++
++			while (!next.equals(p)) {
++				str += " " + next.getName();
++				next = nextPlayerFor(next);
+ 			}
+ 			p.sendMessage(str);
+ 			p.sendMessage("inactive");
+ 		}
+-		
+-		createCardDeck();
+-		
++
+ 		updateMessage("Der Dealer ist dabei sich zu entscheiden");
+-		for (int i = 0; i < playerCount; i++) {
+-			
+-			if (i != dealer && players[i].getLifes() >= 0) {
+-			
+-				p = players[i];
+-				
++		for (Player p : getPlayers()) {
++
++			if (p.getLifes() >= 0) {
++
+ 				giveHand(p);
+-				
++
+ 				Card[] hand = p.getHand();
+-				
+-				p.sendMessage("hand " + hand[0] + " " + hand[1] + " "
+-						+ hand[2]);
+-				updateScore(p);
+-				p.sendMessage("score " + p.getScore());
++
++				p.sendMessage("hand " + hand[0].getImageName()
++						+ " " + hand[1].getImageName() + " "
++						+ hand[2].getImageName());
+ 				p.sendMessage("life " + p.getLifes());
+ 			}
+ 		}
+-		p = players[dealer];
+-		currP = dealer;
++		Player dealer = getDealer();
++		setCurrentPlayer(dealer);
+ 		choice();
+-		p.sendMessage("hand " + p.getHand()[0].getImageName()
+-				+ " " + p.getHand()[1].getImageName()
+-				+ " " + p.getHand()[2].getImageName());
+-		p.sendMessage("takechoice");
+-		synchronized (playerLock) {
++
++		dealer.sendMessage("takechoice");
++		synchronized (dealer.getLock()) {
+ 			try {
+-				playerLock.wait();
++				dealer.getLock().wait();
+ 			} catch (InterruptedException e) {
+ 				e.printStackTrace();
+ 			}
+ 		}
++		
++		updateScores();
+ 	}
+ 
+ 	/**
+-	 * Spielablauf.<br>
++	 * Game sequence.<br>
+ 	 * Alle Spieler sind nach einander dran bis einer die Runde beendet. Danach
+ 	 * kommen die anderen Spieler noch mal an die Reihe.
+ 	 */
+ 	private void playRound() {
+-		while (stopped > playerCount) {
+-			updateMessage(players[currP].getName() + " ist an der Reihe");
+-			players[currP].sendMessage("active");
+-			synchronized (playerLock) {
++		Player p = getCurrentPlayer();
++
++		while (!p.equals(stopper) && winner == null) {
++			updateMessage(p.getName() + " ist an der Reihe");
++			p.sendMessage("active");
++			synchronized (p.getLock()) {
+ 				try {
+-					playerLock.wait();
++					p.getLock().wait();
+ 				} catch (InterruptedException e) {
+ 					e.printStackTrace();
+ 				}
+ 			}
+-			currP = nextPlayer(currP);
+-		}
+-		if (lastrd) {
+-			do {
+-				players[currP].sendMessage("lastround");
+-				synchronized (playerLock) {
+-					try {
+-						playerLock.wait();
+-					} catch (InterruptedException e) {
+-						e.printStackTrace();
+-					}
+-				}
+-				currP = nextPlayer(currP);
+-			} while (currP != stopped);
++			p = nextPlayerFor(p);
++			setCurrentPlayer(p);
+ 		}
+ 	}
+ 
+@@ -168,75 +171,59 @@ public class ThirtyOne extends Gameplay {
+ 	 * es werden die Spieler aus dem Spiel genommen, die keine Leben mehr haben
+ 	 * und es wird eine neue Runde gestartet.
+ 	 */
+-	public void endRound() {
++	public final void endRound() {
+ 		updateScores();
+-		float result = 0;
+-		Player p;
+-		Player[] oldPlayers = players;
+-		int alive = playerCount;
+-		for (int i = 0; i < playerCount; i++) {
+-			p = players[i];
++		float minScore = POINTS_MAX;
++
++		// search for the lowest score in this round
++		for (Player p : getPlayers()) {
+ 			if (p.getLifes() >= 0) {
+-				result = Math.min(result, p.getScore());
++				minScore = Math.min(minScore, p.getScore());
+ 			}
+ 		}
+-		for (int i = 0; i < playerCount; i++) {
+-			p = players[i];
+-			if (p.getLifes() >= 0 && p.getScore() == result) {
++
++		for (Player p : getPlayers()) {
++			if (p.getLifes() >= 0 && p.getScore() == minScore) {
+ 				if (p.getLifes() > 0) {
+ 					p.decreaseLife();
+ 				}
+ 			}
+-			if (p.getLifes() < 0) {
+-				alive--;
+-			}
+ 		}
++
++		int alive = countLivingPlayers();
++		Player host = getHostPlayer();
++
+ 		if (alive == 1) {
+-			p = null;
+-			int i = 0;
+-			while (p == null) {
+-				if (players[i].getLifes() >= 0) {
+-					p = players[i];
++			for (Player p : getPlayers()) {
++				if (p.getLifes() >= 0) {
++					updateMessage(p.getName() + " hat gewonnen");
++					break;
+ 				}
+-				i++;
+ 			}
+-			updateMessage(p.getName() + " hat gewonnen");
++
+ 			playing = false;
+-			players[0].sendMessage("newgame");
+-			synchronized (playerLock) {
+-				try {
+-					playerLock.wait();
+-				} catch (InterruptedException e) {
+-					e.printStackTrace();
+-				}
+-			}
++			host.sendMessage("newgame");
++
+ 		} else if (alive == 0) {
+ 			String str = "Unentschieden zwischen";
+-			p = null;
+-			for (int i = 0; i < playerCount; i++) {
+-				p = oldPlayers[i];
++
++			for (Player p : getPlayers()) {
+ 				if (p.getLifes() >= 0) {
+-					str = str + " " + p.getName();
++					str += " " + p.getName();
+ 				}
+ 			}
+ 			updateMessage(str);
+ 			playing = false;
+-			players[0].sendMessage("newgame");
+-			synchronized (playerLock) {
+-				try {
+-					playerLock.wait();
+-				} catch (InterruptedException e) {
+-					e.printStackTrace();
+-				}
+-			}
++			host.sendMessage("newgame");
+ 		} else {
+-			players[0].sendMessage("nextround");
+-			synchronized (playerLock) {
+-				try {
+-					playerLock.wait();
+-				} catch (InterruptedException e) {
+-					e.printStackTrace();
+-				}
++			host.sendMessage("nextroundchoice");
++		}
++
++		synchronized (host.getLock()) {
++			try {
++				host.getLock().wait();
++			} catch (InterruptedException e) {
++				e.printStackTrace();
+ 			}
+ 		}
+ 	}
+@@ -245,44 +232,27 @@ public class ThirtyOne extends Gameplay {
+ 	 * Dem Dealer wird die Mï¿½glichkeit gegeben sich zwischen zwei Hï¿½nden zu
+ 	 * entscheiden. Die Hand fï¿½r die er sich nicht entschieden hat wird auf
+ 	 * den Tisch gelegt.
+-	 * 
+-	 * @return Hand, fï¿½r die sich der Dealer entschieden hat
++	 * @param str Choice made by the dealer
+ 	 */
+-	private void choiceResult(String str) {
+-		if (str == "hand") {
++	private void choiceResult(final String str) {
++		if (str.equals("hand")) {
+ 			table = choice;
+ 		} else {
+-			table = players[dealer].getHand();
+-			players[dealer].setHand(choice);
+-			updateHand();
++			table = getDealer().getHand();
++			getDealer().setHand(choice);
++			updateHand(getDealer());
+ 		}
+ 		updateTables();
+ 	}
+ 
+-	private void choice() {
+-		choice = new Card[hmax];
+-		for (int i = 0; i < hmax; i++) {
+-			choice[i] = takeCard();
+-		}
+-		giveHand(players[dealer]);
+-	}
+-
+ 	/**
+-	 * Determines the next current player.
+ 	 * 
+-	 * @param p
+-	 *            current player
+-	 * @return next player
+ 	 */
+-	private int nextPlayer(int p) {
+-		int temp = p + 1;
+-		if (temp >= playerCount) {
+-			temp = 0;
+-		}
+-		if (players[temp].getLifes() < 0) {
+-			temp = nextPlayer(temp);
++	private void choice() {
++		choice = new Card[HAND_SIZE];
++		for (int i = 0; i < HAND_SIZE; i++) {
++			choice[i] = takeCard();
+ 		}
+-		return temp;
+ 	}
+ 
+ 	/**
+@@ -292,23 +262,24 @@ public class ThirtyOne extends Gameplay {
+ 	 * @param p
+ 	 *            Spieler
+ 	 */
+-	public void giveHand(Player p) {
+-		boolean temp = true;
+-		for (int i = 0; i < hmax; i++) {
+-			temp = p.addToHand(takeCard());
+-			//if (temp) {
+-			//	i = hmax;
+-			//}
++	public final void giveHand(final Player p) {
++
++		for (int i = 0; i < HAND_SIZE; i++) {
++			p.addToHand(takeCard());
+ 		}
+ 	}
+ 
+ 	/**
+ 	 * Aktualisiert die Punkte aller Spieler.
+ 	 */
+-	public void updateScores() {
+-		for (Player p : players) {
++	public final void updateScores() {
++		for (Player p : getPlayers()) {
+ 			if (p.getLifes() >= 0) {
+ 				updateScore(p);
++				p.sendMessage("score " + p.getScore());
++				if (p.getScore() >= POINTS_WIN) {
++					winner = p;
++				}
+ 			}
+ 		}
+ 	}
+@@ -319,182 +290,149 @@ public class ThirtyOne extends Gameplay {
+ 	 * @param p
+ 	 *            Spieler
+ 	 */
+-	public void updateScore(Player p) {
++	public final void updateScore(final Player p) {
+ 		Card[] hand = p.getHand();
+-		p.setScore(calcScore(hand));
+-	}
+ 
+-	/**
+-	 * Kalkuliert den Punktestand aus der Hand, die ï¿½bergeben wurde.
+-	 * 
+-	 * @param c
+-	 *            Hand, von der die Punkte ermittelt werden soll
+-	 * @return kalkulierte Punktezahl
+-	 */
+-	private float calcScore(Card[] c) {
++		if (hand[0] == null) {
++			return;
++		}
++		
+ 		float hearts = 0;
+ 		float diamonds = 0;
+ 		float spades = 0;
+-		float clover = 0;
+-		float same = 0;
+-		float result = 0;
+-		for (int i = 0; i < c.length; i++) {
+-			switch (c[i].getColor()) {
+-			case HEARTS:
+-				hearts += c[i].getIntValue();
+-				break;
+-			case DIAMONDS:
+-				diamonds += c[i].getIntValue();
+-				break;
+-			case SPADES:
+-				spades += c[i].getIntValue();
+-				break;
+-			case CLUBS:
+-				clover += c[i].getIntValue();
+-				break;
+-			}
+-		}
+-		if (c[0].getValue() == c[1].getValue()
+-				&& c[0].getValue() == c[2].getValue()) {
+-			same = (float) 30.5;
+-			if (c[0].getValue() == CardValue.ACE) {
+-				result = 33;
+-			}
+-		}
+-		result = Math.max(result, hearts);
+-		result = Math.max(result, diamonds);
+-		result = Math.max(result, spades);
+-		result = Math.max(result, clover);
+-		result = Math.max(result, same);
+-		if (result >= 31) {
+-			lastrd = false;
+-			stopped = currP;
+-		}
+-		return result;
+-	}
++		float clubs = 0;
+ 
+-	/**
+-	 * Getter fï¿½r {@link #hmax}
+-	 * 
+-	 * @return {@link #hmax}
+-	 */
+-	public int getHmax() {
+-		return hmax;
+-	}
++		float score = 0;
+ 
+-	/**
+-	 * Setter fï¿½r {@link #hmax}
+-	 * 
+-	 * @param hmax
+-	 *            um {@link #hmax} zu definieren
+-	 */
+-	public void setHmax(int hmax) {
+-		this.hmax = hmax;
+-	}
++		// check for three same values
+ 
+-	/**
+-	 * Getter fï¿½r {@link #table}
+-	 * 
+-	 * @return {@link #table}
+-	 */
+-	public Card[] getTable() {
+-		return table;
+-	}
++		if (hand[0].getValue() == hand[1].getValue()
++				&& hand[0].getValue() == hand[2].getValue()) {
+ 
+-	/**
+-	 * Setter fï¿½r {@link #table}
+-	 * 
+-	 * @param table
+-	 *            um {@link #table} zu definieren
+-	 */
+-	public void setTable(Card[] table) {
+-		this.table = table;
+-	}
++			if (hand[0].getValue() == CardValue.ACE) {
++				score = POINTS_MAX;
++			} else {
++				score = (float) POINTS_TRIPLE;
++			}
++		} else {
+ 
+-	/**
+-	 * Getter fï¿½r {@link #stopped}
+-	 * 
+-	 * @return {@link #stopped}
+-	 */
+-	public int getStopped() {
+-		return stopped;
+-	}
++			for (Card c : hand) {
++				switch (c.getColor()) {
++				case HEARTS:
++					hearts += c.getIntValue();
++					break;
++				case DIAMONDS:
++					diamonds += c.getIntValue();
++					break;
++				case SPADES:
++					spades += c.getIntValue();
++					break;
++				case CLUBS:
++					clubs += c.getIntValue();
++					break;
++				default:
++					break;
++				}
++			}
+ 
+-	/**
+-	 * Setter fï¿½r {@link #stopped}
+-	 * 
+-	 * @param stopped
+-	 *            um {@link #stopped} zu definieren
+-	 */
+-	public void setStopped(int stopped) {
+-		this.stopped = stopped;
++			score = Math.max(score, hearts);
++			score = Math.max(score, diamonds);
++			score = Math.max(score, spades);
++			score = Math.max(score, clubs);
++		}
++		p.setScore(score);
+ 	}
+ 
+-	public void checkMessage(String msg) {
++	@Override
++	public final void checkMessage(final String msg) {
++		
++		Log.d(TAG, "game receiving: " + msg);
++
+ 		String[] parts = msg.split(" ");
+-		if (parts[0] == "swap") {
+-			swapCards(players[currP].getHand(), table, Integer.parseInt(parts[1]),
+-					Integer.parseInt(parts[2]));
++		Player current = getCurrentPlayer();
++		
++		if (parts[0] .equals("swap")) {
++			int handPos = Integer.parseInt(parts[1]);
++			int tablePos = Integer.parseInt(parts[2]);
++			
++			Card temp = current.getHandCard(handPos);
++			current.getHand()[handPos] = table[tablePos];
++			table[tablePos] = temp;
++
+ 			updateTables();
+-			updateHand();
+-		} else if (parts[0] == "swapall") {
+-			for (int i = 0; i < hmax; i++) {
+-				swapCards(table, players[currP].getHand(), i, i);
+-			}
++			updateHand(current);
++		} else if (parts[0].equals("swapall")) {
++			Card[] temp = current.getHand();
++			current.setHand(table);
++			table = temp;
++			
+ 			updateTables();
+-			updateHand();
+-		} else if (parts[0] == "close") {
+-			setStopped(currP);
+-		} else if (parts[0] == "push") {
+-		} else if (parts[0] == "choice") {
++			updateHand(current);
++		} else if (parts[0].equals("close")) {
++			if (stopper == null) {
++				stopper = current;
++			}
++		} else if (parts[0].equals("push")) {
++			Log.i(TAG, current.getName() + " has pushed");
++
++		} else if (parts[0].equals("choice")) {
+ 			choiceResult(parts[1]);
+-			currP = nextPlayer(dealer);
+-		} else if (parts[0] == "nextround") {
+-			if (parts[1] == "yes") {
+-				for (int j = 0; j < playerCount; j++) {
+-					players[j].sendMessage("nextround");
++			setCurrentPlayer(nextPlayerFor(getDealer()));
++		} else if (parts[0].equals("nextround")) {
++			if (parts[1].equals("yes")) {
++				for (Player p : getPlayers()) {
++					p.sendMessage("nextround");
+ 				}
+-				dealer = nextPlayer(dealer);
++				setDealer(nextPlayerFor(getDealer()));
+ 			} else {
+ 				playing = false;
+ 			}
+-		} else if (parts[0] == "newgame"){
+-			if (parts[1] == "yes") {
+-				((Localplayer)players[0]).newGame();
+-			} else {
++		} else if (parts[0].equals("newgame")) {
++			if (parts[1].equals("no")) {
+ 				playing = false;
+-			}
++			} // no action needed if yes
+ 		}
+ 	}
+ 
++
++
++	/**
++	 * Send a broadcast to all players to update the cards on the table.
++	 */
+ 	private void updateTables() {
+ 		String str = "table";
+-		for (int i = 0; i < hmax; i++) {
+-			str = str + " " + table[i].getImageName();
++		for (Card c : table) {
++			str = str + " " + c.getImageName();
+ 		}
+-		for (int i = 0; i < playerCount; i++) {
+-			Player p = players[i];
++		Log.d(TAG, str);
++		for (Player p : getPlayers()) {
+ 			p.sendMessage(str);
+ 		}
+ 	}
+ 
+-	private void updateHand() {
+-		updateScore(players[currP]);
++	/**
++	 * Send a message to the current player with his new hand cards.
++	 * @param p The player who should receive new hand cards
++	 */
++	private void updateHand(final Player p) {
++		updateScore(p);
+ 		String str = "hand";
+-		Player p = players[currP];
+-		for (int i = 0; i < hmax; i++) {
+-			str = str + " " + p.getHand()[i].getImageName();
++		
++		for (Card c : p.getHand()) {
++			str = str + " " + c.getImageName();
+ 		}
+ 		p.sendMessage(str);
+-		updateScore(p);
++
+ 		p.sendMessage("score " + p.getScore());
+ 	}
+ 
+-	private void updateMessage(String msg) {
+-		for (int i = 0; i < playerCount; i++) {
+-			Player p = players[i];
++	/**
++	 * Send a broadcast with a text message to all players.
++	 * @param msg Message to send
++	 */
++	private void updateMessage(final String msg) {
++		for (Player p : getPlayers()) {
+ 			p.sendMessage("msg " + msg);
+ 		}
+ 	}
+-
+-}
+\ No newline at end of file
++}
+diff --git a/src/com/github/mrm1st3r/cards/game/ui/ClientGameActivity.java b/src/com/github/mrm1st3r/cards/game/ui/ClientGameActivity.java
+new file mode 100644
+index 0000000..9432f2e
+--- /dev/null
++++ b/src/com/github/mrm1st3r/cards/game/ui/ClientGameActivity.java
+@@ -0,0 +1,50 @@
++package com.github.mrm1st3r.cards.game.ui;
++
++import android.os.Bundle;
++
++import com.github.mrm1st3r.cards.Cards;
++import com.github.mrm1st3r.connection.AsynchronousConnection;
++import com.github.mrm1st3r.connection.OnReceivedHandler;
++import com.github.mrm1st3r.connection.bluetooth.SimpleBluetoothConnection;
++
++/**
++ * This is the user interface started on the client devices
++ * which only receives it's information from the host.
++ * @author Sergius Maier
++ *
++ */
++public class ClientGameActivity extends GameActivity {
++
++	/**
++	 * Bluetooth connection to the host.
++	 */
++	private SimpleBluetoothConnection connection = null;
++	
++	@Override
++	public final void onCreate(final Bundle bun) {
++		super.onCreate(bun);
++		
++		connection = (SimpleBluetoothConnection) ((Cards) getApplication()).
++				getConnections().keySet().iterator().next();
++
++		connection.setOnReceivedHandler(new OnReceivedHandler<String>() {
++			@Override
++			public void onReceived(final AsynchronousConnection<String> conn,
++					final String msg) {
++
++				ClientGameActivity.this.runOnUiThread(new Runnable() {
++					@Override
++					public void run() {
++						checkMessage(msg);
++					}
++				});
++			}
++		});
++		connection.unpause();
++	}
++
++	@Override
++	public final void sendMessage(final String msg) {
++		connection.write(msg);		
++	}
++}
+diff --git a/src/com/github/mrm1st3r/cards/game/ui/GameActivity.java b/src/com/github/mrm1st3r/cards/game/ui/GameActivity.java
+index e422b01..5ae1ea5 100644
+--- a/src/com/github/mrm1st3r/cards/game/ui/GameActivity.java
++++ b/src/com/github/mrm1st3r/cards/game/ui/GameActivity.java
+@@ -12,69 +12,121 @@ import android.widget.ImageView;
+ import android.widget.TextView;
+ 
+ import com.github.mrm1st3r.cards.R;
++import com.github.mrm1st3r.cards.game.ThirtyOne;
++import com.github.mrm1st3r.util.BitmapUtil;
+ 
++/**
++ * This is the base user interface for both, host and client. 
++ * 
++ * @author Sergius Maier
++ */
+ public abstract class GameActivity extends Activity {
+ 
++	/**
++	 * Default opacity for cards.
++	 */
++	private static final int FULL_OPACITY = 255;
++	/**
++	 * Selected opacity for cards.
++	 */
++	private static final int SELECTED_OPACITY = 150;
++	/**
++	 * Debug tag.
++	 */
+ 	private static final String TAG = GameActivity.class.getSimpleName();
+-	
+-	String[] hand = new String[3];
+-	String[] table = new String[3];
+-	String bg = "card_backside";
+-	String checkedTable = null;
+-	String checkedHand = null;
++	/**
++	 * The card images that are currently shown as hand cards.
++	 */
++	private String[] hand = new String[ThirtyOne.HAND_SIZE];
++	/**
++	 * The card images that are currently shown as table cards.
++	 */
++	private String[] table = new String[ThirtyOne.HAND_SIZE];
++	/**
++	 * The backside for all cards.
++	 */
++	private String bg = "card_backside";
++
++	/**
++	 * Selected table card to swap.
++	 */
++	private int checkedTable = -1;
++	/**
++	 * Selected hand card to swap.
++	 */
++	private int checkedHand = -1;
++	/**
++	 * All table card views.
++	 */
++	private ImageView[] tableCards = new ImageView[ThirtyOne.HAND_SIZE];
++	/**
++	 * All hand card views.
++	 */
++	private ImageView[] handCards = new ImageView[ThirtyOne.HAND_SIZE];
+ 
+ 	@Override
+-	protected void onCreate(Bundle bun) {
+-		super.onCreate(bun);
++	protected void onCreate(final Bundle b) {
++		super.onCreate(b);
++		
+ 		setContentView(R.layout.activity_game);
+-	}
++		
++		Log.d(TAG, "Creating card lists");
++		tableCards[0] = (ImageView) findViewById(R.id.img_table0);
++		tableCards[1] = (ImageView) findViewById(R.id.img_table1);
++		tableCards[2] = (ImageView) findViewById(R.id.img_table2);
++		
+ 
+-	public void checkMessage(String msg) {
++		handCards[0] = (ImageView) findViewById(R.id.img_hand0);
++		handCards[1] = (ImageView) findViewById(R.id.img_hand1);
++		handCards[2] = (ImageView) findViewById(R.id.img_hand2);
++	}
++	
++	/**
++	 * Process a message that is sent from the game to a player.
++	 * @param msg Message that was sent
++	 */
++	public final void checkMessage(final String msg) {
+ 		
+ 		Log.d(TAG, "Check incoming message: " + msg);
+ 		
+ 		String[] parts = msg.split(" ");
+-		if (parts[0] == "active") {
++		if (parts[0].equals("active")) {
+ 			active();
+-		} else if (parts[0] == "inactive") {
++		} else if (parts[0].equals("inactive")) {
+ 			inactive();
+-		} else if (parts[0] == "lastround") {
++		} else if (parts[0].equals("lastround")) {
+ 			lastround();
+-		} else if (parts[0] == "nextround") {
++		} else if (parts[0].equals("nextround")) {
+ 			nextRound();
+-		} else if (parts[0] == "newgame") {
++		} else if (parts[0].equals("newgame")) {
+ 			newGameChoice();
+-		} else if (parts[0] == "nextroundchoice") {
++		} else if (parts[0].equals("nextroundchoice")) {
+ 			nextRoundChoice();
+-		} else if (parts[0] == "takechoice") {
++		} else if (parts[0].equals("takechoice")) {
+ 			takeChoice();
+-		} else if (parts[0] == "hand") {
++		} else if (parts[0].equals("hand")) {
+ 			hand[0] = parts[1];
+ 			hand[1] = parts[2];
+ 			hand[2] = parts[3];
+ 			showHand();
+-		} else if (parts[0] == "table") {
++		} else if (parts[0].equals("table")) {
+ 			table[0] = parts[1];
+ 			table[1] = parts[2];
+ 			table[2] = parts[3];
+ 			showTable();
+-		} else if (parts[0] == "msg") {
+-			String str = "";
+-			for(String s: parts){
+-				if (s != "msg"){
+-					str = str + s;
+-				}
+-			}
+-			changeText(R.id.lbl_message, str);
+-		} else if (parts[0] == "score") {
++		} else if (parts[0].equals("msg")) {
++			
++			changeText(R.id.lbl_message, msg.substring(4));
++		} else if (parts[0].equals("score")) {
+ 			changeText(R.id.lbl_score1, parts[1]);
+-		} else if (parts[0] == "life") {
++		} else if (parts[0].equals("life")) {
+ 			changeText(R.id.lbl_life1, parts[1]);
+-		} else if (parts[0] == "players") {
++		} else if (parts[0].equals("players")) {
++			Log.d(TAG, "receiving new player names" + parts[1]);
+ 			changeText(R.id.lbl_rival0, parts[1]);
+-			if (parts[2] != null)
++			if (parts.length >= 3)
+ 				changeText(R.id.lbl_rival1, parts[2]);
+-			if (parts[3] != null)
++			if (parts.length >= 4)
+ 				changeText(R.id.lbl_rival2, parts[3]);
+ 		}
+ 	}
+@@ -101,21 +153,21 @@ public abstract class GameActivity extends Activity {
+ 	}
+ 
+ 	private void nextRound() {
+-		inactive();
++		/*inactive();
+ 		table = null;
+ 		hand = null;
+ 		showTable();
+-		showHand();
++		showHand();*/
+ 	}
+ 
+ 	private void newGameChoice() {
+-		alertBox("Ihre Wahl", "Neues Spiel", "Ja", "Nein", "nextround yes",
+-				"nextround no");
++		alertBox("Ihre Wahl", "Neues Spiel", "Ja", "Nein", "newgame yes",
++				"newgame no");
+ 	}
+ 	
+ 	private void nextRoundChoice() {
+-		alertBox("Ihre Wahl", "Nächste Runde", "Ja", "Nein", "newgame yes",
+-				"newgame no");
++		alertBox("Ihre Wahl", "Nächste Runde", "Ja", "Nein", "nextround yes",
++				"nextround no");
+ 	}
+ 
+ 	private void takeChoice() {
+@@ -123,66 +175,55 @@ public abstract class GameActivity extends Activity {
+ 		alertBox(
+ 				"Ihre Wahl",
+ 				"Wollen Sie die Karten auf der Hand behalten oder mit den verdeckten Karten auf dem Tisch spielen",
+-				"Hand", "Tisch", "choise hand", "choice table");
++				"Hand", "Tisch", "choice hand", "choice table");
+ 	}
+ 
+ 	private void showTable() {
+ 		if (table != null) {
+ 			changeImage(
+ 					R.id.img_table0,
+-					getResources().getIdentifier(table[0], "drawable",
+-							getPackageName()));
++					BitmapUtil.getDrawableIdentifier(this, table[0]));
+ 			changeImage(
+ 					R.id.img_table1,
+-					getResources().getIdentifier(table[1], "drawable",
+-							getPackageName()));
++					BitmapUtil.getDrawableIdentifier(this, table[1]));
+ 			changeImage(
+ 					R.id.img_table2,
+-					getResources().getIdentifier(table[2], "drawable",
+-							getPackageName()));
++					BitmapUtil.getDrawableIdentifier(this, table[2]));
+ 		} else {
+ 			changeImage(
+ 					R.id.img_table0,
+-					getResources().getIdentifier(bg, "drawable",
+-							getPackageName()));
++					BitmapUtil.getDrawableIdentifier(this, bg));
+ 			changeImage(
+ 					R.id.img_table1,
+-					getResources().getIdentifier(bg, "drawable",
+-							getPackageName()));
++					BitmapUtil.getDrawableIdentifier(this, bg));
+ 			changeImage(
+ 					R.id.img_table2,
+-					getResources().getIdentifier(bg, "drawable",
+-							getPackageName()));
++					BitmapUtil.getDrawableIdentifier(this, bg));
+ 		}
+ 	}
+ 
+ 	private void showHand() {
+-		if (hand != null) {
++		Log.d(TAG, hand[0] + " / " + getPackageName());
++		if (hand[0] != null) {
+ 			changeImage(
+ 					R.id.img_hand0,
+-					getResources().getIdentifier(hand[0], "drawable",
+-							getPackageName()));
++					BitmapUtil.getDrawableIdentifier(this, hand[0]));
+ 			changeImage(
+ 					R.id.img_hand1,
+-					getResources().getIdentifier(hand[1], "drawable",
+-							getPackageName()));
++					BitmapUtil.getDrawableIdentifier(this, hand[1]));
+ 			changeImage(
+ 					R.id.img_hand2,
+-					getResources().getIdentifier(hand[2], "drawable",
+-							getPackageName()));
++					BitmapUtil.getDrawableIdentifier(this, hand[2]));
+ 		} else {
+ 			changeImage(
+ 					R.id.img_hand0,
+-					getResources().getIdentifier(bg, "drawable",
+-							getPackageName()));
++					BitmapUtil.getDrawableIdentifier(this, bg));
+ 			changeImage(
+ 					R.id.img_hand1,
+-					getResources().getIdentifier(bg, "drawable",
+-							getPackageName()));
++					BitmapUtil.getDrawableIdentifier(this, bg));
+ 			changeImage(
+ 					R.id.img_hand2,
+-					getResources().getIdentifier(bg, "drawable",
+-							getPackageName()));
++					BitmapUtil.getDrawableIdentifier(this, bg));
+ 		}
+ 	}
+ 
+@@ -216,7 +257,9 @@ public abstract class GameActivity extends Activity {
+ 
+ 	private void changeImage(int view, int img) {
+ 		ImageView image = (ImageView) findViewById(view);
+-		image.setImageResource(img);
++		//image.setImageResource(img);
++		image.setImageBitmap(BitmapUtil.decodeSampledBitmapFromResource(
++				getResources(), img, image.getWidth(), image.getHeight()));
+ 	}
+ 
+ 	private void switchButton(int b, boolean s) {
+@@ -225,43 +268,81 @@ public abstract class GameActivity extends Activity {
+ 	}
+ 
+ 	private void changeText(int view, String text) {
++		Log.d(TAG, "Changing text to" + text);
+ 		final TextView textViewToChange = (TextView) findViewById(view);
+ 		textViewToChange.setText(text);
+ 	}
+ 
+ 	public void img_table(View view) {
++		resetTableCards();
++		((ImageView) view).setAlpha(SELECTED_OPACITY);
++		
+ 		switch (view.getId()) {
+ 		case R.id.img_table0:
+-			checkedTable = table[0];
++			checkedTable = 0;
+ 			break;
+ 		case R.id.img_table1:
+-			checkedTable = table[1];
++			checkedTable = 1;
+ 			break;
+ 		case R.id.img_table2:
+-			checkedTable = table[2];
++			checkedTable = 2;
+ 			break;
+ 		}
+ 	}
+ 
++	/**
++	 * Reset all table cards to 100% opacity.
++	 */
++	@SuppressWarnings("deprecation")
++	private void resetTableCards() {
++		for (ImageView v : tableCards) {
++			if (v == null) {
++				Log.d(TAG, "table card fail");
++				continue;
++			}
++			v.setAlpha(FULL_OPACITY);
++		}
++	}
++
+ 	public void img_hand(View view) {
++		resetHandCards();
++		((ImageView) view).setAlpha(SELECTED_OPACITY);
++		
+ 		switch (view.getId()) {
+ 		case R.id.img_hand0:
+-			checkedHand = hand[0];
++			checkedHand = 0;
+ 			break;
+ 		case R.id.img_hand1:
+-			checkedHand = hand[1];
++			checkedHand = 1;
+ 			break;
+ 		case R.id.img_hand2:
+-			checkedHand = hand[2];
++			checkedHand = 2;
+ 			break;
+ 		}
+ 	}
++	/**
++	 * Reset all hand cards to 100% opacity.
++	 */
++	@SuppressWarnings("deprecation")
++	private void resetHandCards() {
++		for (ImageView v : handCards) {
++			if (v == null) {
++				Log.d(TAG, "hand card fail");
++				continue;
++			}
++			v.setAlpha(FULL_OPACITY);
++		}
++	}
+ 
+ 	public void btn_1card(View view) {
+-		if (checkedTable != null && checkedHand != null) {
++		if (checkedTable != -1 && checkedHand != -1) {
+ 			inactive();
+ 			sendMessage("swap " + checkedHand + " " + checkedTable);
+ 		}
++		checkedTable = -1;
++		checkedHand = -1;
++		resetHandCards();
++		resetTableCards();
+ 	}
+ 
+ 	public void btn_allcards(View view) {
+@@ -279,6 +360,9 @@ public abstract class GameActivity extends Activity {
+ 		sendMessage("push");
+ 	}
+ 
++	/**
++	 * Send a message from the player to the game logic.
++	 * @param msg Message to send
++	 */
+ 	public abstract void sendMessage(String msg);
+-	public abstract void newGame();
+-}
+\ No newline at end of file
++}
+diff --git a/src/com/github/mrm1st3r/cards/game/ui/Gameclient.java b/src/com/github/mrm1st3r/cards/game/ui/Gameclient.java
+deleted file mode 100644
+index 656fe0a..0000000
+--- a/src/com/github/mrm1st3r/cards/game/ui/Gameclient.java
++++ /dev/null
+@@ -1,47 +0,0 @@
+-package com.github.mrm1st3r.cards.game.ui;
+-
+-import android.os.Bundle;
+-
+-import com.github.mrm1st3r.cards.Cards;
+-import com.github.mrm1st3r.cards.R;
+-import com.github.mrm1st3r.connection.AsynchronousConnection;
+-import com.github.mrm1st3r.connection.OnReceivedHandler;
+-import com.github.mrm1st3r.connection.bluetooth.SimpleBluetoothConnection;
+-
+-public class Gameclient extends GameActivity{
+-
+-	SimpleBluetoothConnection connection = null;
+-	
+-	@Override
+-	public void onCreate(Bundle bun) {
+-		super.onCreate(bun);
+-		setContentView(R.layout.activity_game);
+-		
+-		connection = (SimpleBluetoothConnection) ((Cards) getApplication()).
+-				getConnections().keySet().iterator().next();
+-
+-		connection.setOnReceivedHandler(new OnReceivedHandler<String>() {
+-			@Override
+-			public void onReceived(final AsynchronousConnection<String> conn,
+-					final String msg) {
+-				// logik
+-				Gameclient.this.runOnUiThread(new Runnable() {
+-					@Override
+-					public void run() {
+-						checkMessage(msg);// auf die OberflÃ¤che zugreifen
+-					}
+-				});
+-			}
+-		});
+-		connection.unpause();
+-	}
+-
+-	@Override
+-	public void sendMessage(String msg) {
+-		connection.write(msg);		
+-	}
+-
+-	@Override
+-	public void newGame() {		
+-	}
+-}
+diff --git a/src/com/github/mrm1st3r/cards/game/ui/Gamemaster.java b/src/com/github/mrm1st3r/cards/game/ui/Gamemaster.java
+deleted file mode 100644
+index f5f256e..0000000
+--- a/src/com/github/mrm1st3r/cards/game/ui/Gamemaster.java
++++ /dev/null
+@@ -1,62 +0,0 @@
+-package com.github.mrm1st3r.cards.game.ui;
+-
+-import android.content.Context;
+-import android.content.SharedPreferences;
+-import android.os.Bundle;
+-import android.util.Log;
+-
+-import com.github.mrm1st3r.cards.Cards;
+-import com.github.mrm1st3r.cards.R;
+-import com.github.mrm1st3r.cards.game.Bluetoothplayer;
+-import com.github.mrm1st3r.cards.game.Localplayer;
+-import com.github.mrm1st3r.cards.game.ThirtyOne;
+-import com.github.mrm1st3r.connection.bluetooth.SimpleBluetoothConnection;
+-
+-public class Gamemaster extends GameActivity {
+-
+-	private static final String TAG = Gamemaster.class.getSimpleName();
+-	
+-	int max = 0;
+-	private Thread gameThread;
+-	private ThirtyOne game;
+-
+-	@Override
+-	public void onCreate(Bundle bun) {
+-		super.onCreate(bun);
+-		setContentView(R.layout.activity_game);
+-		newGame();
+-	}
+-	
+-	public void newGame(){
+-		max = ((Cards) getApplication()).getConnections().size() + 1;
+-
+-		SharedPreferences pref = getSharedPreferences(
+-				Cards.PREF_FILE, Context.MODE_PRIVATE);
+-		String localName = pref.getString(Cards.PREF_PLAYER_NAME, "");
+-
+-		Log.d(TAG, "starting new game with " + max + " players");
+-		game = new ThirtyOne(max);
+-		game.addPlayer(new Localplayer(localName, 3, 3, this));
+-
+-		for (SimpleBluetoothConnection conn : ((Cards) getApplication())
+-				.getConnections().keySet()) {
+-
+-			conn.unpause();
+-			String remoteName = ((Cards) getApplication()).getConnections().get(conn);
+-			game.addPlayer(new Bluetoothplayer(remoteName, 3, 3, conn));
+-		}
+-
+-		gameThread = new Thread(new Runnable() {
+-			@Override
+-			public void run() {
+-				game.start();
+-			}
+-		});
+-		gameThread.start();
+-	}
+-
+-	@Override
+-	public void sendMessage(String msg) {
+-		game.checkMessage(msg);	
+-	}
+-}
+diff --git a/src/com/github/mrm1st3r/cards/game/ui/HostGameActivity.java b/src/com/github/mrm1st3r/cards/game/ui/HostGameActivity.java
+new file mode 100644
+index 0000000..795f195
+--- /dev/null
++++ b/src/com/github/mrm1st3r/cards/game/ui/HostGameActivity.java
+@@ -0,0 +1,105 @@
++package com.github.mrm1st3r.cards.game.ui;
++
++import android.content.Context;
++import android.content.SharedPreferences;
++import android.os.Bundle;
++import android.util.Log;
++
++import com.github.mrm1st3r.cards.Cards;
++import com.github.mrm1st3r.cards.game.BluetoothPlayer;
++import com.github.mrm1st3r.cards.game.LocalPlayer;
++import com.github.mrm1st3r.cards.game.ThirtyOne;
++import com.github.mrm1st3r.connection.AsynchronousConnection;
++import com.github.mrm1st3r.connection.OnReceivedHandler;
++import com.github.mrm1st3r.connection.bluetooth.SimpleBluetoothConnection;
++
++/**
++ * This is the user interface that is started on the host device and
++ * controls the game loop.
++ * @author Sergius Maier
++ */
++public class HostGameActivity extends GameActivity {
++
++	/**
++	 * Debug Tag.
++	 */
++	private static final String TAG = HostGameActivity.class.getSimpleName();
++	/**
++	 * The background thread where the game loop is running.
++	 */
++	private Thread gameThread;
++	/**
++	 * The game itself.
++	 */
++	private ThirtyOne game;
++	/**
++	 * The local player.
++	 */
++	private LocalPlayer localPlayer;
++
++	@Override
++	public final void onCreate(final Bundle bun) {
++		super.onCreate(bun);
++		
++		newGame();
++	}
++	
++	/**
++	 * Start a new game.
++	 */
++	public final void newGame() {
++		int playerCount =
++				((Cards) getApplication()).getConnections().size() + 1;
++
++		SharedPreferences pref = getSharedPreferences(
++				Cards.PREF_FILE, Context.MODE_PRIVATE);
++		String localName = pref.getString(Cards.PREF_PLAYER_NAME, "");
++
++		Log.d(TAG, "starting new game with " + playerCount + " players");
++		game = new ThirtyOne(playerCount);
++		localPlayer = new LocalPlayer(localName, ThirtyOne.HAND_SIZE,
++				ThirtyOne.MAX_LIFES, this);
++		game.addPlayer(localPlayer);
++
++		for (SimpleBluetoothConnection conn : ((Cards) getApplication())
++				.getConnections().keySet()) {
++
++			conn.unpause();
++			String remoteName =
++					((Cards) getApplication()).getConnections().get(conn);
++			final BluetoothPlayer remotePlayer = new BluetoothPlayer(remoteName,
++					ThirtyOne.HAND_SIZE, ThirtyOne.MAX_LIFES, conn);
++			
++			game.addPlayer(remotePlayer);
++			
++			remotePlayer.getConn()
++					.setOnReceivedHandler(new OnReceivedHandler<String>() {
++				@Override
++				public void onReceived(
++						final AsynchronousConnection<String> conn,
++						final String msg) {
++					synchronized (remotePlayer.getLock()) {
++						game.checkMessage(msg);
++						remotePlayer.getLock().notify();
++					}
++				}
++			});
++		}
++
++		gameThread = new Thread(new Runnable() {
++			@Override
++			public void run() {
++				game.start();
++			}
++		});
++		gameThread.start();
++	}
++
++	@Override
++	public final void sendMessage(final String msg) {
++		synchronized (localPlayer.getLock()) {
++			game.checkMessage(msg);	
++			localPlayer.getLock().notify();
++		}
++	}
++}
+diff --git a/src/com/github/mrm1st3r/cards/game/ui/package-info.java b/src/com/github/mrm1st3r/cards/game/ui/package-info.java
+new file mode 100644
+index 0000000..12060eb
+--- /dev/null
++++ b/src/com/github/mrm1st3r/cards/game/ui/package-info.java
+@@ -0,0 +1,5 @@
++/**
++ * Contains the user interface for the actual game.
++ */
++
++package com.github.mrm1st3r.cards.game.ui;
+diff --git a/src/com/github/mrm1st3r/cards/lobby/LobbyActivity.java b/src/com/github/mrm1st3r/cards/lobby/LobbyActivity.java
+index 977b662..99511f6 100644
+--- a/src/com/github/mrm1st3r/cards/lobby/LobbyActivity.java
++++ b/src/com/github/mrm1st3r/cards/lobby/LobbyActivity.java
+@@ -13,7 +13,7 @@ import android.widget.ArrayAdapter;
+ 
+ import com.github.mrm1st3r.cards.Cards;
+ import com.github.mrm1st3r.cards.R;
+-import com.github.mrm1st3r.cards.game.ui.Gameclient;
++import com.github.mrm1st3r.cards.game.ui.ClientGameActivity;
+ import com.github.mrm1st3r.connection.AsynchronousConnection;
+ import com.github.mrm1st3r.connection.OnConnectionChangeHandler;
+ import com.github.mrm1st3r.connection.OnReceivedHandler;
+@@ -123,8 +123,9 @@ public class LobbyActivity extends Activity {
+ 				} else if (set[0].equals("start")) {
+ 					
+ 					Intent intent = new Intent(LobbyActivity.this,
+-							Gameclient.class);
++							ClientGameActivity.class);
+ 					intent.putExtra(EXTRA_PLAYER_LIST, playerList);
++					conn.setOnConnectionChangeHandler(null);
+ 					startActivity(intent);
+ 					finish();
+ 				} else if (set[0].equals("quit")) {
+@@ -152,7 +153,7 @@ public class LobbyActivity extends Activity {
+ 	@Override
+ 	public final void onDestroy() {
+ 		super.onDestroy();
+-		leaveLobby();
++		//leaveLobby();
+ 	}
+ 
+ 	@Override
+diff --git a/src/com/github/mrm1st3r/cards/lobby/LobbyCreateActivity.java b/src/com/github/mrm1st3r/cards/lobby/LobbyCreateActivity.java
+index 1d7aa91..92dea36 100644
+--- a/src/com/github/mrm1st3r/cards/lobby/LobbyCreateActivity.java
++++ b/src/com/github/mrm1st3r/cards/lobby/LobbyCreateActivity.java
+@@ -21,7 +21,7 @@ import android.widget.Toast;
+ 
+ import com.github.mrm1st3r.cards.Cards;
+ import com.github.mrm1st3r.cards.R;
+-import com.github.mrm1st3r.cards.game.ui.Gamemaster;
++import com.github.mrm1st3r.cards.game.ui.HostGameActivity;
+ import com.github.mrm1st3r.connection.AsynchronousConnection;
+ import com.github.mrm1st3r.connection.OnConnectionChangeHandler;
+ import com.github.mrm1st3r.connection.OnReceivedHandler;
+@@ -297,7 +297,7 @@ public class LobbyCreateActivity extends Activity {
+ 		// stop listening for new connections.
+ 		serv.close();
+ 
+-		Intent intent = new Intent(this, Gamemaster.class);
++		Intent intent = new Intent(this, HostGameActivity.class);
+ 		startActivity(intent);
+ 	}
+ 
+diff --git a/src/com/github/mrm1st3r/cards/lobby/LobbyJoinActivity.java b/src/com/github/mrm1st3r/cards/lobby/LobbyJoinActivity.java
+index 80311b3..01fa208 100644
+--- a/src/com/github/mrm1st3r/cards/lobby/LobbyJoinActivity.java
++++ b/src/com/github/mrm1st3r/cards/lobby/LobbyJoinActivity.java
+@@ -312,6 +312,6 @@ public class LobbyJoinActivity extends Activity {
+ 	@Override
+ 	protected final void onDestroy() {
+ 		super.onDestroy();
+-		cancelSearch();
++		//cancelSearch();
+ 	}
+ }
+diff --git a/src/com/github/mrm1st3r/util/BitmapUtil.java b/src/com/github/mrm1st3r/util/BitmapUtil.java
+new file mode 100644
+index 0000000..bd0e303
+--- /dev/null
++++ b/src/com/github/mrm1st3r/util/BitmapUtil.java
+@@ -0,0 +1,107 @@
++package com.github.mrm1st3r.util;
++
++import java.util.HashMap;
++
++import android.content.Context;
++import android.content.res.Resources;
++import android.graphics.Bitmap;
++import android.graphics.BitmapFactory;
++
++/**
++ * This class provides additional functions for bitmap processing.
++ * @author Lukas 'mrm1st3r' Taake
++ */
++public final class BitmapUtil {
++
++	/**
++	 * Buffer scaled bitmaps.
++	 */
++	private static HashMap<String, Bitmap> bitmapBuffer =
++			new HashMap<String, Bitmap>();
++	
++	/**
++	 * @throws InstantiationException There should be no instances of this class
++	 */
++	private BitmapUtil() throws InstantiationException {
++		throw new InstantiationException();
++	}
++
++	/**
++	 * Load a bitmap in a given size.
++	 * @param res Resource set to use
++	 * @param resId Bitmap to load
++	 * @param reqWidth Width to load
++	 * @param reqHeight Height to load
++	 * @return The requested bitmap
++	 */
++	public static Bitmap decodeSampledBitmapFromResource(
++			final Resources res, final int resId,
++			final int reqWidth, final int reqHeight) {
++		
++		String bufferKey = resId + "_" + reqWidth + "_" + reqHeight;
++		
++		if (bitmapBuffer.containsKey(bufferKey)) {
++			return bitmapBuffer.get(bufferKey);
++		}
++
++		// First decode with inJustDecodeBounds=true to check dimensions
++		final BitmapFactory.Options options = new BitmapFactory.Options();
++		options.inJustDecodeBounds = true;
++		BitmapFactory.decodeResource(res, resId, options);
++
++		// Calculate inSampleSize
++		options.inSampleSize =
++				calculateInSampleSize(options, reqWidth, reqHeight);
++
++		// Decode bitmap with inSampleSize set
++		options.inJustDecodeBounds = false;
++		
++		Bitmap tmp = BitmapFactory.decodeResource(res, resId, options);
++		bitmapBuffer.put(bufferKey, tmp);
++		return tmp;
++	}
++
++	/**
++	 * Calculate the sample size for a bitmap.
++	 * @param options Option set
++	 * @param reqWidth Width to scale to
++	 * @param reqHeight Height to scale to
++	 * @return Sample factor
++	 */
++	public static int calculateInSampleSize(
++			final BitmapFactory.Options options,
++			final int reqWidth, final int reqHeight) {
++		// Raw height and width of image
++		final int height = options.outHeight;
++		final int width = options.outWidth;
++		int inSampleSize = 1;
++
++		if (height > reqHeight || width > reqWidth) {
++
++			final int halfHeight = height / 2;
++			final int halfWidth = width / 2;
++
++			// Calculate the largest inSampleSize value that is a power of 2
++			// and keeps both height and width larger than
++			// the requested height and width.
++			while ((halfHeight / inSampleSize) > reqHeight
++					&& (halfWidth / inSampleSize) > reqWidth) {
++				inSampleSize *= 2;
++			}
++		}
++
++		return inSampleSize;
++	}
++
++	/**
++	 * Get the identifier of an image.
++	 * @param context Application context
++	 * @param filename The images filename
++	 * @return The images identifier
++	 */
++	public static int getDrawableIdentifier(
++			final Context context, final String filename) {
++		return context.getResources().getIdentifier(filename, "drawable",
++				context.getPackageName());
++	}
++}

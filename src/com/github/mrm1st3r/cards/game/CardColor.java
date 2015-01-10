@@ -3,7 +3,8 @@ package com.github.mrm1st3r.cards.game;
 /**
  * All possible four game card colors.
  * @author Lukas 'mrm1st3r' Taake
- *
+ * @author Sergius Maier
+ * @version 1.0
  */
 public enum CardColor {
 
@@ -38,7 +39,6 @@ public enum CardColor {
 	}
 
 	/**
-	 * Get the colors name.
 	 * @return The colors name
 	 */
 	public String getName() {

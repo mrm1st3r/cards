@@ -4,9 +4,8 @@ import java.util.LinkedList;
 
 /**
  * This abstract class describes the general functions of a card game.
- * 
  * @author Sergius Maier
- * @version 0.8
+ * @version 1.0
  */
 public abstract class Gameplay {
 
@@ -38,7 +37,6 @@ public abstract class Gameplay {
 
 	/**
 	 * Construct a new game.
-	 * 
 	 * @param pPlayerCount Number of players for this game
 	 * @param pCardDeck The type of card deck that is used
 	 */
@@ -53,9 +51,7 @@ public abstract class Gameplay {
 	 * set in {@link #cardDeckType} in all four colors.
 	 */
 	protected final void createCardDeck() {
-
 		cards = new LinkedList<Card>();
-
 		for (CardColor color : CardColor.values()) {
 			for (CardValue value : cardDeckType) {
 				cards.add(new Card(color, value));
@@ -65,18 +61,15 @@ public abstract class Gameplay {
 
 	/**
 	 * Take a random card from the ordered card deck.
-	 * 
 	 * @return The taken card, or null if there are no cards left on the deck
 	 */
 	public final Card takeCard() {
 		if (cards.size() == 0) {
 			return null;
 		}
-
 		int num = (int) (Math.random() * cards.size());
 		Card c = cards.get(num);
 		cards.remove(num);
-
 		return c;
 	}
 

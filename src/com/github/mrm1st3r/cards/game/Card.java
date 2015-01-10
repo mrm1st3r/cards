@@ -2,9 +2,8 @@ package com.github.mrm1st3r.cards.game;
 
 /**
  * This class describes a playing card.
- * 
  * @author Sergius Maier
- * @version 2.0
+ * @version 1.0
  */
 public class Card {
 

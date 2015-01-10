@@ -5,7 +5,7 @@ import com.github.mrm1st3r.cards.game.ui.HostGameActivity;
 /**
  * This class describes a local player.
  * @author Sergius Maier
- *
+ * @version 1.0
  */
 public class LocalPlayer extends Player {
 
@@ -22,8 +22,7 @@ public class LocalPlayer extends Player {
 	 * @param pUi The local user interface
 	 */
 	public LocalPlayer(final String pName, final int pHandSize,
-			final int pLifes, final HostGameActivity pUi) {
-		
+			final int pLifes, final HostGameActivity pUi) {	
 		super(pName, pHandSize, pLifes);
 		userInterface = pUi;
 	}

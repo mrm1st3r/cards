@@ -246,7 +246,7 @@ public class ThirtyOne extends Gameplay {
 	}
 
 	/**
-	 * 
+	 * Creates a second hand of cards for the dealer
 	 */
 	private void choice() {
 		choice = new Card[HAND_SIZE];

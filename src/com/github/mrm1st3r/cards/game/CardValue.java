@@ -3,7 +3,8 @@ package com.github.mrm1st3r.cards.game;
 /**
  * All possible game card values.
  * @author Lukas 'mrm1st3r' Taake
- *
+ * @author Sergius Maier
+ * @version 1.0
  */
 public enum CardValue {
 
@@ -68,7 +69,6 @@ public enum CardValue {
 	 * The number of card values contained in a skat deck.
 	 */
 	public static final int SKAT_DECK_SIZE = 8;
-	
 	/**
 	 * The name of the card value.
 	 */

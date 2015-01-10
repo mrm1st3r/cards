@@ -3,9 +3,8 @@ package com.github.mrm1st3r.cards.game;
 
 /**
  * This class describes a card player.
- * 
  * @author Sergius Maier
- * @version 0.8
+ * @version 1.0
  */
 public abstract class Player {
 
@@ -32,7 +31,6 @@ public abstract class Player {
 
 	/**
 	 * Construct a new player.
-	 * 
 	 * @param pName The players name
 	 * @param pHandSize	Maximum number of hand cards
 	 * @param pLifes Number of lifes to start with
@@ -45,25 +43,21 @@ public abstract class Player {
 
 	/**
 	 * Add a new card to the players hand.
-	 * 
 	 * @param c	New hand card
 	 * @return	true on success, false otherwise
 	 */
 	public final boolean addToHand(final Card c) {
-
 		for (int i = 0; i < handCards.length; i++) {
 			if (handCards[i] == null) {
 				handCards[i] = c;
 				return true;
 			}
 		}
-
 		return false;
 	}
 
 	/**
 	 * Remove a card from the players hand.
-	 * 
 	 * @param c Card to remove
 	 * @return true on success, false otherwise
 	 */
@@ -119,15 +113,7 @@ public abstract class Player {
 	public final Card[] getHand() {
 		return handCards;
 	}
-
-	/**
-	 * Give the player new hand cards.
-	 * @param hand New hand cards
-	 */
-	public final void setHand(final Card[] hand) {
-		this.handCards = hand;
-	}
-
+	
 	/**
 	 * Get a specified hand card.
 	 * @param pos Position of the request card in the players hand
@@ -135,6 +121,14 @@ public abstract class Player {
 	 */
 	public final Card getHandCard(final int pos) {
 		return handCards[pos];
+	}
+
+	/**
+	 * Give the player new hand cards.
+	 * @param hand New hand cards
+	 */
+	public final void setHand(final Card[] hand) {
+		this.handCards = hand;
 	}
 
 	/**
