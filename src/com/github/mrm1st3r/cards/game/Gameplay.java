@@ -134,10 +134,6 @@ public abstract class Gameplay {
 	 * Set a player to be the new dealer.
 	 * @param pDealer New dealer
 	 */
-<<<<<<< HEAD
-	public int getPlayerCount() {
-		return playerCount;
-=======
 	public final void setDealer(final Player pDealer) {
 		if (!playerList.contains(pDealer)) {
 			throw new IllegalArgumentException(
@@ -145,7 +141,6 @@ public abstract class Gameplay {
 		}
 
 		dealer = pDealer;
->>>>>>> 095ad206f97354132a8fe1775b1f858e93777d58
 	}
 
 	/**
