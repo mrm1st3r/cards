@@ -163,7 +163,7 @@ public abstract class Gameplay {
 	 * 
 	 * @return {@link #playerCount}
 	 */
-	public int getMax() {
+	public int getPlayerCount() {
 		return playerCount;
 	}
 	
