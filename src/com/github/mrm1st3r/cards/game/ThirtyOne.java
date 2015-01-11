@@ -1,16 +1,18 @@
 package com.github.mrm1st3r.cards.game;
 
+import java.util.LinkedList;
+
 import android.util.Log;
 
 /**
- * This class describes the game rules and sequence for the game "Schwimmen".
+ * This class describes the game rules and sequence for the game "Thirty-One".
  * 
  * @author Sergius Maier
- * @version 0.8
+ * @version 1.0
  */
 public class ThirtyOne extends Gameplay {
 
-/**
+	/**
 	 * Debug tag.
 	 */
 	private static final String TAG = ThirtyOne.class.getSimpleName();
@@ -47,9 +49,8 @@ public class ThirtyOne extends Gameplay {
 	 */
 	private Player winner = null;
 	/**
-	 * The hidden cards that the dealer will get if he refuses
-	 * his hand cards. If the dealer accepts his hand cards, these
-	 * will become the table cards.
+	 * The hidden cards that the dealer will get if he refuses his hand cards.
+	 * If the dealer accepts his hand cards, these will become the table cards.
 	 */
 	private Card[] choice = new Card[HAND_SIZE];
 	/**
@@ -58,8 +59,10 @@ public class ThirtyOne extends Gameplay {
 	private boolean playing = true;
 
 	/**
-	 * Construct a new game of "Schwimmen".
-	 * @param pPlayerCount Number of players to begin with
+	 * Construct a new game of "Thirty-One".
+	 * 
+	 * @param pPlayerCount
+	 *            Number of players to begin with
 	 */
 	public ThirtyOne(final int pPlayerCount) {
 		super(pPlayerCount, CardValue.getSkatDeck());
@@ -69,64 +72,59 @@ public class ThirtyOne extends Gameplay {
 	 * Set a random player to be the dealer and start the game.
 	 */
 	public final void start() {
-
 		// the host is always dealer in the first round
 		setDealer(getHostPlayer());
-
 		while (playing) {
 			startRound();
 			playRound();
 			endRound();
-		}
+		}		
 	}
 
 	/**
 	 * The start of a game round.<br>
-	 * All players receive their hand cards and the dealer has to choose
-	 * between two card sets of which he sees only one.
+	 * All players receive their hand cards and the dealer has to choose between
+	 * two card sets of which he sees only one.
 	 */
 	public final void startRound() {
+		// initialisation
 		String play = "players";
 		for (Player p : getPlayers()) {
 			p.setLifes(MAX_LIFES);
 			p.setHand(new Card[HAND_SIZE]);
-			
 		}
 		stopper = null;
 		winner = null;
 		createCardDeck();
-		
 		// send the list of opponents to each player
 		for (Player p : getPlayers()) {
 			Player next = nextPlayerFor(p);
 			String str = play;
-
 			while (!next.equals(p)) {
 				str += " " + next.getName();
 				next = nextPlayerFor(next);
 			}
-			p.connect(str);
-			p.connect("inactive");
+			p.sendMessage(str);
+			p.sendMessage("inactive");
 		}
-		updateMessage("Der Dealer ist dabei sich zu entscheiden");
+		// all players who have still lives get hand cards
 		for (Player p : getPlayers()) {
-
 			if (p.getLifes() >= 0) {
-
 				giveHand(p);
-
 				Card[] hand = p.getHand();
-
-				p.sendMessage("hand " + hand[0].getImageName()
-						+ " " + hand[1].getImageName() + " "
+				p.sendMessage("hand " + hand[0].getImageName() + " "
+						+ hand[1].getImageName() + " " 
 						+ hand[2].getImageName());
 				p.sendMessage("life " + p.getLifes());
 			}
 		}
+		// the dealer is given the choice between two hand cards
+		updateMessage("Der Dealer ist dabei sich zu entscheiden");
 		Player dealer = getDealer();
 		setCurrentPlayer(dealer);
 		choice();
 		dealer.sendMessage("takechoice");
+		// waiting for dealers choice
 		synchronized (dealer.getLock()) {
 			try {
 				dealer.getLock().wait();
@@ -134,21 +132,24 @@ public class ThirtyOne extends Gameplay {
 				e.printStackTrace();
 			}
 		}
-		
+		// update the scores of all player
 		updateScores();
 	}
 
 	/**
 	 * Game sequence.<br>
-	 * Alle Spieler sind nach einander dran bis einer die Runde beendet. Danach
-	 * kommen die anderen Spieler noch mal an die Reihe.
+	 * All players are successively tuned till an active player finishes the
+	 * round. All other players get the possibility to do one last action.
 	 */
 	private void playRound() {
 		Player p = getCurrentPlayer();
-
 		while (!p.equals(stopper) && winner == null) {
 			updateMessage(p.getName() + " ist an der Reihe");
-			p.sendMessage("active");
+			if (stopper == null) {
+				p.sendMessage("active");
+			} else {
+				p.sendMessage("lastround");
+			}
 			synchronized (p.getLock()) {
 				try {
 					p.getLock().wait();
@@ -162,23 +163,22 @@ public class ThirtyOne extends Gameplay {
 	}
 
 	/**
-	 * Ende einer Runde.<br>
-	 * Ermittelt den oder die Spieler mit der niedrigsten Punktezahl, die dann
-	 * ein Leben verlieren. Entweder gibt es einen Gewinner, Unendschieden oder
-	 * es werden die Spieler aus dem Spiel genommen, die keine Leben mehr haben
-	 * und es wird eine neue Runde gestartet.
+	 * End of a round.<br>
+	 * Gets one or more players with the lowest score. These players lose a
+	 * life. Either there is a winner, a draw or the players are removed from
+	 * the game, who have no life and it starts a new round/game.
 	 */
 	public final void endRound() {
 		updateScores();
 		float minScore = POINTS_MAX;
-
+		LinkedList<Player> oldPlayers = getPlayers();
 		// search for the lowest score in this round
 		for (Player p : getPlayers()) {
 			if (p.getLifes() >= 0) {
 				minScore = Math.min(minScore, p.getScore());
 			}
 		}
-
+		// decrease the life of players with the lowest score
 		for (Player p : getPlayers()) {
 			if (p.getLifes() >= 0 && p.getScore() == minScore) {
 				if (p.getLifes() > 0) {
@@ -186,25 +186,21 @@ public class ThirtyOne extends Gameplay {
 				}
 			}
 		}
-
 		int alive = countLivingPlayers();
 		Player host = getHostPlayer();
-
+		// winner
 		if (alive == 1) {
 			for (Player p : getPlayers()) {
 				if (p.getLifes() >= 0) {
-					updateMessage(p.getName() + " hat gewonnen");
-					break;
+					updateMessage(p.getName() + " hat das Spiel gewonnen");
 				}
 			}
-
 			playing = false;
 			host.sendMessage("newgame");
-
+		// draw
 		} else if (alive == 0) {
 			String str = "Unentschieden zwischen";
-
-			for (Player p : getPlayers()) {
+			for (Player p : oldPlayers) {
 				if (p.getLifes() >= 0) {
 					str += " " + p.getName();
 				}
@@ -213,9 +209,10 @@ public class ThirtyOne extends Gameplay {
 			playing = false;
 			host.sendMessage("newgame");
 		} else {
+			updateMessage(winner.getName() + " hat die Runde gewonnen");
 			host.sendMessage("nextroundchoice");
 		}
-
+		// wait for host choice for new round/game
 		synchronized (host.getLock()) {
 			try {
 				host.getLock().wait();
@@ -226,24 +223,18 @@ public class ThirtyOne extends Gameplay {
 	}
 
 	/**
-	 * Dem Dealer wird die M�glichkeit gegeben sich zwischen zwei H�nden zu
-	 * entscheiden. Die Hand f�r die er sich nicht entschieden hat wird auf
-	 * den Tisch gelegt.
-	 * @param str Choice made by the dealer
+	 * Player p takes 3 Cards from deck and add it to his hand.
+	 * @param p
+	 *            Player who gets cards from deck to his hand
 	 */
-	private void choiceResult(final String str) {
-		if (str.equals("hand")) {
-			table = choice;
-		} else {
-			table = getDealer().getHand();
-			getDealer().setHand(choice);
-			updateHand(getDealer());
+	public final void giveHand(final Player p) {
+		for (int i = 0; i < HAND_SIZE; i++) {
+			p.addToHand(takeCard());
 		}
-		updateTables();
 	}
 
 	/**
-	 * Creates a second hand of cards for the dealer
+	 * Creates a second hand of cards for the dealer.
 	 */
 	private void choice() {
 		choice = new Card[HAND_SIZE];
@@ -253,66 +244,65 @@ public class ThirtyOne extends Gameplay {
 	}
 
 	/**
-	 * Es werden {@link hmax} Karten vom Stapel genommen und in die Hand des
-	 * Spielers hinzugef�gt.
-	 * 
-	 * @param p
-	 *            Spieler
+	 * Count the number of players with lifes.
+	 * @return The number of living players left
 	 */
-	public final void giveHand(final Player p) {
+	public final int countLivingPlayers() {
+		int num = 0;
+		for (Player p : getPlayers()) {
+			if (p.getLifes() >= 0) {
+				num++;
+			}
+		}
+		return num;
+	}
 
-		for (int i = 0; i < HAND_SIZE; i++) {
-			p.addToHand(takeCard());
+	/**
+	 * Send a broadcast with a text message to all players.
+	 * @param msg
+	 *            Message to send
+	 */
+	private void updateMessage(final String msg) {
+		for (Player p : getPlayers()) {
+			p.sendMessage("msg " + msg);
 		}
 	}
 
 	/**
-	 * Aktualisiert die Punkte aller Spieler.
+	 * Update the score of all players.
 	 */
 	public final void updateScores() {
 		for (Player p : getPlayers()) {
 			if (p.getLifes() >= 0) {
 				updateScore(p);
-				p.sendMessage("score " + p.getScore());
-				if (p.getScore() >= POINTS_WIN) {
-					winner = p;
-				}
 			}
 		}
 	}
 
 	/**
-	 * Aktualisiert die Punkte eines Spielers.
-	 * 
+	 * Update the score of one player.
 	 * @param p
-	 *            Spieler
+	 *            Player whose score to update
 	 */
 	public final void updateScore(final Player p) {
 		Card[] hand = p.getHand();
-
 		if (hand[0] == null) {
 			return;
 		}
-		
 		float hearts = 0;
 		float diamonds = 0;
 		float spades = 0;
 		float clubs = 0;
-
 		float score = 0;
-
 		// check for three same values
-
 		if (hand[0].getValue() == hand[1].getValue()
 				&& hand[0].getValue() == hand[2].getValue()) {
-
 			if (hand[0].getValue() == CardValue.ACE) {
 				score = POINTS_MAX;
 			} else {
 				score = (float) POINTS_TRIPLE;
 			}
 		} else {
-
 			for (Card c : hand) {
 				switch (c.getColor()) {
 				case HEARTS:
@@ -331,31 +321,32 @@ public class ThirtyOne extends Gameplay {
 					break;
 				}
 			}
-
 			score = Math.max(score, hearts);
 			score = Math.max(score, diamonds);
 			score = Math.max(score, spades);
 			score = Math.max(score, clubs);
 		}
+		Log.d(TAG, "The calculated score of the current player is " 
+		+ score);
+		if (p.getScore() >= POINTS_WIN) {
+			Log.d(TAG, "");
+			winner = p;
+		}
 		p.setScore(score);
+		p.sendMessage("score " + p.getScore());
 	}
 
 	@Override
 	public final void checkMessage(final String msg) {
-		
 		Log.d(TAG, "game receiving: " + msg);
-
 		String[] parts = msg.split(" ");
 		Player current = getCurrentPlayer();
-		
-		if (parts[0] .equals("swap")) {
+		if (parts[0].equals("swap")) {
 			int handPos = Integer.parseInt(parts[1]);
 			int tablePos = Integer.parseInt(parts[2]);
-			
 			Card temp = current.getHandCard(handPos);
 			current.getHand()[handPos] = table[tablePos];
 			table[tablePos] = temp;
-
 			updateTables();
 			updateHand(current);
 		} else if (parts[0].equals("swapall")) {
@@ -370,7 +361,6 @@ public class ThirtyOne extends Gameplay {
 			}
 		} else if (parts[0].equals("push")) {
 			Log.i(TAG, current.getName() + " has pushed");
-
 		} else if (parts[0].equals("choice")) {
 			choiceResult(parts[1]);
 			setCurrentPlayer(nextPlayerFor(getDealer()));
@@ -386,11 +376,30 @@ public class ThirtyOne extends Gameplay {
 		} else if (parts[0].equals("newgame")) {
 			if (parts[1].equals("no")) {
 				playing = false;
-			} // no action needed if yes
+			} else {
+				newGame();
+			}
 		}
 	}
 
-
+	/**
+	 * Evaluation of the dealer's choice at the beginning of a round. If dealer
+	 * choose hand the hidden cards would lay down on the table. Otherwise the
+	 * dealer gets the hidden cards and the dealer's hand would lay down on the
+	 * table.
+	 * @param str
+	 *            Choice made by the dealer
+	 */
+	private void choiceResult(final String str) {
+		if (str.equals("hand")) {
+			table = choice;
+		} else {
+			table = getDealer().getHand();
+			getDealer().setHand(choice);
+			updateHand(getDealer());
+		}
+		updateTables();
+	}
 
 	/**
 	 * Send a broadcast to all players to update the cards on the table.
@@ -408,7 +417,8 @@ public class ThirtyOne extends Gameplay {
 
 	/**
 	 * Send a message to the current player with his new hand cards.
-	 * @param p The player who should receive new hand cards
+	 * @param p
+	 *            The player who should receive new hand cards
 	 */
 	private void updateHand(final Player p) {
 		updateScore(p);
@@ -417,17 +427,18 @@ public class ThirtyOne extends Gameplay {
 			str = str + " " + c.getImageName();
 		}
 		p.sendMessage(str);
-
-		p.sendMessage("score " + p.getScore());
 	}
 
 	/**
-	 * Send a broadcast with a text message to all players.
-	 * @param msg Message to send
+	 * Preparation for a new game. (new dealer, all players get max lifes)
 	 */
-	private void updateMessage(final String msg) {
+	private void newGame() {
 		for (Player p : getPlayers()) {
-			p.sendMessage("msg " + msg);
+			p.sendMessage("nextround");
+			p.setLifes(MAX_LIFES);
 		}
+		stopper = null;
+		winner = null;
+		setDealer(nextPlayerFor(getDealer()));
 	}
 }

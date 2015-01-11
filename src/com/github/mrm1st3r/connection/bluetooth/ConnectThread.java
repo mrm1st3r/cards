@@ -8,7 +8,7 @@ import com.github.mrm1st3r.connection.OnConnectionChangeHandler;
  * Base class for Bluetooth connecting threads.
  * 
  * @author Lukas 'mrm1st3r' Taake
- * @version 1.0.0
+ * @version 1.0
  */
 public abstract class ConnectThread extends Thread implements Closeable {
 

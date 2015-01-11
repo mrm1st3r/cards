@@ -11,7 +11,7 @@ import android.util.Log;
  * an endless loop in a separate thread.
  * 
  * @author Lukas 'mrm1st3r' Taake
- * @version 1.0.0
+ * @version 1.0
  */
 public abstract class ThreadedConnection extends Thread implements Closeable {
 

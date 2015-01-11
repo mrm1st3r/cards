@@ -11,7 +11,7 @@ import com.github.mrm1st3r.connection.bluetooth.SimpleBluetoothConnection;
  * This is the user interface started on the client devices
  * which only receives it's information from the host.
  * @author Sergius Maier
- *
+ * @version 1.0
  */
 public class ClientGameActivity extends GameActivity {
 

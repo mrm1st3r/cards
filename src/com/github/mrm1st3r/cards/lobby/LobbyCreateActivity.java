@@ -37,7 +37,7 @@ import com.github.mrm1st3r.util.ResultAction;
  * incoming connections.
  * 
  * @author Lukas 'mrm1st3r' Taake
- *
+ * @version 1.0
  */
 public class LobbyCreateActivity extends Activity {
 

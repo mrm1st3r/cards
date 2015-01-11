@@ -20,6 +20,7 @@ import com.github.mrm1st3r.cards.lobby.LobbyJoinActivity;
  * the apps functions.
  * 
  * @author Lukas 'mrm1st3r' Taake
+ * @version 1.0
  */
 public class MainActivity extends Activity {
 
@@ -28,7 +29,6 @@ public class MainActivity extends Activity {
 	 */
 	@SuppressWarnings("unused")
 	private static final String TAG = MainActivity.class.getSimpleName();
-
 	/**
 	 * Preferences for player name.
 	 */
@@ -42,11 +42,8 @@ public class MainActivity extends Activity {
 	protected final void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-
-		// read currently saved player name
-		
+		// read currently saved player name		
 		pref = getSharedPreferences(Cards.PREF_FILE, Context.MODE_PRIVATE);
-
 		// use null as default value to be able to immediately save
 		// default value to prevent empty user name.
 		String name = pref.getString(Cards.PREF_PLAYER_NAME, null);

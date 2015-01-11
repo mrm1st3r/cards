@@ -17,6 +17,7 @@ import com.github.mrm1st3r.connection.bluetooth.SimpleBluetoothConnection;
  * This is the user interface that is started on the host device and
  * controls the game loop.
  * @author Sergius Maier
+ * @version 1.0
  */
 public class HostGameActivity extends GameActivity {
 
@@ -39,8 +40,7 @@ public class HostGameActivity extends GameActivity {
 
 	@Override
 	public final void onCreate(final Bundle bun) {
-		super.onCreate(bun);
-		
+		super.onCreate(bun);		
 		newGame();
 	}
 	
@@ -50,28 +50,22 @@ public class HostGameActivity extends GameActivity {
 	public final void newGame() {
 		int playerCount =
 				((Cards) getApplication()).getConnections().size() + 1;
-
 		SharedPreferences pref = getSharedPreferences(
 				Cards.PREF_FILE, Context.MODE_PRIVATE);
 		String localName = pref.getString(Cards.PREF_PLAYER_NAME, "");
-
 		Log.d(TAG, "starting new game with " + playerCount + " players");
 		game = new ThirtyOne(playerCount);
 		localPlayer = new LocalPlayer(localName, ThirtyOne.HAND_SIZE,
 				ThirtyOne.MAX_LIFES, this);
 		game.addPlayer(localPlayer);
-
 		for (SimpleBluetoothConnection conn : ((Cards) getApplication())
 				.getConnections().keySet()) {
-
 			conn.unpause();
 			String remoteName =
 					((Cards) getApplication()).getConnections().get(conn);
 			final BluetoothPlayer remotePlayer = new BluetoothPlayer(remoteName,
-					ThirtyOne.HAND_SIZE, ThirtyOne.MAX_LIFES, conn);
-			
-			game.addPlayer(remotePlayer);
-			
+					ThirtyOne.HAND_SIZE, ThirtyOne.MAX_LIFES, conn);			
+			game.addPlayer(remotePlayer);			
 			remotePlayer.getConn()
 					.setOnReceivedHandler(new OnReceivedHandler<String>() {
 				@Override
@@ -85,7 +79,6 @@ public class HostGameActivity extends GameActivity {
 				}
 			});
 		}
-
 		gameThread = new Thread(new Runnable() {
 			@Override
 			public void run() {

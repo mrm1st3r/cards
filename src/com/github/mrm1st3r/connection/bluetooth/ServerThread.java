@@ -19,7 +19,7 @@ import com.github.mrm1st3r.connection.OnConnectionChangeHandler;
  * until a new connection is established.
  * 
  * @author Lukas 'mrm1st3r' Taake
- * @version 1.1.0
+ * @version 1.1
  */
 public class ServerThread extends ConnectThread {
 

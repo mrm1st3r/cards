@@ -1,6 +1,5 @@
 package com.github.mrm1st3r.cards.game;
 
-
 /**
  * This class describes a card player.
  * @author Sergius Maier

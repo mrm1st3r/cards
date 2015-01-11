@@ -7,7 +7,7 @@ import android.bluetooth.BluetoothDevice;
  * Empty default implementations allow omitting not needed methods.
  * 
  * @author Lukas Taake
- * @version 1.0.0
+ * @version 1.0
  */
 public abstract class OnConnectionChangeHandler {
 

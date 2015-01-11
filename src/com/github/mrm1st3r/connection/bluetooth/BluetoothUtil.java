@@ -10,7 +10,7 @@ import android.util.SparseArray;
 /**
  * Utility class for managing Bluetooth connections.
  * @author Lukas 'mrm1st3r' Taake
- * @version 1.1.0
+ * @version 1.1
  */
 public final class BluetoothUtil {
 
@@ -117,8 +117,7 @@ public final class BluetoothUtil {
 			act.onSuccess();
 		} else {
 			act.onFailure();
-		}
-		
+		}	
 		return true;
 	}
 

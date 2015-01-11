@@ -9,6 +9,7 @@ import android.widget.BaseAdapter;
 /**
  * Base adapter for HashMap based lists.
  * @author Lukas 'mrm1st3r' Taake
+ * @version 1.0
  *
  * @param <K> key data type
  * @param <V> value data type

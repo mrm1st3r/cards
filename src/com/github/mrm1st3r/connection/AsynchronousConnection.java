@@ -5,6 +5,7 @@ import java.io.Closeable;
 /**
  * 
  * @author Lukas 'mrm1st3r' Taake
+ * @version 1.0
  *
  * @param <T> Data type that will be sent and received
  */

@@ -75,7 +75,6 @@ public abstract class Gameplay {
 
 	/**
 	 * Add a new player to the game.
-	 * 
 	 * @param p The player to be added
 	 * @return true on success, false when the maximum number
 	 * of players was already reached before
@@ -84,11 +83,28 @@ public abstract class Gameplay {
 		if (playerList.size() == maxPlayerCount) {
 			return false;
 		}
-
 		playerList.add(p);
 		return true;
 	}
 
+	/**
+	 * Get the player who is to make his turn after the given player.
+	 * @param p The player whose next to search
+	 * @return The next player
+	 */
+	protected final Player nextPlayerFor(final Player p) {
+		int nextPos = playerList.indexOf(p) + 1;
+		if (nextPos == playerList.size()) {
+			nextPos = 0;
+		}
+		Player next = playerList.get(nextPos);		
+		if (next.getLifes() > 0) {
+			return next;
+		} else {
+			return nextPlayerFor(next);
+		}
+	}	
+	
 	/**
 	 * @return All players currently in the game
 	 */
@@ -102,7 +118,7 @@ public abstract class Gameplay {
 	public final Player getCurrentPlayer() {
 		return activePlayer;
 	}
-
+	
 	/**
 	 * Set a new active player.
 	 * @param pPlayer New player
@@ -112,7 +128,6 @@ public abstract class Gameplay {
 			throw new IllegalArgumentException(
 					"Active player was not found in player list");
 		}
-
 		this.activePlayer = pPlayer;
 	}
 
@@ -122,7 +137,7 @@ public abstract class Gameplay {
 	public final Player getDealer() {
 		return dealer;
 	}
-
+	
 	/**
 	 * Set a player to be the new dealer.
 	 * @param pDealer New dealer
@@ -132,28 +147,7 @@ public abstract class Gameplay {
 			throw new IllegalArgumentException(
 					"Dealer was not found in player list");
 		}
-
 		dealer = pDealer;
-	}
-
-	/**
-	 * Get the player who is to make his turn after the given player.
-	 * @param p The player whose next to search
-	 * @return The next player
-	 */
-	protected final Player nextPlayerFor(final Player p) {
-		int nextPos = playerList.indexOf(p) + 1;
-		if (nextPos == playerList.size()) {
-			nextPos = 0;
-		}
-		
-		Player next = playerList.get(nextPos);
-		
-		if (next.getLifes() > 0) {
-			return next;
-		} else {
-			return nextPlayerFor(next);
-		}
 	}
 
 	/**
@@ -164,19 +158,6 @@ public abstract class Gameplay {
 	}
 
 	/**
-	 * @return The number of living players left
-	 */
-	public final int countLivingPlayers() {
-		int num = 0;
-		for (Player p : getPlayers()) {
-			if (p.getLifes() >= 0) {
-				num++;
-			}
-		}
-		return num;
-	}
-
-	/**
 	 * @return The player at the local host device
 	 */
 	public final LocalPlayer getHostPlayer() {
@@ -184,8 +165,7 @@ public abstract class Gameplay {
 			if (p.getClass().equals(LocalPlayer.class)) {
 				return (LocalPlayer) p;
 			}
-		}
-		
+		}		
 		return null;
 	}
 

@@ -20,7 +20,7 @@ import com.github.mrm1st3r.connection.ThreadedConnection;
  * writing.
  * 
  * @author Lukas Taake
- * @version 1.1.0
+ * @version 1.1
  */
 public class SimpleBluetoothConnection
 extends ThreadedConnection

@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory;
 /**
  * This class provides additional functions for bitmap processing.
  * @author Lukas 'mrm1st3r' Taake
+ * @version 1.0
  */
 public final class BitmapUtil {
 

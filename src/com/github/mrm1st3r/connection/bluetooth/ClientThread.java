@@ -19,7 +19,7 @@ import com.github.mrm1st3r.connection.OnConnectionChangeHandler;
  * a confirmative user input).
  * 
  * @author Lukas 'mrm1st3r' Taake
- * @version 1.1.0
+ * @version 1.1
  */
 public class ClientThread extends ConnectThread {
 
@@ -101,7 +101,6 @@ public class ClientThread extends ConnectThread {
 			}
 			return;
 		}
-
 		// Create a new asynchronous connection object for the
 		// established connection
 		SimpleBluetoothConnection conn =

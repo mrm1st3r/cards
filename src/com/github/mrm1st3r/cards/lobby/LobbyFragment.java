@@ -16,6 +16,7 @@ import com.github.mrm1st3r.cards.R;
  * both, host and clients.
  * 
  * @author Lukas 'mrm1st3r' Taake
+ * @version 1.0
  */
 public class LobbyFragment extends Fragment {
 

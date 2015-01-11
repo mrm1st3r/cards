@@ -26,7 +26,7 @@ import com.github.mrm1st3r.connection.bluetooth.SimpleBluetoothConnection;
  * appropriate command from the game host.
  * 
  * @author Lukas 'mrm1st3r' Taake
- *
+ * @version 1.0
  */
 public class LobbyActivity extends Activity {
 
