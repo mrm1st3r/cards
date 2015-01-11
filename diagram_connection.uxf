@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?><diagram program="umlet" version="12.1">
+  <zoom_level>11</zoom_level>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>77</x>
+      <y>198</y>
+      <w>418</w>
+      <h>88</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;Interface&gt;&gt;
+AsynchronousConnection&lt;T&gt;
+--
+/+setOnReceivedHandler(h: onReceivedHandler&lt;T&gt;)/
+/+write(data: T)/</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>407</x>
+      <y>132</y>
+      <w>143</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;interface&gt;&gt;
+java.io.Closeable</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>374</x>
+      <y>143</y>
+      <w>87</w>
+      <h>76</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.</panel_attributes>
+    <additional_attributes>66;33;33;55</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>506</x>
+      <y>198</y>
+      <w>407</w>
+      <h>231</h>
+    </coordinates>
+    <panel_attributes>/ThreadedConnection/
+--
+-connectionHandler: OnConnectionChangeHandler
+-pausing: AtomicBoolean
+--
++setOnConnectionChangeHandler(
+        h: ConnectionChangeHandler)
+/#onRun()/
+/#onResume()/
++run()
++pause()
++unpause()
++isPaused(): boolean</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>473</x>
+      <y>143</y>
+      <w>98</w>
+      <h>76</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.</panel_attributes>
+    <additional_attributes>33;33;77;55</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>671</x>
+      <y>132</y>
+      <w>143</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>java.lang.Thread</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>704</x>
+      <y>132</y>
+      <w>54</w>
+      <h>87</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>33;33;33;66</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>275</x>
+      <y>451</y>
+      <w>429</w>
+      <h>330</h>
+    </coordinates>
+    <panel_attributes>SimpleBluetoothConnection&lt;String&gt;
+--
+in: BufferedReader
+out: PrintWriter
+messageHandler: OnReceivedHandler&lt;String&gt;
+buffer: String
+socket: BluetoothSocket
+--
+#onRun()
+#onResume()
++setOnReceivedHandler(H: OnReceivedHandler)
++write(data: String)
++getDeviceName(): String
++close()</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>484</x>
+      <y>396</y>
+      <w>98</w>
+      <h>76</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>77;33;33;55</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>253</x>
+      <y>253</y>
+      <w>120</w>
+      <h>219</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.</panel_attributes>
+    <additional_attributes>33;33;99;198</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>77</x>
+      <y>66</y>
+      <w>473</w>
+      <h>55</h>
+    </coordinates>
+    <panel_attributes>OnReceivedHandler&lt;T&gt;
+--
+--
+onReveiced(conn: AsynchronousConnection&lt;T&gt;, data: T)
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>121</x>
+      <y>88</y>
+      <w>54</w>
+      <h>131</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>33;33;33;110</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>561</x>
+      <y>0</y>
+      <w>363</w>
+      <h>88</h>
+    </coordinates>
+    <panel_attributes>/OnConnectionChangeHandler/
+--
+--
++onConnect(conn: ThreadedConnection)
++onConnectionFailed(dev: BluetoothDevice)
++onDisconnect(conn: ThreadedConnection)</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>836</x>
+      <y>55</y>
+      <w>54</w>
+      <h>164</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>33;33;33;143</additional_attributes>
+  </element>
+</diagram>
