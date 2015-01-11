@@ -328,8 +328,8 @@ public class ThirtyOne extends Gameplay {
 		}
 		Log.d(TAG, "The calculated score of the current player is " 
 		+ score);
-		if (p.getScore() >= POINTS_WIN) {
-			Log.d(TAG, "");
+		if (score >= POINTS_WIN) {
+			Log.d(TAG, "test");
 			winner = p;
 		}
 		p.setScore(score);
