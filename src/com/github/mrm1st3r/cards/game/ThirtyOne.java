@@ -90,7 +90,6 @@ public class ThirtyOne extends Gameplay {
 		// initialisation
 		String play = "players";
 		for (Player p : getPlayers()) {
-			p.setLifes(MAX_LIFES);
 			p.setHand(new Card[HAND_SIZE]);
 		}
 		stopper = null;
@@ -171,23 +170,32 @@ public class ThirtyOne extends Gameplay {
 	public final void endRound() {
 		updateScores();
 		float minScore = POINTS_MAX;
+		float maxScore = 0;
 		LinkedList<Player> oldPlayers = getPlayers();
 		// search for the lowest score in this round
 		for (Player p : getPlayers()) {
 			if (p.getLifes() >= 0) {
 				minScore = Math.min(minScore, p.getScore());
+				maxScore = Math.max(maxScore, p.getScore());
 			}
 		}
 		// decrease the life of players with the lowest score
 		for (Player p : getPlayers()) {
 			if (p.getLifes() >= 0 && p.getScore() == minScore) {
-				if (p.getLifes() > 0) {
-					p.decreaseLife();
-				}
+				p.decreaseLife();
+			
 			}
+			// all players might have same points
+			if (winner == null && p.getScore() == maxScore) {
+				// someone closed with less than 31 points
+				winner = p;
+			}
+			Log.d(TAG, p.toString());
 		}
+		
 		int alive = countLivingPlayers();
 		Player host = getHostPlayer();
+		Log.d(TAG, alive + " players alive");
 		// winner
 		if (alive == 1) {
 			for (Player p : getPlayers()) {
@@ -215,7 +223,9 @@ public class ThirtyOne extends Gameplay {
 		// wait for host choice for new round/game
 		synchronized (host.getLock()) {
 			try {
+				Log.d(TAG, "waiting...");
 				host.getLock().wait();
+				Log.d(TAG, "notified...");
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -326,10 +336,8 @@ public class ThirtyOne extends Gameplay {
 			score = Math.max(score, spades);
 			score = Math.max(score, clubs);
 		}
-		Log.d(TAG, "The calculated score of the current player is " 
-		+ score);
+
 		if (score >= POINTS_WIN) {
-			Log.d(TAG, "test");
 			winner = p;
 		}
 		p.setScore(score);
@@ -409,7 +417,7 @@ public class ThirtyOne extends Gameplay {
 		for (Card c : table) {
 			str = str + " " + c.getImageName();
 		}
-		Log.d(TAG, str);
+
 		for (Player p : getPlayers()) {
 			p.sendMessage(str);
 		}

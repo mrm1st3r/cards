@@ -26,7 +26,7 @@ public abstract class Player {
 	/**
 	 * Lock used when waiting for player input.
 	 */
-	private Object lock = new Object();
+	private final Object lock = new Object();
 
 	/**
 	 * Construct a new player.

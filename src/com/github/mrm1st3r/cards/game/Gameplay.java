@@ -17,7 +17,7 @@ public abstract class Gameplay {
 	/**
 	 * All currently connected players.
 	 */
-	private LinkedList<Player> playerList;
+	private final LinkedList<Player> playerList;
 	/**
 	 * The current deck of hidden cards left.
 	 */
@@ -98,7 +98,7 @@ public abstract class Gameplay {
 			nextPos = 0;
 		}
 		Player next = playerList.get(nextPos);		
-		if (next.getLifes() > 0) {
+		if (next.getLifes() >= 0) {
 			return next;
 		} else {
 			return nextPlayerFor(next);

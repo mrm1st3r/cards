@@ -73,6 +73,9 @@ implements AsynchronousConnection<String> {
 		in = tmpIn;
 		out = tmpOut;
 		socket = sock;
+
+		// Set thread name for debugging
+		this.setName("Connection to " + socket.getRemoteDevice().getName());
 	}
 
 	/**
@@ -111,7 +114,7 @@ implements AsynchronousConnection<String> {
 	@Override
 	protected final void onRun() throws IOException {
 		String str = in.readLine();
-		Log.d(TAG, "incoming: " + str);
+		Log.v(TAG, "incoming: " + str);
 		if (str == null) {
 			return;
 		}
@@ -140,6 +143,7 @@ implements AsynchronousConnection<String> {
 
 	@Override
 	public final void write(final String str) {
+		Log.v(TAG, "writing: " + str);
 		out.println(str);
 		out.flush();
 	}

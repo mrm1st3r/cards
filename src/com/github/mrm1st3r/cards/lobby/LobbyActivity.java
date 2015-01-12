@@ -126,6 +126,7 @@ public class LobbyActivity extends Activity {
 							ClientGameActivity.class);
 					intent.putExtra(EXTRA_PLAYER_LIST, playerList);
 					conn.setOnConnectionChangeHandler(null);
+					conn.pause();
 					startActivity(intent);
 					finish();
 				} else if (set[0].equals("quit")) {

@@ -85,13 +85,14 @@ public class HostGameActivity extends GameActivity {
 				game.start();
 			}
 		});
+		gameThread.setName("Game loop");
 		gameThread.start();
 	}
 
 	@Override
 	public final void sendMessage(final String msg) {
 		synchronized (localPlayer.getLock()) {
-			game.checkMessage(msg);	
+			game.checkMessage(msg);
 			localPlayer.getLock().notify();
 		}
 	}
