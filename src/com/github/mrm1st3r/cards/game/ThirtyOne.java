@@ -182,8 +182,7 @@ public class ThirtyOne extends Gameplay {
 		// decrease the life of players with the lowest score
 		for (Player p : getPlayers()) {
 			if (p.getLifes() >= 0 && p.getScore() == minScore) {
-				p.decreaseLife();
-			
+				p.decreaseLife();			
 			}
 			// all players might have same points
 			if (winner == null && p.getScore() == maxScore) {
@@ -191,8 +190,7 @@ public class ThirtyOne extends Gameplay {
 				winner = p;
 			}
 			Log.d(TAG, p.toString());
-		}
-		
+		}		
 		int alive = countLivingPlayers();
 		Player host = getHostPlayer();
 		Log.d(TAG, alive + " players alive");
@@ -378,13 +376,13 @@ public class ThirtyOne extends Gameplay {
 					p.sendMessage("nextround");
 				}
 				setDealer(nextPlayerFor(getDealer()));
-			} else {
+			} else if (parts[1].equals("no")) {
 				playing = false;
 			}
 		} else if (parts[0].equals("newgame")) {
 			if (parts[1].equals("no")) {
 				playing = false;
-			} else {
+			} else if (parts[1].equals("yes")) {
 				newGame();
 			}
 		}
@@ -447,6 +445,7 @@ public class ThirtyOne extends Gameplay {
 		}
 		stopper = null;
 		winner = null;
+		choice = new Card[HAND_SIZE];
 		setDealer(nextPlayerFor(getDealer()));
 	}
 }
