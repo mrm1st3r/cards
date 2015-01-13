@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import android.app.Application;
 
+import com.github.mrm1st3r.connection.bluetooth.BluetoothUtil;
 import com.github.mrm1st3r.connection.bluetooth.SimpleBluetoothConnection;
 
 /**
@@ -33,6 +34,10 @@ public class Cards extends Application {
 	 */
 	private HashMap<SimpleBluetoothConnection, String> connections =
 			new HashMap<SimpleBluetoothConnection, String>();
+	/**
+	 * True if bluetooth was enabled by the application.
+	 */
+	private boolean enabledBluetooth = false;
 
 	/**
 	 * @return List of all established connections.
@@ -51,5 +56,20 @@ public class Cards extends Application {
 			final HashMap<SimpleBluetoothConnection, String> conn) {
 		connections = conn;
 	}
-
+	/**
+	 * Register if bluetooth was enabled by the application.
+	 * @param state true if bluetooth was enabled by the application
+	 */
+	public final void setEnabled(final boolean state) {
+		enabledBluetooth = state;
+	}
+	/**
+	 * Reset the local bluetooth adapter to the state it was when the
+	 * application was launched.
+	 */
+	public final void resetBluetoothAdapter() {
+		if (enabledBluetooth) {
+			BluetoothUtil.disable();
+		}
+	}
 }

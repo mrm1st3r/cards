@@ -72,6 +72,10 @@ public class LobbyJoinActivity extends Activity {
 	 * Dialog that is shown while a new connection is being established.
 	 */
 	private ProgressDialog dlgJoin = null;
+	/**
+	 * The Bluetooth adapters enabling status before the app was started.
+	 */
+	private boolean oldBtState = false;
 
 	/**
 	 * Receiver that will receive any discovery results and status changes.
@@ -118,7 +122,8 @@ public class LobbyJoinActivity extends Activity {
 			cancelSearch();
 		}
 
-		BluetoothUtil.enable(this, new ResultAction() {
+		oldBtState = BluetoothUtil.isEnabled();
+		BluetoothUtil.requestEnable(this, new ResultAction() {
 
 			@Override
 			public void onSuccess() {
@@ -168,6 +173,8 @@ public class LobbyJoinActivity extends Activity {
 			}
 
 		});
+		
+		((Cards) getApplication()).setEnabled(!oldBtState);
 	}
 
 	/**
