@@ -105,12 +105,10 @@ public abstract class Gameplay {
 		if (playerList.size() < 2) {
 			return null;
 		}
-		
 		int nextPos = playerList.indexOf(p) + 1;
 		if (nextPos == playerList.size()) {
 			nextPos = 0;
 		}
-
 		Player next = playerList.get(nextPos);
 		if (next.getLifes() >= 0) {
 			return next;

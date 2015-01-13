@@ -99,15 +99,14 @@ public class ThirtyOne extends Gameplay {
 		for (Player p : getPlayers()) {
 			// all players receive their points
 			p.sendMessage("life " + p.getLifes());
-			
+
 			if (p.getLifes() >= 0) {
 				// all players who have still lives get hand cards
 				giveHand(p);
 				Card[] hand = p.getHand();
 				p.sendMessage("hand " + hand[0].getImageName() + " "
-						+ hand[1].getImageName() + " "
-						+ hand[2].getImageName());
-				
+						+ hand[1].getImageName() + " " + hand[2].getImageName());
+
 				// opponents for all players with points
 				Player next = nextPlayerFor(p);
 				String str = play;
@@ -178,7 +177,8 @@ public class ThirtyOne extends Gameplay {
 		updateScores();
 		float minScore = POINTS_MAX;
 		float maxScore = 0;
-		LinkedList<Player> oldPlayers = getPlayers();
+		LinkedList<Player> oldPlayers = (LinkedList<Player>) getPlayers()
+				.clone();
 		// search for the lowest score in this round
 		for (Player p : getPlayers()) {
 			if (p.getLifes() >= 0) {

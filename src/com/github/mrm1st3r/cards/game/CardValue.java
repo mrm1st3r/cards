@@ -111,7 +111,6 @@ public enum CardValue {
 	public static CardValue[] getSkatDeck() {
 		CardValue[] skatDeck = new CardValue[SKAT_DECK_SIZE];
 		CardValue[] all = values();
-
 		// minimum value that is used in a skat deck.
 		final int minValue = 7;
 
@@ -120,7 +119,6 @@ public enum CardValue {
 				skatDeck[j++] = all[i];
 			}
 		}
-
 		return skatDeck;
 	}
 
