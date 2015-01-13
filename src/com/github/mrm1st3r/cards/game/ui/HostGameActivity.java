@@ -18,6 +18,7 @@ import com.github.mrm1st3r.cards.game.ThirtyOne;
 import com.github.mrm1st3r.connection.AsynchronousConnection;
 import com.github.mrm1st3r.connection.OnReceivedHandler;
 import com.github.mrm1st3r.connection.bluetooth.SimpleBluetoothConnection;
+import com.github.mrm1st3r.util.BitmapUtil;
 
 /**
  * This is the user interface that is started on the host device and controls
@@ -64,8 +65,8 @@ public class HostGameActivity extends GameActivity {
 				Context.MODE_PRIVATE);
 		String localName = pref.getString(Cards.PREF_PLAYER_NAME, "");
 
-		HashMap<SimpleBluetoothConnection, String> connections = ((Cards) getApplication())
-				.getConnections();
+		HashMap<SimpleBluetoothConnection, String> connections =
+				((Cards) getApplication()).getConnections();
 
 		// add one for local player
 		int playerCount = connections.size() + 1;
@@ -137,7 +138,7 @@ public class HostGameActivity extends GameActivity {
 			Log.w(TAG, e);
 		}
 		((Cards) getApplication()).getConnections().clear();
-
+		BitmapUtil.clearBitmapBuffer();
 		super.onBackPressed();
 		finish();
 	}
@@ -151,6 +152,7 @@ public class HostGameActivity extends GameActivity {
 	public final void onBackPressed() {
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 		dialog.setTitle(R.string.close_game);
+		dialog.setMessage(R.string.close_game_info);
 		dialog.setPositiveButton(R.string.yes,
 				new DialogInterface.OnClickListener() {
 

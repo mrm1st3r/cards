@@ -261,13 +261,14 @@ public class LobbyCreateActivity extends Activity {
 		SimpleBluetoothConnection conn = (SimpleBluetoothConnection) ac;
 
 		String[] set = msg.split(" ");
+		final int namePos = 5;
 
 		if (set[0].equals("join")) {
 			// no player name sent
 			if (set[1].length() == 0) {
 				return;
 			}
-			playerList.put(conn, msg.substring(5));
+			playerList.put(conn, msg.substring(namePos));
 			// send new player name to other players
 			broadcast(msg);
 
