@@ -64,14 +64,15 @@ public final class BluetoothUtil {
 	}
 
 	/**
-	 * Enable bluetooth.
+	 * Request a user input to enable the bluetooth adapter.
 	 * 
 	 * @param context
 	 *            current activity context.
 	 * @param act
 	 *            callback to be executed afterwards.
 	 */
-	public static void enable(final Activity context, final ResultAction act) {
+	public static void requestEnable(final Activity context,
+			final ResultAction act) {
 		Intent enableInt = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
 		context.startActivityForResult(enableInt, REQUEST_ENABLE_BT);
 
@@ -79,7 +80,13 @@ public final class BluetoothUtil {
 	}
 
 	/**
-	 * Enable Bluetooth discoverable mode.
+	 * Disable the bluetooth adapter.
+	 */
+	public static void disable() {
+		adapter.disable();
+	}
+	/**
+	 * request a user input to enable Bluetooth discoverable mode.
 	 * 
 	 * @param context
 	 *            application context
@@ -88,7 +95,7 @@ public final class BluetoothUtil {
 	 * @param act
 	 *            callback to be executed afterwards.
 	 */
-	public static void enableDiscoverable(final Activity context,
+	public static void requestEnableDiscoverable(final Activity context,
 			final int time, final ResultAction act) {
 
 		Intent discoverableIntent = new Intent(

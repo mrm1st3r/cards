@@ -75,6 +75,10 @@ public class LobbyCreateActivity extends Activity {
 	 * Local player name.
 	 */
 	private String localPlayerName;
+	/**
+	 * The Bluetooth adapters enabling status before the app was started.
+	 */
+	private boolean oldBtState = false;
 
 	@Override
 	protected final void onCreate(final Bundle savedInstanceState) {
@@ -91,12 +95,15 @@ public class LobbyCreateActivity extends Activity {
 		((TextView) findViewById(R.id.txtLobbyName)).setText(BluetoothUtil
 				.getDeviceName());
 
-		BluetoothUtil.enable(this, new ResultAction() {
+		oldBtState = BluetoothUtil.isEnabled();
+		
+		BluetoothUtil.requestEnable(this, new ResultAction() {
 
 			@Override
 			public void onSuccess() {
 
-				BluetoothUtil.enableDiscoverable(LobbyCreateActivity.this,
+				BluetoothUtil.requestEnableDiscoverable(
+						LobbyCreateActivity.this,
 						LOBBY_CREATE_TIMEOUT, new ResultAction() {
 							@Override
 							public void onSuccess() {
@@ -126,7 +133,7 @@ public class LobbyCreateActivity extends Activity {
 			// this method should only be called once.
 			return;
 		}
-
+		((Cards) getApplication()).setEnabled(!oldBtState);
 		// read local player name from preferences
 		SharedPreferences pref = getSharedPreferences(Cards.PREF_FILE,
 				Context.MODE_PRIVATE);
@@ -343,7 +350,8 @@ public class LobbyCreateActivity extends Activity {
 	 *            Calling menu item
 	 */
 	public final void becomeVisible(final MenuItem item) {
-		BluetoothUtil.enableDiscoverable(this, LOBBY_CREATE_TIMEOUT, null);
+		BluetoothUtil.requestEnableDiscoverable(
+				this, LOBBY_CREATE_TIMEOUT, null);
 	}
 
 	@Override
