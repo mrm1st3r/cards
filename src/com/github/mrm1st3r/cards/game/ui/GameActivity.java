@@ -119,9 +119,9 @@ public abstract class GameActivity extends Activity {
 			changeText(R.id.lbl_rival0, parts[1]);
 			if (parts.length >= 3) {
 				changeText(R.id.lbl_rival1, parts[2]);
-			}
-			if (parts.length >= 4) {
-				changeText(R.id.lbl_rival2, parts[3]);
+				if (parts.length >= 4) {
+					changeText(R.id.lbl_rival2, parts[3]);
+				}
 			}
 		}
 	}
@@ -326,9 +326,11 @@ public abstract class GameActivity extends Activity {
 	 * Save the marked card on the table.
 	 * @param view ID of the ImageView which is marked
 	 */
-	public void img_table(final View view) {
+	@SuppressWarnings("deprecation")
+	public final void img_table(final View view) {
 		resetTableCards();
 		((ImageView) view).setAlpha(SELECTED_OPACITY);
+
 		switch (view.getId()) {
 		case R.id.img_table0:
 			checkedTable = 0;
@@ -362,9 +364,11 @@ public abstract class GameActivity extends Activity {
 	 * Save the marked card in the hand.
 	 * @param view ID of the ImageView which is marked
 	 */
-	public void img_hand(final View view) {
+	@SuppressWarnings("deprecation")
+	public final void img_hand(final View view) {
 		resetHandCards();
 		((ImageView) view).setAlpha(SELECTED_OPACITY);
+
 		switch (view.getId()) {
 		case R.id.img_hand0:
 			checkedHand = 0;
@@ -399,7 +403,7 @@ public abstract class GameActivity extends Activity {
 	 * and the marked hand card.
 	 * @param view Button that was pressed, not used
 	 */
-	public void btn_1card(final View view) {
+	public final void btn_1card(final View view) {
 		if (checkedTable != -1 && checkedHand != -1) {
 			inactive();
 			sendMessage("swap " + checkedHand + " " + checkedTable);
@@ -415,7 +419,7 @@ public abstract class GameActivity extends Activity {
 	 * hand cards of the player.
 	 * @param view Button that was pressed, not used
 	 */
-	public void btn_allcards(final View view) {
+	public final void btn_allcards(final View view) {
 		inactive();
 		sendMessage("swapall");
 	}
@@ -424,7 +428,7 @@ public abstract class GameActivity extends Activity {
 	 * Send a message to the game, to close the round.
 	 * @param view Button that was pressed, not used
 	 */
-	public void btn_knock(final View view) {
+	public final void btn_knock(final View view) {
 		inactive();
 		sendMessage("close");
 	}
@@ -433,7 +437,7 @@ public abstract class GameActivity extends Activity {
 	 * Send a message to the game, to push.
 	 * @param view Button that was pressed, not used
 	 */
-	public void btn_push(final View view) {
+	public final void btn_push(final View view) {
 		inactive();
 		sendMessage("push");
 	}

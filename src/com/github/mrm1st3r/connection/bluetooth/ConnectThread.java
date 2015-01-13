@@ -18,9 +18,11 @@ public abstract class ConnectThread extends Thread implements Closeable {
 	private OnConnectionChangeHandler handler = null;
 
 	/**
-	 * Register a handler that will react to a
-	 * failed or succeeded connection attempt.
-	 * @param h Handler to be registered
+	 * Register a handler that will react to a failed or succeeded connection
+	 * attempt.
+	 * 
+	 * @param h
+	 *            Handler to be registered
 	 */
 	public final void setOnConnectionChangeHandler(
 			final OnConnectionChangeHandler h) {

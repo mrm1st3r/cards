@@ -7,8 +7,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import android.util.Log;
 
 /**
- * Base class for asynchronous and other connections that need to run
- * an endless loop in a separate thread.
+ * Base class for asynchronous and other connections that need to run an endless
+ * loop in a separate thread.
  * 
  * @author Lukas 'mrm1st3r' Taake
  * @version 1.0
@@ -30,7 +30,9 @@ public abstract class ThreadedConnection extends Thread implements Closeable {
 
 	/**
 	 * Register a handler that will react to a disconnect.
-	 * @param newHand handler to be called
+	 * 
+	 * @param newHand
+	 *            handler to be called
 	 */
 	public final void setOnConnectionChangeHandler(
 			final OnConnectionChangeHandler newHand) {
@@ -39,14 +41,17 @@ public abstract class ThreadedConnection extends Thread implements Closeable {
 
 	/**
 	 * Action that is performed on each loop turn.
-	 * @throws IOException on error
+	 * 
+	 * @throws IOException
+	 *             on error
 	 */
 	protected abstract void onRun() throws IOException;
+
 	/**
 	 * Action that is performed after the connection was paused.
 	 */
 	protected abstract void onResume();
-	
+
 	@Override
 	public final void run() {
 		while (true) {

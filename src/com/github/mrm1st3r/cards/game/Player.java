@@ -2,6 +2,7 @@ package com.github.mrm1st3r.cards.game;
 
 /**
  * This class describes a card player.
+ * 
  * @author Sergius Maier
  * @version 1.0
  */
@@ -30,9 +31,13 @@ public abstract class Player {
 
 	/**
 	 * Construct a new player.
-	 * @param pName The players name
-	 * @param pHandSize	Maximum number of hand cards
-	 * @param pLifes Number of lifes to start with
+	 * 
+	 * @param pName
+	 *            The players name
+	 * @param pHandSize
+	 *            Maximum number of hand cards
+	 * @param pLifes
+	 *            Number of lifes to start with
 	 */
 	public Player(final String pName, final int pHandSize, final int pLifes) {
 		setName(pName);
@@ -42,8 +47,10 @@ public abstract class Player {
 
 	/**
 	 * Add a new card to the players hand.
-	 * @param c	New hand card
-	 * @return	true on success, false otherwise
+	 * 
+	 * @param c
+	 *            New hand card
+	 * @return true on success, false otherwise
 	 */
 	public final boolean addToHand(final Card c) {
 		for (int i = 0; i < handCards.length; i++) {
@@ -57,7 +64,9 @@ public abstract class Player {
 
 	/**
 	 * Remove a card from the players hand.
-	 * @param c Card to remove
+	 * 
+	 * @param c
+	 *            Card to remove
 	 * @return true on success, false otherwise
 	 */
 	public final boolean removeFromHand(final Card c) {
@@ -72,7 +81,9 @@ public abstract class Player {
 
 	/**
 	 * Send a message to the player.
-	 * @param msg Message to send
+	 * 
+	 * @param msg
+	 *            Message to send
 	 */
 	public abstract void sendMessage(String msg);
 
@@ -85,7 +96,9 @@ public abstract class Player {
 
 	/**
 	 * Change the players name.
-	 * @param pName New player name
+	 * 
+	 * @param pName
+	 *            New player name
 	 */
 	public final void setName(final String pName) {
 		this.name = pName;
@@ -100,7 +113,9 @@ public abstract class Player {
 
 	/**
 	 * Update the players score.
-	 * @param pScore The new score
+	 * 
+	 * @param pScore
+	 *            The new score
 	 */
 	public final void setScore(final float pScore) {
 		this.score = pScore;
@@ -112,10 +127,12 @@ public abstract class Player {
 	public final Card[] getHand() {
 		return handCards;
 	}
-	
+
 	/**
 	 * Get a specified hand card.
-	 * @param pos Position of the request card in the players hand
+	 * 
+	 * @param pos
+	 *            Position of the request card in the players hand
 	 * @return The requested card
 	 */
 	public final Card getHandCard(final int pos) {
@@ -124,7 +141,9 @@ public abstract class Player {
 
 	/**
 	 * Give the player new hand cards.
-	 * @param hand New hand cards
+	 * 
+	 * @param hand
+	 *            New hand cards
 	 */
 	public final void setHand(final Card[] hand) {
 		this.handCards = hand;
@@ -139,7 +158,9 @@ public abstract class Player {
 
 	/**
 	 * Update the players lifes.
-	 * @param pLifes New number of lifes
+	 * 
+	 * @param pLifes
+	 *            New number of lifes
 	 */
 	public final void setLifes(final int pLifes) {
 		lifes = pLifes;

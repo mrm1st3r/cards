@@ -13,10 +13,6 @@ import android.util.Log;
 public class ThirtyOne extends Gameplay {
 
 	/**
-	 * Debug tag.
-	 */
-	private static final String TAG = ThirtyOne.class.getSimpleName();
-	/**
 	 * Number of lifes for each player to start with.
 	 */
 	public static final int MAX_LIFES = 3;
@@ -25,17 +21,21 @@ public class ThirtyOne extends Gameplay {
 	 */
 	public static final int HAND_SIZE = 3;
 	/**
+	 * Debug tag.
+	 */
+	private static final String TAG = ThirtyOne.class.getSimpleName();
+	/**
 	 * Maximum number of points that can be reached.
 	 */
-	public static final int POINTS_MAX = 33;
+	private static final int POINTS_MAX = 33;
 	/**
 	 * Number of points that is achieved with three cards of the same value.
 	 */
-	public static final double POINTS_TRIPLE = 30.5;
+	private static final double POINTS_TRIPLE = 30.5;
 	/**
 	 * The number of points needed to instantly win a round.
 	 */
-	public static final int POINTS_WIN = 31;
+	private static final int POINTS_WIN = 31;
 	/**
 	 * All cards laying openly on the table.
 	 */
@@ -78,7 +78,7 @@ public class ThirtyOne extends Gameplay {
 			startRound();
 			playRound();
 			endRound();
-		}		
+		}
 	}
 
 	/**
@@ -87,7 +87,7 @@ public class ThirtyOne extends Gameplay {
 	 * two card sets of which he sees only one.
 	 */
 	public final void startRound() {
-		// initialisation
+		// initialization
 		String play = "players";
 		for (Player p : getPlayers()) {
 			p.setHand(new Card[HAND_SIZE]);
@@ -95,26 +95,28 @@ public class ThirtyOne extends Gameplay {
 		stopper = null;
 		winner = null;
 		createCardDeck();
-		// send the list of opponents to each player
+
 		for (Player p : getPlayers()) {
-			Player next = nextPlayerFor(p);
-			String str = play;
-			while (!next.equals(p)) {
-				str += " " + next.getName();
-				next = nextPlayerFor(next);
-			}
-			p.sendMessage(str);
-			p.sendMessage("inactive");
-		}
-		// all players who have still lives get hand cards
-		for (Player p : getPlayers()) {
+			// all players receive their points
+			p.sendMessage("life " + p.getLifes());
+			
 			if (p.getLifes() >= 0) {
+				// all players who have still lives get hand cards
 				giveHand(p);
 				Card[] hand = p.getHand();
 				p.sendMessage("hand " + hand[0].getImageName() + " "
-						+ hand[1].getImageName() + " " 
+						+ hand[1].getImageName() + " "
 						+ hand[2].getImageName());
-				p.sendMessage("life " + p.getLifes());
+				
+				// opponents for all players with points
+				Player next = nextPlayerFor(p);
+				String str = play;
+				while (!next.equals(p)) {
+					str += " " + next.getName();
+					next = nextPlayerFor(next);
+				}
+				p.sendMessage(str);
+				p.sendMessage("inactive");
 			}
 		}
 		// the dealer is given the choice between two hand cards
@@ -157,6 +159,11 @@ public class ThirtyOne extends Gameplay {
 				}
 			}
 			p = nextPlayerFor(p);
+			if (p == null) {
+				playing = false;
+				throw new IllegalStateException(
+						"Game with less than two players");
+			}
 			setCurrentPlayer(p);
 		}
 	}
@@ -183,7 +190,7 @@ public class ThirtyOne extends Gameplay {
 		for (Player p : getPlayers()) {
 			if (p.getLifes() >= 0 && p.getScore() == minScore) {
 				p.decreaseLife();
-			
+
 			}
 			// all players might have same points
 			if (winner == null && p.getScore() == maxScore) {
@@ -192,7 +199,7 @@ public class ThirtyOne extends Gameplay {
 			}
 			Log.d(TAG, p.toString());
 		}
-		
+
 		int alive = countLivingPlayers();
 		Player host = getHostPlayer();
 		Log.d(TAG, alive + " players alive");
@@ -203,9 +210,9 @@ public class ThirtyOne extends Gameplay {
 					updateMessage(p.getName() + " hat das Spiel gewonnen");
 				}
 			}
-			playing = false;
+
 			host.sendMessage("newgame");
-		// draw
+			// draw
 		} else if (alive == 0) {
 			String str = "Unentschieden zwischen";
 			for (Player p : oldPlayers) {
@@ -214,7 +221,7 @@ public class ThirtyOne extends Gameplay {
 				}
 			}
 			updateMessage(str);
-			playing = false;
+
 			host.sendMessage("newgame");
 		} else {
 			updateMessage(winner.getName() + " hat die Runde gewonnen");
@@ -223,9 +230,9 @@ public class ThirtyOne extends Gameplay {
 		// wait for host choice for new round/game
 		synchronized (host.getLock()) {
 			try {
-				Log.d(TAG, "waiting...");
+				Log.d(TAG, "waiting for " + host.getLock());
 				host.getLock().wait();
-				Log.d(TAG, "notified...");
+				Log.d(TAG, "received notification from " + host.getLock());
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -234,6 +241,7 @@ public class ThirtyOne extends Gameplay {
 
 	/**
 	 * Player p takes 3 Cards from deck and add it to his hand.
+	 * 
 	 * @param p
 	 *            Player who gets cards from deck to his hand
 	 */
@@ -255,6 +263,7 @@ public class ThirtyOne extends Gameplay {
 
 	/**
 	 * Count the number of players with lifes.
+	 * 
 	 * @return The number of living players left
 	 */
 	public final int countLivingPlayers() {
@@ -269,6 +278,7 @@ public class ThirtyOne extends Gameplay {
 
 	/**
 	 * Send a broadcast with a text message to all players.
+	 * 
 	 * @param msg
 	 *            Message to send
 	 */
@@ -291,6 +301,7 @@ public class ThirtyOne extends Gameplay {
 
 	/**
 	 * Update the score of one player.
+	 * 
 	 * @param p
 	 *            Player whose score to update
 	 */
@@ -345,10 +356,13 @@ public class ThirtyOne extends Gameplay {
 	}
 
 	@Override
-	public final void checkMessage(final String msg) {
+	public final void checkMessage(final Player player, final String msg) {
 		Log.d(TAG, "game receiving: " + msg);
 		String[] parts = msg.split(" ");
 		Player current = getCurrentPlayer();
+		if (parts[0].equals("left")) {
+			getPlayers().remove(player);
+		}
 		if (parts[0].equals("swap")) {
 			int handPos = Integer.parseInt(parts[1]);
 			int tablePos = Integer.parseInt(parts[2]);
@@ -388,6 +402,10 @@ public class ThirtyOne extends Gameplay {
 				newGame();
 			}
 		}
+		synchronized (player.getLock()) {
+			player.getLock().notify();
+			Log.d(TAG, "notified " + player.getLock().toString());
+		}
 	}
 
 	/**
@@ -395,6 +413,7 @@ public class ThirtyOne extends Gameplay {
 	 * choose hand the hidden cards would lay down on the table. Otherwise the
 	 * dealer gets the hidden cards and the dealer's hand would lay down on the
 	 * table.
+	 * 
 	 * @param str
 	 *            Choice made by the dealer
 	 */
@@ -425,6 +444,7 @@ public class ThirtyOne extends Gameplay {
 
 	/**
 	 * Send a message to the current player with his new hand cards.
+	 * 
 	 * @param p
 	 *            The player who should receive new hand cards
 	 */

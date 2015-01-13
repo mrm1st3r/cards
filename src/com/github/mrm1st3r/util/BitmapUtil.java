@@ -9,7 +9,15 @@ import android.graphics.BitmapFactory;
 
 /**
  * This class provides additional functions for bitmap processing.
- * @author Lukas 'mrm1st3r' Taake
+ * 
+ * The methods
+ * {@link #decodeSampledBitmapFromResource(Resources, int, int, int)} and
+ * {@link #calculateSamples(android.graphics.BitmapFactory.Options, int, int)}
+ * are provided under creative commons 2.5 license by google at
+ * http://developer.android.com/training/displaying-bitmaps/load-bitmap.html The
+ * additional bitmapBuffer was added.
+ * 
+ * @author Google, Lukas 'mrm1st3r' Taake
  * @version 1.0
  */
 public final class BitmapUtil {
@@ -19,9 +27,10 @@ public final class BitmapUtil {
 	 */
 	private static HashMap<String, Bitmap> bitmapBuffer =
 			new HashMap<String, Bitmap>();
-	
+
 	/**
-	 * @throws InstantiationException There should be no instances of this class
+	 * @throws InstantiationException
+	 *             There should be no instances of this class
 	 */
 	private BitmapUtil() throws InstantiationException {
 		throw new InstantiationException();
@@ -29,18 +38,22 @@ public final class BitmapUtil {
 
 	/**
 	 * Load a bitmap in a given size.
-	 * @param res Resource set to use
-	 * @param resId Bitmap to load
-	 * @param reqWidth Width to load
-	 * @param reqHeight Height to load
+	 * 
+	 * @param res
+	 *            Resource set to use
+	 * @param resId
+	 *            Bitmap to load
+	 * @param reqWidth
+	 *            Width to load
+	 * @param reqHeight
+	 *            Height to load
 	 * @return The requested bitmap
 	 */
-	public static Bitmap decodeSampledBitmapFromResource(
-			final Resources res, final int resId,
-			final int reqWidth, final int reqHeight) {
-		
+	public static Bitmap decodeSampledBitmapFromResource(final Resources res,
+			final int resId, final int reqWidth, final int reqHeight) {
+
 		String bufferKey = resId + "_" + reqWidth + "_" + reqHeight;
-		
+
 		if (bitmapBuffer.containsKey(bufferKey)) {
 			return bitmapBuffer.get(bufferKey);
 		}
@@ -51,12 +64,11 @@ public final class BitmapUtil {
 		BitmapFactory.decodeResource(res, resId, options);
 
 		// Calculate inSampleSize
-		options.inSampleSize =
-				calculateInSampleSize(options, reqWidth, reqHeight);
+		options.inSampleSize = calculateSamples(options, reqWidth, reqHeight);
 
 		// Decode bitmap with inSampleSize set
 		options.inJustDecodeBounds = false;
-		
+
 		Bitmap tmp = BitmapFactory.decodeResource(res, resId, options);
 		bitmapBuffer.put(bufferKey, tmp);
 		return tmp;
@@ -64,13 +76,16 @@ public final class BitmapUtil {
 
 	/**
 	 * Calculate the sample size for a bitmap.
-	 * @param options Option set
-	 * @param reqWidth Width to scale to
-	 * @param reqHeight Height to scale to
+	 * 
+	 * @param options
+	 *            Option set
+	 * @param reqWidth
+	 *            Width to scale to
+	 * @param reqHeight
+	 *            Height to scale to
 	 * @return Sample factor
 	 */
-	public static int calculateInSampleSize(
-			final BitmapFactory.Options options,
+	public static int calculateSamples(final BitmapFactory.Options options,
 			final int reqWidth, final int reqHeight) {
 		// Raw height and width of image
 		final int height = options.outHeight;
@@ -96,13 +111,23 @@ public final class BitmapUtil {
 
 	/**
 	 * Get the identifier of an image.
-	 * @param context Application context
-	 * @param filename The images filename
+	 * 
+	 * @param context
+	 *            Application context
+	 * @param filename
+	 *            The images filename
 	 * @return The images identifier
 	 */
-	public static int getDrawableIdentifier(
-			final Context context, final String filename) {
+	public static int getDrawableIdentifier(final Context context,
+			final String filename) {
 		return context.getResources().getIdentifier(filename, "drawable",
 				context.getPackageName());
+	}
+
+	/**
+	 * Clear the buffer containing all loaded bitmaps.
+	 */
+	public static void clearBitmapBuffer() {
+		bitmapBuffer.clear();
 	}
 }

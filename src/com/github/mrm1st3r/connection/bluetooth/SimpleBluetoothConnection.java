@@ -14,23 +14,21 @@ import com.github.mrm1st3r.connection.OnReceivedHandler;
 import com.github.mrm1st3r.connection.ThreadedConnection;
 
 /**
- * Implementation of {@link BluetoothConnection},
- * providing asynchronous connection for use with Strings.
- * Uses a {@link BufferedReader} for reading a {@link PrintWriter} for
- * writing.
+ * Implementation of {@link BluetoothConnection}, providing asynchronous
+ * connection for use with Strings. Uses a {@link BufferedReader} for reading a
+ * {@link PrintWriter} for writing.
  * 
  * @author Lukas Taake
  * @version 1.1
  */
-public class SimpleBluetoothConnection
-extends ThreadedConnection
-implements AsynchronousConnection<String> {
+public class SimpleBluetoothConnection extends ThreadedConnection implements
+		AsynchronousConnection<String> {
 
 	/**
 	 * Tag for logging.
 	 */
-	private static final String TAG =
-			SimpleBluetoothConnection.class.getSimpleName();
+	private static final String TAG = SimpleBluetoothConnection.class
+			.getSimpleName();
 	/**
 	 * Input connection.
 	 */
@@ -55,7 +53,9 @@ implements AsynchronousConnection<String> {
 
 	/**
 	 * Create a new connection without any handlers.
-	 * @param sock Socket to use
+	 * 
+	 * @param sock
+	 *            Socket to use
 	 */
 	public SimpleBluetoothConnection(final BluetoothSocket sock) {
 
@@ -63,8 +63,8 @@ implements AsynchronousConnection<String> {
 		PrintWriter tmpOut = null;
 
 		try {
-			tmpIn = new BufferedReader(
-					new InputStreamReader(sock.getInputStream()));
+			tmpIn = new BufferedReader(new InputStreamReader(
+					sock.getInputStream()));
 			tmpOut = new PrintWriter(sock.getOutputStream());
 		} catch (IOException e) {
 			Log.w(TAG, e);
@@ -80,8 +80,11 @@ implements AsynchronousConnection<String> {
 
 	/**
 	 * Create a new connection with only a message handler.
-	 * @param sock Socket to use
-	 * @param inHand message handler
+	 * 
+	 * @param sock
+	 *            Socket to use
+	 * @param inHand
+	 *            message handler
 	 */
 	public SimpleBluetoothConnection(final BluetoothSocket sock,
 			final OnReceivedHandler<String> inHand) {
@@ -91,9 +94,13 @@ implements AsynchronousConnection<String> {
 
 	/**
 	 * Create a new connection with receive and connection handler.
-	 * @param sock Socket to use
-	 * @param inHand message handler
-	 * @param dcHand disconnect handler
+	 * 
+	 * @param sock
+	 *            Socket to use
+	 * @param inHand
+	 *            message handler
+	 * @param dcHand
+	 *            disconnect handler
 	 */
 	public SimpleBluetoothConnection(final BluetoothSocket sock,
 			final OnReceivedHandler<String> inHand,
@@ -108,8 +115,6 @@ implements AsynchronousConnection<String> {
 			final OnReceivedHandler<String> newHand) {
 		messageHandler = newHand;
 	}
-
-
 
 	@Override
 	protected final void onRun() throws IOException {
@@ -126,6 +131,7 @@ implements AsynchronousConnection<String> {
 			messageHandler.onReceived(this, str);
 		}
 	}
+
 	@Override
 	protected final void onResume() {
 		if (buffer != null && messageHandler != null) {
@@ -155,5 +161,5 @@ implements AsynchronousConnection<String> {
 		} catch (IOException e) {
 			Log.w(TAG, e);
 		}
-	}	
+	}
 }

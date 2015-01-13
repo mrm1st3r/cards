@@ -11,12 +11,12 @@ import android.util.Log;
 import com.github.mrm1st3r.connection.OnConnectionChangeHandler;
 
 /**
- * Helper thread to create a {@link BluetoothServerSocket} and
- * wait for incoming client connections.
+ * Helper thread to create a {@link BluetoothServerSocket} and wait for incoming
+ * client connections.
  * 
- * Using a separate thread to wait for new bluetooth connections
- * is useful, because {@link BluetoothServerSocket#accept()} will block
- * until a new connection is established.
+ * Using a separate thread to wait for new bluetooth connections is useful,
+ * because {@link BluetoothServerSocket#accept()} will block until a new
+ * connection is established.
  * 
  * @author Lukas 'mrm1st3r' Taake
  * @version 1.1
@@ -37,11 +37,15 @@ public class ServerThread extends ConnectThread {
 	private boolean closing = false;
 
 	/**
-	 * Create a new server thread and listen with a given service name
-	 * and UUID and register a callback handler.
-	 * @param name Service name
-	 * @param uuid Service UUID
-	 * @param handler callback handler to be registered
+	 * Create a new server thread and listen with a given service name and UUID
+	 * and register a callback handler.
+	 * 
+	 * @param name
+	 *            Service name
+	 * @param uuid
+	 *            Service UUID
+	 * @param handler
+	 *            callback handler to be registered
 	 */
 	public ServerThread(final String name, final UUID uuid,
 			final OnConnectionChangeHandler handler) {
@@ -51,18 +55,20 @@ public class ServerThread extends ConnectThread {
 	}
 
 	/**
-	 * Create a new server thread and listen with a given service name
-	 * and UUID.
-	 * @param name Service name
-	 * @param uuid Service UUID
+	 * Create a new server thread and listen with a given service name and UUID.
+	 * 
+	 * @param name
+	 *            Service name
+	 * @param uuid
+	 *            Service UUID
 	 */
 	public ServerThread(final String name, final UUID uuid) {
 
 		BluetoothServerSocket tmp = null;
 		try {
 			// open bluetooth server-socket
-			tmp = BluetoothAdapter.getDefaultAdapter().
-					listenUsingRfcommWithServiceRecord(name, uuid);
+			tmp = BluetoothAdapter.getDefaultAdapter()
+					.listenUsingRfcommWithServiceRecord(name, uuid);
 		} catch (IOException e) {
 			Log.w(TAG, e);
 		}
@@ -79,8 +85,8 @@ public class ServerThread extends ConnectThread {
 
 			try {
 				socket = mmServerSocket.accept();
-				SimpleBluetoothConnection conn = 
-						new SimpleBluetoothConnection(socket, null);
+				SimpleBluetoothConnection conn = new SimpleBluetoothConnection(
+						socket, null);
 
 				Log.d(TAG, "incoming connection from "
 						+ socket.getRemoteDevice().getName());

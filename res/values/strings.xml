@@ -49,5 +49,9 @@ Danach geht es der Reihe nach im Uhrzeigersinn, angefangen beim Nebenmann des Ge
 <b>Gewonnen</b> hat am Ende der Spieler mit den meisten Punkten.</string>
 <string name="become_visible">Sichtbar werden</string>
 <string name="refresh_failed">Fehler beim Aktualisieren</string>
-
+<string name="yes">Ja</string>
+<string name="no">Nein</string>
+<string name="leave_game">Spiel verlassen?</string>
+<string name="close_game">Spiel beenden?</string>
+<string name="close_game_info">Das Spiel wird für alle Spieler beendet.</string>
 </resources>

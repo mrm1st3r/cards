@@ -4,14 +4,15 @@ import java.util.LinkedList;
 
 /**
  * This abstract class describes the general functions of a card game.
+ * 
  * @author Sergius Maier
  * @version 1.0
  */
 public abstract class Gameplay {
 
 	/**
-	 * The maximum number of players in this game.
-	 * (In most cases this is the number of players who start the game)
+	 * The maximum number of players in this game. (In most cases this is the
+	 * number of players who start the game)
 	 */
 	private final int maxPlayerCount;
 	/**
@@ -37,8 +38,11 @@ public abstract class Gameplay {
 
 	/**
 	 * Construct a new game.
-	 * @param pPlayerCount Number of players for this game
-	 * @param pCardDeck The type of card deck that is used
+	 * 
+	 * @param pPlayerCount
+	 *            Number of players for this game
+	 * @param pCardDeck
+	 *            The type of card deck that is used
 	 */
 	public Gameplay(final int pPlayerCount, final CardValue[] pCardDeck) {
 		cardDeckType = pCardDeck;
@@ -47,8 +51,8 @@ public abstract class Gameplay {
 	}
 
 	/**
-	 * Create a new, ordered card deck that contains all values
-	 * set in {@link #cardDeckType} in all four colors.
+	 * Create a new, ordered card deck that contains all values set in
+	 * {@link #cardDeckType} in all four colors.
 	 */
 	protected final void createCardDeck() {
 		cards = new LinkedList<Card>();
@@ -61,6 +65,7 @@ public abstract class Gameplay {
 
 	/**
 	 * Take a random card from the ordered card deck.
+	 * 
 	 * @return The taken card, or null if there are no cards left on the deck
 	 */
 	public final Card takeCard() {
@@ -75,9 +80,11 @@ public abstract class Gameplay {
 
 	/**
 	 * Add a new player to the game.
-	 * @param p The player to be added
-	 * @return true on success, false when the maximum number
-	 * of players was already reached before
+	 * 
+	 * @param p
+	 *            The player to be added
+	 * @return true on success, false when the maximum number of players was
+	 *         already reached before
 	 */
 	public final boolean addPlayer(final Player p) {
 		if (playerList.size() == maxPlayerCount) {
@@ -89,22 +96,29 @@ public abstract class Gameplay {
 
 	/**
 	 * Get the player who is to make his turn after the given player.
-	 * @param p The player whose next to search
+	 * 
+	 * @param p
+	 *            The player whose next to search
 	 * @return The next player
 	 */
 	protected final Player nextPlayerFor(final Player p) {
+		if (playerList.size() < 2) {
+			return null;
+		}
+		
 		int nextPos = playerList.indexOf(p) + 1;
 		if (nextPos == playerList.size()) {
 			nextPos = 0;
 		}
-		Player next = playerList.get(nextPos);		
+
+		Player next = playerList.get(nextPos);
 		if (next.getLifes() >= 0) {
 			return next;
 		} else {
 			return nextPlayerFor(next);
 		}
-	}	
-	
+	}
+
 	/**
 	 * @return All players currently in the game
 	 */
@@ -118,10 +132,12 @@ public abstract class Gameplay {
 	public final Player getCurrentPlayer() {
 		return activePlayer;
 	}
-	
+
 	/**
 	 * Set a new active player.
-	 * @param pPlayer New player
+	 * 
+	 * @param pPlayer
+	 *            New player
 	 */
 	public final void setCurrentPlayer(final Player pPlayer) {
 		if (!playerList.contains(pPlayer)) {
@@ -137,10 +153,12 @@ public abstract class Gameplay {
 	public final Player getDealer() {
 		return dealer;
 	}
-	
+
 	/**
 	 * Set a player to be the new dealer.
-	 * @param pDealer New dealer
+	 * 
+	 * @param pDealer
+	 *            New dealer
 	 */
 	public final void setDealer(final Player pDealer) {
 		if (!playerList.contains(pDealer)) {
@@ -165,13 +183,17 @@ public abstract class Gameplay {
 			if (p.getClass().equals(LocalPlayer.class)) {
 				return (LocalPlayer) p;
 			}
-		}		
+		}
 		return null;
 	}
 
 	/**
 	 * Handle an incoming message.
-	 * @param msg Incoming message
+	 * 
+	 * @param p
+	 *            The player who sent the message
+	 * @param msg
+	 *            Incoming message
 	 */
-	public abstract void checkMessage(String msg);
+	public abstract void checkMessage(Player p, String msg);
 }
