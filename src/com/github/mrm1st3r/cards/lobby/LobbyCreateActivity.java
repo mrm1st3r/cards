@@ -49,7 +49,10 @@ public class LobbyCreateActivity extends Activity {
 	 * Number of seconds that Bluetooth discoverable will be activated.
 	 */
 	private static final int LOBBY_CREATE_TIMEOUT = 60;
-
+	/**
+	 * Maximum number of remote players that might connect to a lobby.
+	 */
+	private static final int MAXIMUM_REMOTE_PLAYER_COUNT = 3;
 	/**
 	 * Background thread that will wait for incoming client connections.
 	 */
@@ -178,6 +181,13 @@ public class LobbyCreateActivity extends Activity {
 		// new connection for each player
 		SimpleBluetoothConnection conn = (SimpleBluetoothConnection) tc;
 
+		// do not accept new connections when maximum number is reached.
+		if (playerList.size() == MAXIMUM_REMOTE_PLAYER_COUNT) {
+			conn.write("quit");
+			conn.close();
+			return;
+		}
+		
 		// send player list to new player
 		for (String player : playerList.values()) {
 			conn.write("join " + player);
