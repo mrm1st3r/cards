@@ -167,7 +167,7 @@ public abstract class GameActivity extends Activity {
 		table[1] = null;
 		table[2] = null;
 		showTable();
-		changeText(R.id.lbl_message, "new round");
+		changeText(R.id.lbl_message, "Neue Runde");
 	}
 
 	/**

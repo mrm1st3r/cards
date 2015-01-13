@@ -97,15 +97,13 @@ public class ThirtyOne extends Gameplay {
 		createCardDeck();
 
 		for (Player p : getPlayers()) {
-			// all players receive their points
-			p.sendMessage("life " + p.getLifes());
-
 			if (p.getLifes() >= 0) {
 				// all players who have still lives get hand cards
 				giveHand(p);
 				Card[] hand = p.getHand();
 				p.sendMessage("hand " + hand[0].getImageName() + " "
-						+ hand[1].getImageName() + " " + hand[2].getImageName());
+						+ hand[1].getImageName() + " " 
+						+ hand[2].getImageName());
 
 				// opponents for all players with points
 				Player next = nextPlayerFor(p);
@@ -116,6 +114,7 @@ public class ThirtyOne extends Gameplay {
 				}
 				p.sendMessage(str);
 				p.sendMessage("inactive");
+				p.sendMessage("life " + p.getLifes());
 			}
 		}
 		// the dealer is given the choice between two hand cards

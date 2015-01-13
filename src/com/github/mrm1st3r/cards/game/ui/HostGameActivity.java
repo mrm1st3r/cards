@@ -72,8 +72,8 @@ public class HostGameActivity extends GameActivity {
 
 		Log.d(TAG, "starting new game with " + playerCount + " players");
 		game = new ThirtyOne(playerCount);
-		localPlayer = new LocalPlayer(localName.replace(' ', '_'), ThirtyOne.HAND_SIZE,
-				ThirtyOne.MAX_LIFES, this);
+		localPlayer = new LocalPlayer(localName.replace(' ', '_'),
+				ThirtyOne.HAND_SIZE, ThirtyOne.MAX_LIFES, this);
 		game.addPlayer(localPlayer);
 
 		for (SimpleBluetoothConnection conn : connections.keySet()) {
