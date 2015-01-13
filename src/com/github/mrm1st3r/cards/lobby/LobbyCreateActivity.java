@@ -33,8 +33,8 @@ import com.github.mrm1st3r.util.HashMapAdapter;
 import com.github.mrm1st3r.util.ResultAction;
 
 /**
- * This activity will create a new Bluetooth server socket and wait for
- * incoming connections.
+ * This activity will create a new Bluetooth server socket and wait for incoming
+ * connections.
  * 
  * @author Lukas 'mrm1st3r' Taake
  * @version 1.0
@@ -49,7 +49,10 @@ public class LobbyCreateActivity extends Activity {
 	 * Number of seconds that Bluetooth discoverable will be activated.
 	 */
 	private static final int LOBBY_CREATE_TIMEOUT = 60;
-
+	/**
+	 * Maximum number of remote players that might connect to a lobby.
+	 */
+	private static final int MAXIMUM_REMOTE_PLAYER_COUNT = 3;
 	/**
 	 * Background thread that will wait for incoming client connections.
 	 */
@@ -64,8 +67,8 @@ public class LobbyCreateActivity extends Activity {
 	 */
 	private HashMapAdapter<SimpleBluetoothConnection, String> playerListAdapter;
 	/**
-	 * Button that will start the actual game
-	 * when there are any players connected.
+	 * Button that will start the actual game when there are any players
+	 * connected.
 	 */
 	private Button btnStart = null;
 	/**
@@ -79,15 +82,14 @@ public class LobbyCreateActivity extends Activity {
 
 		// go back to start if bluetooth is not supported
 		if (!BluetoothUtil.isSupported()) {
-			Toast.makeText(this, getString(
-					R.string.bluetooth_not_supported), Toast.LENGTH_LONG)
-					.show();
+			Toast.makeText(this, getString(R.string.bluetooth_not_supported),
+					Toast.LENGTH_LONG).show();
 			onBackPressed();
 		}
 
 		setContentView(R.layout.activity_lobby_create);
-		((TextView) findViewById(R.id.txtLobbyName)).setText(
-				BluetoothUtil.getDeviceName());
+		((TextView) findViewById(R.id.txtLobbyName)).setText(BluetoothUtil
+				.getDeviceName());
 
 		BluetoothUtil.enable(this, new ResultAction() {
 
@@ -96,16 +98,18 @@ public class LobbyCreateActivity extends Activity {
 
 				BluetoothUtil.enableDiscoverable(LobbyCreateActivity.this,
 						LOBBY_CREATE_TIMEOUT, new ResultAction() {
-					@Override
-					public void onSuccess() {
-						createLobby();
-					}
-					@Override
-					public void onFailure() {
-						onBackPressed();
-					}
-				});
+							@Override
+							public void onSuccess() {
+								createLobby();
+							}
+
+							@Override
+							public void onFailure() {
+								onBackPressed();
+							}
+						});
 			}
+
 			@Override
 			public void onFailure() {
 				onBackPressed();
@@ -114,28 +118,28 @@ public class LobbyCreateActivity extends Activity {
 	}
 
 	/**
-	 * Initialize missing user interface elements and
-	 * create a new bluetooth service for the lobby.
+	 * Initialize missing user interface elements and create a new bluetooth
+	 * service for the lobby.
 	 */
 	private void createLobby() {
 		if (serv != null) {
 			// this method should only be called once.
 			return;
 		}
-		
+
 		// read local player name from preferences
-		SharedPreferences pref = getSharedPreferences(
-				Cards.PREF_FILE, Context.MODE_PRIVATE);
+		SharedPreferences pref = getSharedPreferences(Cards.PREF_FILE,
+				Context.MODE_PRIVATE);
 		localPlayerName = pref.getString(Cards.PREF_PLAYER_NAME, "");
 		playerList.put(null, localPlayerName);
 
 		btnStart = (Button) findViewById(R.id.btnStart);
-		LobbyFragment lobbyFragment = (LobbyFragment) getFragmentManager().
-				findFragmentById(R.id.player_list);
+		LobbyFragment lobbyFragment = (LobbyFragment) getFragmentManager()
+				.findFragmentById(R.id.player_list);
 
 		playerListAdapter =
 				new HashMapAdapter<SimpleBluetoothConnection, String>(
-						LobbyCreateActivity.this, playerList) {
+				LobbyCreateActivity.this, playerList) {
 			@Override
 			public View getView(final int pos, final View convertView,
 					final ViewGroup parent) {
@@ -158,23 +162,31 @@ public class LobbyCreateActivity extends Activity {
 		lobbyFragment.setAdapter(playerListAdapter);
 
 		serv = new ServerThread(getString(R.string.app_name),
-				UUID.fromString(Cards.UUID),
-				new OnConnectionChangeHandler() {
-			@Override
-			public void onConnect(final ThreadedConnection conn) {
-				clientConnected(conn);
-			}
-		});
+				UUID.fromString(Cards.UUID), new OnConnectionChangeHandler() {
+					@Override
+					public void onConnect(final ThreadedConnection conn) {
+						clientConnected(conn);
+					}
+				});
 		serv.start();
 	}
 
 	/**
 	 * Handle an incoming client connection.
-	 * @param tc New incoming client connection
+	 * 
+	 * @param tc
+	 *            New incoming client connection
 	 */
 	private void clientConnected(final ThreadedConnection tc) {
 		// new connection for each player
 		SimpleBluetoothConnection conn = (SimpleBluetoothConnection) tc;
+
+		// do not accept new connections when maximum number is reached.
+		if (playerList.size() == MAXIMUM_REMOTE_PLAYER_COUNT) {
+			conn.write("quit");
+			conn.close();
+			return;
+		}
 		
 		// send player list to new player
 		for (String player : playerList.values()) {
@@ -200,9 +212,11 @@ public class LobbyCreateActivity extends Activity {
 	}
 
 	/**
-	 * Notify other players and update user interface when
-	 * a player left the lobby.
-	 * @param conn The left players connection (might already be closed)
+	 * Notify other players and update user interface when a player left the
+	 * lobby.
+	 * 
+	 * @param conn
+	 *            The left players connection (might already be closed)
 	 */
 	private void playerLeft(final ThreadedConnection conn) {
 		// temporarily save player name for notification
@@ -222,21 +236,23 @@ public class LobbyCreateActivity extends Activity {
 				}
 			}
 		});
-		
-		// send leave note to remaining player
+		// send leave note to remaining players
 		broadcast("left " + leftPlayer);
 	}
 
 	/**
 	 * Handle an incoming message.
-	 * @param ac Connection where the message came from
-	 * @param msg The received message
+	 * 
+	 * @param ac
+	 *            Connection where the message came from
+	 * @param msg
+	 *            The received message
 	 */
-	private void handleIncomingMessage(
-			final AsynchronousConnection<String> ac, final String msg) {
+	private void handleIncomingMessage(final AsynchronousConnection<String> ac,
+			final String msg) {
 
 		SimpleBluetoothConnection conn = (SimpleBluetoothConnection) ac;
-		
+
 		String[] set = msg.split(" ");
 
 		if (set[0].equals("join")) {
@@ -244,12 +260,10 @@ public class LobbyCreateActivity extends Activity {
 			if (set[1].length() == 0) {
 				return;
 			}
-		
-			playerList.put(conn, set[1]);
-			
+			playerList.put(conn, msg.substring(5));
 			// send new player name to other players
 			broadcast(msg);
-			
+
 			runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
@@ -258,10 +272,10 @@ public class LobbyCreateActivity extends Activity {
 					playerListAdapter.notifyDataSetChanged();
 				}
 			});
-			
+
 		} else if (set[0].equals("left") && set[1].equals(playerList.get(ac))) {
 			// verify correct player name on leave
-			
+
 			playerLeft((SimpleBluetoothConnection) ac);
 		} else {
 			Log.w(TAG, "Illegal message received: " + msg);
@@ -270,7 +284,9 @@ public class LobbyCreateActivity extends Activity {
 
 	/**
 	 * Send a message to all connected clients.
-	 * @param msg Message to send
+	 * 
+	 * @param msg
+	 *            Message to send
 	 */
 	private void broadcast(final String msg) {
 		for (SimpleBluetoothConnection c : playerList.keySet()) {
@@ -279,16 +295,19 @@ public class LobbyCreateActivity extends Activity {
 			}
 		}
 	}
+
 	/**
-	 * Close the server thread, notify all connected clients and
-	 * start the actual game.
-	 * @param v Calling user interface element
+	 * Close the server thread, notify all connected clients and start the
+	 * actual game.
+	 * 
+	 * @param v
+	 *            Calling user interface element
 	 */
 	public final void start(final View v) {
 		((Cards) getApplication()).setConnections(playerList);
 
 		playerList.remove(null);
-		
+
 		// send start command to clients and pause connections
 		for (SimpleBluetoothConnection conn : playerList.keySet()) {
 			conn.write("start");
@@ -299,10 +318,11 @@ public class LobbyCreateActivity extends Activity {
 
 		Intent intent = new Intent(this, HostGameActivity.class);
 		startActivity(intent);
+		finish();
 	}
 
 	/**
-	 * Close the server thread and close all client connections. 
+	 * Close the server thread and close all client connections.
 	 */
 	private void cancelLobby() {
 		if (serv != null) {
@@ -318,23 +338,19 @@ public class LobbyCreateActivity extends Activity {
 
 	/**
 	 * Re-enable Bluetooth discoverable mode.
-	 * @param item Calling menu item
+	 * 
+	 * @param item
+	 *            Calling menu item
 	 */
 	public final void becomeVisible(final MenuItem item) {
 		BluetoothUtil.enableDiscoverable(this, LOBBY_CREATE_TIMEOUT, null);
 	}
 
 	@Override
-	protected final void onDestroy() {
-		super.onDestroy();
-		cancelLobby();
-	}
-
-	@Override
 	protected final void onActivityResult(final int reqCode,
 			final int resultCode, final Intent data) {
 		super.onActivityResult(reqCode, resultCode, data);
-		
+
 		BluetoothUtil.onActivityResult(this, reqCode, resultCode, data);
 	}
 

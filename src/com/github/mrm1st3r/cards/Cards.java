@@ -18,7 +18,8 @@ public class Cards extends Application {
 	/**
 	 * Preference file.
 	 */
-	public static final String PREF_FILE = "com.github.mrm1st3r.cards.preferences";
+	public static final String PREF_FILE =
+			"com.github.mrm1st3r.cards.preferences";
 	/**
 	 * Preference name for the player name.
 	 */
@@ -30,7 +31,8 @@ public class Cards extends Application {
 	/**
 	 * Contains all currently active bluetooth connections.
 	 */
-	private HashMap<SimpleBluetoothConnection, String> connections = new HashMap<SimpleBluetoothConnection, String>();
+	private HashMap<SimpleBluetoothConnection, String> connections =
+			new HashMap<SimpleBluetoothConnection, String>();
 
 	/**
 	 * @return List of all established connections.

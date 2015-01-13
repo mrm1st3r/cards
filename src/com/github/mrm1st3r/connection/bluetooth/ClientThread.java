@@ -13,10 +13,9 @@ import com.github.mrm1st3r.connection.OnConnectionChangeHandler;
 /**
  * Helper thread to establish a bluetooth connection as a client.
  * 
- * Using a separate thread to establish a new bluetooth connection
- * is useful, because {@link BluetoothSocket#connect()} will block
- * as long as it takes to finish connecting (what might include
- * a confirmative user input).
+ * Using a separate thread to establish a new bluetooth connection is useful,
+ * because {@link BluetoothSocket#connect()} will block as long as it takes to
+ * finish connecting (what might include a confirmative user input).
  * 
  * @author Lukas 'mrm1st3r' Taake
  * @version 1.1
@@ -42,8 +41,11 @@ public class ClientThread extends ConnectThread {
 
 	/**
 	 * Create a new client thread for a given remote device and service UUID.
-	 * @param dev Remote device to connect to
-	 * @param uuid Service UUID that is also used by server application
+	 * 
+	 * @param dev
+	 *            Remote device to connect to
+	 * @param uuid
+	 *            Service UUID that is also used by server application
 	 */
 	public ClientThread(final BluetoothDevice dev, final UUID uuid) {
 
@@ -60,11 +62,15 @@ public class ClientThread extends ConnectThread {
 	}
 
 	/**
-	 * Create a new client thread for a given remote device and service UUID
-	 * and register a callback handler.
-	 * @param dev Remote device to connect to
-	 * @param uuid Service UUID that is also used by server application
-	 * @param connHandler callback handler to be registered
+	 * Create a new client thread for a given remote device and service UUID and
+	 * register a callback handler.
+	 * 
+	 * @param dev
+	 *            Remote device to connect to
+	 * @param uuid
+	 *            Service UUID that is also used by server application
+	 * @param connHandler
+	 *            callback handler to be registered
 	 */
 	public ClientThread(final BluetoothDevice dev, final UUID uuid,
 			final OnConnectionChangeHandler connHandler) {
@@ -103,8 +109,8 @@ public class ClientThread extends ConnectThread {
 		}
 		// Create a new asynchronous connection object for the
 		// established connection
-		SimpleBluetoothConnection conn =
-				new SimpleBluetoothConnection(mmSocket, null);
+		SimpleBluetoothConnection conn = new SimpleBluetoothConnection(
+				mmSocket, null);
 
 		if (getHandler() != null) {
 			getHandler().onConnect(conn);
@@ -120,5 +126,4 @@ public class ClientThread extends ConnectThread {
 			Log.d(TAG, e.toString());
 		}
 	}
-
 }

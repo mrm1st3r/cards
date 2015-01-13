@@ -2,8 +2,8 @@ package com.github.mrm1st3r.cards.game;
 
 /**
  * All possible game card values.
- * @author Lukas 'mrm1st3r' Taake
- * @author Sergius Maier
+ * 
+ * @author Lukas 'mrm1st3r' Taake, Sergius Maier
  * @version 1.0
  */
 public enum CardValue {
@@ -11,55 +11,55 @@ public enum CardValue {
 	/**
 	 * Ace.
 	 */
-	ACE		("ace", 11),
+	ACE("ace", 11),
 	/**
 	 * King.
 	 */
-	KING	("king", 10),
+	KING("king", 10),
 	/**
 	 * Queen.
 	 */
-	QUEEN	("queen", 10),
+	QUEEN("queen", 10),
 	/**
 	 * Jack.
 	 */
-	JACK	("jack", 10),
+	JACK("jack", 10),
 	/**
 	 * 10.
 	 */
-	TEN		("10", 10),
+	TEN("10", 10),
 	/**
 	 * 9.
 	 */
-	NINE	("9", 9),
+	NINE("9", 9),
 	/**
 	 * 8.
 	 */
-	EIGHT	("8", 8),
+	EIGHT("8", 8),
 	/**
 	 * 7.
 	 */
-	SEVEN	("7", 7),
+	SEVEN("7", 7),
 	/**
 	 * 6.
 	 */
-	SIX		("6", 6),
+	SIX("6", 6),
 	/**
 	 * 5.
 	 */
-	FIVE	("5", 5),
+	FIVE("5", 5),
 	/**
 	 * 4.
 	 */
-	FOUR	("4", 4),
+	FOUR("4", 4),
 	/**
 	 * 3.
 	 */
-	THREE	("3", 3),
+	THREE("3", 3),
 	/**
 	 * 2.
 	 */
-	TWO		("2", 2);
+	TWO("2", 2);
 
 	/**
 	 * The number of card values contained in a poker deck.
@@ -77,11 +77,14 @@ public enum CardValue {
 	 * The represented numerical value.
 	 */
 	private int value;
-	
+
 	/**
 	 * Construct a card value.
-	 * @param pName The card values name
-	 * @param pValue The numerical value
+	 * 
+	 * @param pName
+	 *            The card values name
+	 * @param pValue
+	 *            The numerical value
 	 */
 	private CardValue(final String pName, final int pValue) {
 		name = pName;
@@ -108,16 +111,16 @@ public enum CardValue {
 	public static CardValue[] getSkatDeck() {
 		CardValue[] skatDeck = new CardValue[SKAT_DECK_SIZE];
 		CardValue[] all = values();
-		
+
 		// minimum value that is used in a skat deck.
 		final int minValue = 7;
-		
+
 		for (int i = 0, j = 0; i < all.length; i++) {
 			if (all[i].value >= minValue) {
 				skatDeck[j++] = all[i];
 			}
 		}
-		
+
 		return skatDeck;
 	}
 

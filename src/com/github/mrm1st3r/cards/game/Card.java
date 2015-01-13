@@ -2,6 +2,7 @@ package com.github.mrm1st3r.cards.game;
 
 /**
  * This class describes a playing card.
+ * 
  * @author Sergius Maier
  * @version 1.0
  */
@@ -22,15 +23,17 @@ public class Card {
 
 	/**
 	 * Construct a new playing card.
-	 * @param pColor The cards color
-	 * @param pValue The cards value
+	 * 
+	 * @param pColor
+	 *            The cards color
+	 * @param pValue
+	 *            The cards value
 	 */
 	public Card(final CardColor pColor, final CardValue pValue) {
 		color = pColor;
 		value = pValue;
 		imageName = "card_" + color + "_" + value;
 	}
-
 
 	/**
 	 * @return The cards color
@@ -60,9 +63,8 @@ public class Card {
 		return imageName;
 	}
 
-
 	@Override
 	public final String toString() {
-		return value  + " of " + color;
+		return value + " of " + color;
 	}
 }

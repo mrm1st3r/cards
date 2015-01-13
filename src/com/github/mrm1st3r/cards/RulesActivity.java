@@ -10,7 +10,7 @@ import android.os.Bundle;
  * @version 1.0
  */
 public class RulesActivity extends Activity {
-	
+
 	@Override
 	protected final void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

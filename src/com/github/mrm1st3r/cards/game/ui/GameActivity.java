@@ -17,6 +17,7 @@ import com.github.mrm1st3r.util.BitmapUtil;
 
 /**
  * This is the base user interface for both, host and client.
+ * 
  * @author Sergius Maier
  * @version 1.0
  */
@@ -78,6 +79,7 @@ public abstract class GameActivity extends Activity {
 
 	/**
 	 * Process a message that is sent from the game to a player.
+	 * 
 	 * @param msg
 	 *            Message that was sent
 	 */
@@ -115,14 +117,7 @@ public abstract class GameActivity extends Activity {
 		} else if (parts[0].equals("life")) {
 			changeText(R.id.lbl_life1, parts[1]);
 		} else if (parts[0].equals("players")) {
-			Log.d(TAG, "receiving new player names" + parts[1]);
-			changeText(R.id.lbl_rival0, parts[1]);
-			if (parts.length >= 3) {
-				changeText(R.id.lbl_rival1, parts[2]);
-			}
-			if (parts.length >= 4) {
-				changeText(R.id.lbl_rival2, parts[3]);
-			}
+			showPlayers(parts);
 		}
 	}
 
@@ -247,7 +242,37 @@ public abstract class GameActivity extends Activity {
 	}
 
 	/**
+	 * Show name and image for playing players.
+	 * 
+	 * @param players
+	 *            Message with names of the opponents
+	 */
+	private void showPlayers(final String[] players) {
+		Log.d(TAG, "receiving new player names" + players[1]);
+		changeText(R.id.lbl_rival0, players[1]);
+		if (players.length >= 3) {
+			changeText(R.id.lbl_rival1, players[2]);
+			switchImageView(R.id.img_rival1, View.VISIBLE);
+			switchTextView(R.id.lbl_rival1, View.VISIBLE);
+			if (players.length >= 4) {
+				changeText(R.id.lbl_rival2, players[3]);
+				switchImageView(R.id.img_rival2, View.VISIBLE);
+				switchTextView(R.id.lbl_rival2, View.VISIBLE);
+			} else {
+				switchImageView(R.id.img_rival2, View.INVISIBLE);
+				switchTextView(R.id.lbl_rival2, View.INVISIBLE);
+			}
+		} else {
+			switchImageView(R.id.img_rival1, View.INVISIBLE);
+			switchTextView(R.id.lbl_rival1, View.INVISIBLE);
+			switchImageView(R.id.img_rival2, View.INVISIBLE);
+			switchTextView(R.id.lbl_rival2, View.INVISIBLE);
+		}
+	}
+
+	/**
 	 * A dialog box pops up and waits for the choice of the player.
+	 * 
 	 * @param title
 	 *            Title of the dialog box
 	 * @param msg
@@ -292,8 +317,11 @@ public abstract class GameActivity extends Activity {
 
 	/**
 	 * Displays an image in the ImageView.
-	 * @param view ID of the ImageView which shows the image
-	 * @param img ID of the image to show
+	 * 
+	 * @param view
+	 *            ID of the ImageView which shows the image
+	 * @param img
+	 *            ID of the image to show
 	 */
 	private void changeImage(final int view, final int img) {
 		ImageView image = (ImageView) findViewById(view);
@@ -303,8 +331,11 @@ public abstract class GameActivity extends Activity {
 
 	/**
 	 * Activate or deactivate a button.
-	 * @param b ID of the Button to switch
-	 * @param s true to activate/ false to deactivate
+	 * 
+	 * @param b
+	 *            ID of the Button to switch
+	 * @param s
+	 *            true to activate/ false to deactivate
 	 */
 	private void switchButton(final int b, final boolean s) {
 		Button btn = (Button) findViewById(b);
@@ -312,9 +343,38 @@ public abstract class GameActivity extends Activity {
 	}
 
 	/**
+	 * Show or hide an ImageView.
+	 * 
+	 * @param view
+	 *            ID of the Button to switch
+	 * @param state
+	 *            VISIBLE or INVISIBLE
+	 */
+	private void switchImageView(final int view, final int state) {
+		ImageView iv = (ImageView) findViewById(view);
+		iv.setVisibility(state);
+	}
+
+	/**
+	 * Show or hide an TextView.
+	 * 
+	 * @param view
+	 *            ID of the Button to switch
+	 * @param state
+	 *            VISIBLE or INVISIBLE
+	 */
+	private void switchTextView(final int view, final int state) {
+		TextView tv = (TextView) findViewById(view);
+		tv.setVisibility(state);
+	}
+
+	/**
 	 * Displays a text in the Textview.
-	 * @param view ID of the TextView which show the text
-	 * @param text Text to show
+	 * 
+	 * @param view
+	 *            ID of the TextView which show the text
+	 * @param text
+	 *            Text to show
 	 */
 	private void changeText(final int view, final String text) {
 		Log.d(TAG, "Changing text to " + text);
@@ -324,11 +384,15 @@ public abstract class GameActivity extends Activity {
 
 	/**
 	 * Save the marked card on the table.
-	 * @param view ID of the ImageView which is marked
+	 * 
+	 * @param view
+	 *            ID of the ImageView which is marked
 	 */
-	public void img_table(final View view) {
+	@SuppressWarnings("deprecation")
+	public final void img_table(final View view) {
 		resetTableCards();
 		((ImageView) view).setAlpha(SELECTED_OPACITY);
+
 		switch (view.getId()) {
 		case R.id.img_table0:
 			checkedTable = 0;
@@ -360,11 +424,15 @@ public abstract class GameActivity extends Activity {
 
 	/**
 	 * Save the marked card in the hand.
-	 * @param view ID of the ImageView which is marked
+	 * 
+	 * @param view
+	 *            ID of the ImageView which is marked
 	 */
-	public void img_hand(final View view) {
+	@SuppressWarnings("deprecation")
+	public final void img_hand(final View view) {
 		resetHandCards();
 		((ImageView) view).setAlpha(SELECTED_OPACITY);
+
 		switch (view.getId()) {
 		case R.id.img_hand0:
 			checkedHand = 0;
@@ -395,11 +463,13 @@ public abstract class GameActivity extends Activity {
 	}
 
 	/**
-	 * Send a message to the game, to exchange the marked table card
-	 * and the marked hand card.
-	 * @param view Button that was pressed, not used
+	 * Send a message to the game, to exchange the marked table card and the
+	 * marked hand card.
+	 * 
+	 * @param view
+	 *            Button that was pressed, not used
 	 */
-	public void btn_1card(final View view) {
+	public final void btn_1card(final View view) {
 		if (checkedTable != -1 && checkedHand != -1) {
 			inactive();
 			sendMessage("swap " + checkedHand + " " + checkedTable);
@@ -411,35 +481,42 @@ public abstract class GameActivity extends Activity {
 	}
 
 	/**
-	 * Send a message to the game, to exchange the table cards and the
-	 * hand cards of the player.
-	 * @param view Button that was pressed, not used
+	 * Send a message to the game, to exchange the table cards and the hand
+	 * cards of the player.
+	 * 
+	 * @param view
+	 *            Button that was pressed, not used
 	 */
-	public void btn_allcards(final View view) {
+	public final void btn_allcards(final View view) {
 		inactive();
 		sendMessage("swapall");
 	}
 
 	/**
 	 * Send a message to the game, to close the round.
-	 * @param view Button that was pressed, not used
+	 * 
+	 * @param view
+	 *            Button that was pressed, not used
 	 */
-	public void btn_knock(final View view) {
+	public final void btn_knock(final View view) {
 		inactive();
 		sendMessage("close");
 	}
 
 	/**
 	 * Send a message to the game, to push.
-	 * @param view Button that was pressed, not used
+	 * 
+	 * @param view
+	 *            Button that was pressed, not used
 	 */
-	public void btn_push(final View view) {
+	public final void btn_push(final View view) {
 		inactive();
 		sendMessage("push");
 	}
 
 	/**
 	 * Send a message from the player to the game logic.
+	 * 
 	 * @param msg
 	 *            Message to send
 	 */

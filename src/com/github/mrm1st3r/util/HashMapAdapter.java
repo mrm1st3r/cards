@@ -8,11 +8,14 @@ import android.widget.BaseAdapter;
 
 /**
  * Base adapter for HashMap based lists.
+ * 
  * @author Lukas 'mrm1st3r' Taake
  * @version 1.0
  *
- * @param <K> key data type
- * @param <V> value data type
+ * @param <K>
+ *            key data type
+ * @param <V>
+ *            value data type
  */
 public abstract class HashMapAdapter<K, V> extends BaseAdapter {
 
@@ -27,11 +30,14 @@ public abstract class HashMapAdapter<K, V> extends BaseAdapter {
 
 	/**
 	 * Create a new HashMapAdapter.
-	 * @param c application context
-	 * @param data data structure to be used
+	 * 
+	 * @param c
+	 *            application context
+	 * @param data
+	 *            data structure to be used
 	 */
 	public HashMapAdapter(final Context c, final HashMap<K, V> data) {
-		mData  = data;
+		mData = data;
 		context = c;
 	}
 
@@ -59,7 +65,9 @@ public abstract class HashMapAdapter<K, V> extends BaseAdapter {
 
 	/**
 	 * Get the key for a key-value pair.
-	 * @param pos The pairs position inside the data structure
+	 * 
+	 * @param pos
+	 *            The pairs position inside the data structure
 	 * @return The key
 	 */
 	protected final K getKey(final int pos) {

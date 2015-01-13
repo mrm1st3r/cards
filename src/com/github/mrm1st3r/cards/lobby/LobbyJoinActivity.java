@@ -34,8 +34,8 @@ import com.github.mrm1st3r.connection.bluetooth.SimpleBluetoothConnection;
 import com.github.mrm1st3r.util.ResultAction;
 
 /**
- * This activity lists all currently available bluetooth devices
- * and gives the user the ability to connect to one.
+ * This activity lists all currently available bluetooth devices and gives the
+ * user the ability to connect to one.
  * 
  * @author Lukas 'mrm1st3r' Taake
  * @version 1.0
@@ -59,13 +59,13 @@ public class LobbyJoinActivity extends Activity {
 	 */
 	private ListView deviceList;
 	/**
-	 * Worker thread that will try to establish a connection to
-	 * a selected remote device.
+	 * Worker thread that will try to establish a connection to a selected
+	 * remote device.
 	 */
 	private ClientThread connector = null;
 	/**
-	 * Button to reactivate Bluetooth discovery and
-	 * to show current discovery status.
+	 * Button to reactivate Bluetooth discovery and to show current discovery
+	 * status.
 	 */
 	private Button btnRefresh = null;
 	/**
@@ -86,14 +86,14 @@ public class LobbyJoinActivity extends Activity {
 				btnRefresh.setText(getResources().getString(R.string.refresh));
 
 			} else if (!BluetoothDevice.ACTION_FOUND.equals(action)) {
-				// theoretically there should be no other broadcasts 
+				// theoretically there should be no other broadcasts
 				// received here. Just in case.
 				return;
 			}
 
 			// Get the BluetoothDevice object from the Intent
-			BluetoothDevice device = intent.getParcelableExtra(
-					BluetoothDevice.EXTRA_DEVICE);
+			BluetoothDevice device = intent
+					.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 
 			if (device == null) {
 				return;
@@ -113,9 +113,8 @@ public class LobbyJoinActivity extends Activity {
 
 		// go back to start if bluetooth is not supported
 		if (!BluetoothUtil.isSupported()) {
-			Toast.makeText(this, getString(
-					R.string.bluetooth_not_supported), Toast.LENGTH_LONG)
-					.show();
+			Toast.makeText(this, getString(R.string.bluetooth_not_supported),
+					Toast.LENGTH_LONG).show();
 			cancelSearch();
 		}
 
@@ -123,8 +122,7 @@ public class LobbyJoinActivity extends Activity {
 
 			@Override
 			public void onSuccess() {
-				// user interface won't be needed
-				// if bluetooth doesn't get enabled
+				// user interface won't be needed if bluetooth isn't enabled
 				initUi();
 				searchForLobbies();
 			}
@@ -150,7 +148,8 @@ public class LobbyJoinActivity extends Activity {
 		mDeviceAdapter = new ArrayAdapter<BluetoothDevice>(this,
 				android.R.layout.simple_list_item_1, mDeviceList) {
 
-			@Override public View getView(final int pos, final View vOld, 
+			@Override
+			public View getView(final int pos, final View vOld,
 					final ViewGroup parent) {
 
 				View vNew = super.getView(pos, vOld, parent);
@@ -177,7 +176,6 @@ public class LobbyJoinActivity extends Activity {
 	private void searchForLobbies() {
 		Log.d(TAG, "searching for new devices...");
 
-
 		IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
 		filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
 		registerReceiver(mReceiver, filter);
@@ -197,9 +195,12 @@ public class LobbyJoinActivity extends Activity {
 		}
 		BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
 	}
+
 	/**
 	 * Reactivate Bluetooth discovery.
-	 * @param v Button that was pressed, not used
+	 * 
+	 * @param v
+	 *            Button that was pressed
 	 */
 	public final void refresh(final View v) {
 		BluetoothAdapter self = BluetoothAdapter.getDefaultAdapter();
@@ -209,7 +210,7 @@ public class LobbyJoinActivity extends Activity {
 		mDeviceAdapter.notifyDataSetChanged();
 
 		if (!self.startDiscovery()) {
-			Toast.makeText(this, getString(R.string.refresh_failed), 
+			Toast.makeText(this, getString(R.string.refresh_failed),
 					Toast.LENGTH_SHORT).show();
 			Log.w(TAG, "Failed to start bluetooth discovery");
 		} else {
@@ -220,7 +221,9 @@ public class LobbyJoinActivity extends Activity {
 
 	/**
 	 * Try to connect to a discovered remote device.
-	 * @param dev Remote device to connect to
+	 * 
+	 * @param dev
+	 *            Remote device to connect to
 	 */
 	private void joinLobby(final BluetoothDevice dev) {
 		Log.d(TAG, "connecting to " + dev.getAddress());
@@ -229,16 +232,16 @@ public class LobbyJoinActivity extends Activity {
 		dlgJoin.setCancelable(true);
 		dlgJoin.setCanceledOnTouchOutside(false);
 		dlgJoin.setMessage(getResources().getString(R.string.joining));
-		dlgJoin.setButton(ProgressDialog.BUTTON_NEGATIVE, 
-				getResources().getString(R.string.cancel),
+		dlgJoin.setButton(ProgressDialog.BUTTON_NEGATIVE, getResources()
+				.getString(R.string.cancel),
 				new DialogInterface.OnClickListener() {
 
-			@Override
-			public void onClick(final DialogInterface dialog, 
-					final int which) {
-				connector.close();
-			}
-		});
+					@Override
+					public void onClick(final DialogInterface dialog,
+							final int which) {
+						connector.close();
+					}
+				});
 		dlgJoin.show();
 
 		connector = new ClientThread(dev, UUID.fromString(Cards.UUID));
@@ -258,6 +261,7 @@ public class LobbyJoinActivity extends Activity {
 
 				Intent intent = new Intent(LobbyJoinActivity.this,
 						LobbyActivity.class);
+				intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 				startActivity(intent);
 				finish();
 			}
@@ -271,8 +275,10 @@ public class LobbyJoinActivity extends Activity {
 				runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						Toast.makeText(LobbyJoinActivity.this, getResources().
-								getString(R.string.connection_failed),
+						Toast.makeText(
+								LobbyJoinActivity.this,
+								getResources().getString(
+										R.string.connection_failed),
 								Toast.LENGTH_SHORT).show();
 						mDeviceAdapter.notifyDataSetChanged();
 					}
@@ -308,11 +314,5 @@ public class LobbyJoinActivity extends Activity {
 		if (mDeviceAdapter != null) {
 			mDeviceAdapter.notifyDataSetChanged();
 		}
-	}
-
-	@Override
-	protected final void onDestroy() {
-		super.onDestroy();
-		//cancelSearch();
 	}
 }
