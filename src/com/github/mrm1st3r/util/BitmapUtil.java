@@ -12,7 +12,7 @@ import android.graphics.BitmapFactory;
  * 
  * The methods
  * {@link #decodeSampledBitmapFromResource(Resources, int, int, int)} and
- * {@link #calculateSamples(android.graphics.BitmapFactory.Options, int, int)}
+ * {@link #calculateSamples(BitmapFactory.Options, int, int)}
  * are provided under creative commons 2.5 license by google at
  * http://developer.android.com/training/displaying-bitmaps/load-bitmap.html The
  * additional bitmapBuffer was added.

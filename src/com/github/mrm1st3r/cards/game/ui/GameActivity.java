@@ -182,7 +182,7 @@ public abstract class GameActivity extends Activity {
 	 * Gives the host the choice for a new round.
 	 */
 	private void nextRoundChoice() {
-		alertBox("Ihre Wahl", "Nächste Runde", "Ja", "Nein", "nextround yes",
+		alertBox("Ihre Wahl", "NÃ¤chste Runde", "Ja", "Nein", "nextround yes",
 				"nextround no");
 	}
 

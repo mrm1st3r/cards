@@ -14,9 +14,9 @@ import com.github.mrm1st3r.connection.OnReceivedHandler;
 import com.github.mrm1st3r.connection.ThreadedConnection;
 
 /**
- * Implementation of {@link BluetoothConnection}, providing asynchronous
- * connection for use with Strings. Uses a {@link BufferedReader} for reading a
- * {@link PrintWriter} for writing.
+ * Implementation of {@link AsynchronousConnection} for use with Strings.
+ * Uses a {@link BufferedReader} for reading and a {@link PrintWriter}
+ * for writing.
  * 
  * @author Lukas Taake
  * @version 1.1
