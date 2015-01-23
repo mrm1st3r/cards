@@ -144,11 +144,17 @@ public class ThirtyOne extends Gameplay {
 		Player p = getCurrentPlayer();
 		while (!p.equals(stopper) && winner == null) {
 			updateMessage(p.getName() + " ist an der Reihe");
+			
+			// Send message to player, that will be processed on another device
+			// or on the local device in the UI thread.
 			if (stopper == null) {
 				p.sendMessage("active");
 			} else {
 				p.sendMessage("lastround");
 			}
+			
+			// wait until action is finished and the local UI thread
+			// or the thread for the players bluetooth connection will notify.
 			synchronized (p.getLock()) {
 				try {
 					p.getLock().wait();
@@ -399,6 +405,11 @@ public class ThirtyOne extends Gameplay {
 				newGame();
 			}
 		}
+		
+		// This method will be called not from the game thread, but from
+		// a player thread (or the UI thread for local player)
+		// after having performed an action, notify the game thread to continue
+		// the game loop.
 		synchronized (player.getLock()) {
 			player.getLock().notify();
 			Log.d(TAG, "notified " + player.getLock().toString());

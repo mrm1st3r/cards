@@ -42,6 +42,9 @@ public class LocalPlayer extends Player {
 
 	@Override
 	public final void sendMessage(final String msg) {
+		
+		// process an incoming message from the game loop on the UI thread to
+		// be able to interact with it.
 		userInterface.runOnUiThread(new Runnable() {
 			@Override
 			public void run() {

@@ -95,6 +95,9 @@ public class HostGameActivity extends GameActivity {
 						}
 					});
 		}
+		
+		// Run the game loop in an own thread to avoid the user interface being
+		// not usable.
 		gameThread = new Thread(new Runnable() {
 			@Override
 			public void run() {
