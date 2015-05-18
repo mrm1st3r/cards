@@ -9,22 +9,23 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.github.mrm1st3r.cards.Cards;
 import com.github.mrm1st3r.cards.R;
 import com.github.mrm1st3r.cards.game.BluetoothPlayer;
 import com.github.mrm1st3r.cards.game.LocalPlayer;
 import com.github.mrm1st3r.cards.game.ThirtyOne;
-import com.github.mrm1st3r.connection.AsynchronousConnection;
-import com.github.mrm1st3r.connection.OnReceivedHandler;
-import com.github.mrm1st3r.connection.bluetooth.SimpleBluetoothConnection;
-import com.github.mrm1st3r.util.BitmapUtil;
+import com.github.mrm1st3r.libdroid.connect.AsynchronousConnection;
+import com.github.mrm1st3r.libdroid.connect.OnReceivedHandler;
+import com.github.mrm1st3r.libdroid.connect.bluetooth.SimpleBluetoothConnection;
+import com.github.mrm1st3r.libdroid.display.BitmapUtil;
 
 /**
  * This is the user interface that is started on the host device and controls
  * the game loop.
  * 
- * @author Sergius Maier
+ * @author Sergius Maier, Lukas 'mrm1st3r' Taake
  * @version 1.0
  */
 public class HostGameActivity extends GameActivity {
@@ -68,34 +69,35 @@ public class HostGameActivity extends GameActivity {
 		HashMap<SimpleBluetoothConnection, String> connections =
 				((Cards) getApplication()).getConnections();
 
+		setPlayerList(connections.values());
+
 		// add one for local player
 		int playerCount = connections.size() + 1;
-
 		Log.d(TAG, "starting new game with " + playerCount + " players");
-		game = new ThirtyOne(playerCount);
-		localPlayer = new LocalPlayer(localName.replace(' ', '_'),
-				ThirtyOne.HAND_SIZE, ThirtyOne.MAX_LIFES, this);
+
+		game = ThirtyOne.createInstance(playerCount);
+		localPlayer = new LocalPlayer(localName, this);
 		game.addPlayer(localPlayer);
 
 		for (SimpleBluetoothConnection conn : connections.keySet()) {
 			conn.unpause();
 			String remoteName = connections.get(conn);
+
 			final BluetoothPlayer remotePlayer = new BluetoothPlayer(
-					remoteName.replace(' ', '_'), ThirtyOne.HAND_SIZE,
-					ThirtyOne.MAX_LIFES, conn);
+					remoteName, conn);
 
 			game.addPlayer(remotePlayer);
-			remotePlayer.getConn().setOnReceivedHandler(
+			remotePlayer.getConnection().setOnReceivedHandler(
 					new OnReceivedHandler<String>() {
 						@Override
 						public void onReceived(
 								final AsynchronousConnection<String> conn,
 								final String msg) {
-							game.checkMessage(remotePlayer, msg);
+							game.handleMessage(remotePlayer, msg);
 						}
 					});
 		}
-		
+
 		// Run the game loop in an own thread to avoid the user interface being
 		// not usable.
 		gameThread = new Thread(new Runnable() {
@@ -109,11 +111,13 @@ public class HostGameActivity extends GameActivity {
 			@Override
 			public void uncaughtException(final Thread th, final Throwable e) {
 				Log.w(TAG, e);
+				Toast.makeText(HostGameActivity.this, e.getMessage(),
+						Toast.LENGTH_LONG).show();
 				closeGame();
 			}
 		});
 
-		// for debugging uses
+		// for debugging
 		gameThread.setName("game_loop");
 
 		gameThread.start();
@@ -148,7 +152,7 @@ public class HostGameActivity extends GameActivity {
 
 	@Override
 	public final void sendMessage(final String msg) {
-		game.checkMessage(localPlayer, msg);
+		game.handleMessage(localPlayer, msg);
 	}
 
 	@Override

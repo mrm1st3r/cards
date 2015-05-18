@@ -1,114 +1,85 @@
 package com.github.mrm1st3r.cards.game;
 
+
 /**
  * This class describes a card player.
  * 
- * @author Sergius Maier
- * @version 1.0
+ * @author Lukas 'mrm1st3r' Taake, Sergius Maier
+ * @version 1.1.0
  */
 public abstract class Player {
 
 	/**
 	 * The players name.
 	 */
-	private String name;
-	/**
-	 * The number of lifes the player has left.
-	 */
-	private int lifes = 0;
-	/**
-	 * The number of points the player has reached so far.
-	 */
-	private float score = 0;
+	private final String mName;
 	/**
 	 * The players hand cards.
 	 */
-	private Card[] handCards;
+	private final CardDeck mHandCards;
 	/**
 	 * Lock used when waiting for player input.
 	 */
-	private final Object lock = new Object();
+	private final Object mLock = new Object();
+	/**
+	 * The number of lifes the player has left.
+	 */
+	private int mLifes = 0;
+	/**
+	 * The number of points the player has reached so far.
+	 */
+	private float mScore = 0;
 
 	/**
-	 * Construct a new player.
+	 * Construct a new card player.
 	 * 
 	 * @param pName
 	 *            The players name
-	 * @param pHandSize
+	 */
+	public Player(final String pName) {
+		mName = pName;
+		mHandCards = new CardDeck();
+	}
+
+	/**
+	 * Construct a new card player.
+	 * 
+	 * @param pName
+	 *            The players name
+	 * @param pHandLimit
 	 *            Maximum number of hand cards
 	 * @param pLifes
 	 *            Number of lifes to start with
 	 */
-	public Player(final String pName, final int pHandSize, final int pLifes) {
-		setName(pName);
-		setLifes(pLifes);
-		setHand(new Card[pHandSize]);
-	}
-
-	/**
-	 * Add a new card to the players hand.
-	 * 
-	 * @param c
-	 *            New hand card
-	 * @return true on success, false otherwise
-	 */
-	public final boolean addToHand(final Card c) {
-		for (int i = 0; i < handCards.length; i++) {
-			if (handCards[i] == null) {
-				handCards[i] = c;
-				return true;
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * Remove a card from the players hand.
-	 * 
-	 * @param c
-	 *            Card to remove
-	 * @return true on success, false otherwise
-	 */
-	public final boolean removeFromHand(final Card c) {
-		for (int i = 0; i < handCards.length; i++) {
-			if (handCards[i].equals(c)) {
-				handCards[i] = null;
-				return true;
-			}
-		}
-		return false;
+	public Player(final String pName, final int pHandLimit, final int pLifes) {
+		this(pName);
+		mHandCards.setLimit(pHandLimit);
 	}
 
 	/**
 	 * Send a message to the player.
 	 * 
-	 * @param msg
+	 * @param pComm
 	 *            Message to send
 	 */
-	public abstract void sendMessage(String msg);
+	public abstract void command(String pComm);
 
 	/**
+	 * Get the players name.
+	 * 
 	 * @return The players name
 	 */
 	public final String getName() {
-		return name;
+		return mName;
 	}
 
 	/**
-	 * Change the players name.
+	 * Get the players score.
 	 * 
-	 * @param pName
-	 *            New player name
-	 */
-	public final void setName(final String pName) {
-		this.name = pName;
-	}
-
-	/**
 	 * @return The players current score
 	 */
 	public final float getScore() {
-		return score;
+		return mScore;
 	}
 
 	/**
@@ -118,42 +89,25 @@ public abstract class Player {
 	 *            The new score
 	 */
 	public final void setScore(final float pScore) {
-		this.score = pScore;
+		mScore = pScore;
 	}
 
 	/**
+	 * Get all current hand cards.
+	 * 
 	 * @return The players current hand cards
 	 */
-	public final Card[] getHand() {
-		return handCards;
+	public final CardDeck getHand() {
+		return mHandCards;
 	}
 
 	/**
-	 * Get a specified hand card.
+	 * Get the current number of lifes.
 	 * 
-	 * @param pos
-	 *            Position of the request card in the players hand
-	 * @return The requested card
-	 */
-	public final Card getHandCard(final int pos) {
-		return handCards[pos];
-	}
-
-	/**
-	 * Give the player new hand cards.
-	 * 
-	 * @param hand
-	 *            New hand cards
-	 */
-	public final void setHand(final Card[] hand) {
-		this.handCards = hand;
-	}
-
-	/**
 	 * @return The players current lifes
 	 */
 	public final int getLifes() {
-		return lifes;
+		return mLifes;
 	}
 
 	/**
@@ -163,25 +117,27 @@ public abstract class Player {
 	 *            New number of lifes
 	 */
 	public final void setLifes(final int pLifes) {
-		lifes = pLifes;
+		mLifes = pLifes;
 	}
 
 	/**
 	 * Decrease the number of lifes by one.
 	 */
-	public final void decreaseLife() {
-		lifes--;
+	public final void decreaseLifes() {
+		mLifes--;
 	}
 
 	/**
+	 * Get the players thread lock.
+	 * 
 	 * @return This players lock object
 	 */
 	public final Object getLock() {
-		return lock;
+		return mLock;
 	}
 
 	@Override
 	public final String toString() {
-		return name + " has " + score + " points and " + lifes + " lifes";
+		return mName + " has " + mScore + " points and " + mLifes + " lifes";
 	}
 }

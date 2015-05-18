@@ -1,19 +1,32 @@
 package com.github.mrm1st3r.cards.game;
 
-import com.github.mrm1st3r.cards.game.ui.HostGameActivity;
+import com.github.mrm1st3r.cards.game.ui.GameActivity;
 
 /**
  * This class describes a local player.
  * 
- * @author Sergius Maier
- * @version 1.0
+ * @author Lukas 'mrm1st3r' Taake, Sergius Maier
+ * @version 1.0.2
  */
 public class LocalPlayer extends Player {
 
 	/**
 	 * The local user interface to interact with.
 	 */
-	private HostGameActivity userInterface;
+	private final GameActivity userInterface;
+
+	/**
+	 * Construct a new local player.
+	 * 
+	 * @param pName
+	 *            Player name
+	 * @param pUi
+	 *            Local user interface
+	 */
+	public LocalPlayer(final String pName, final GameActivity pUi) {
+		super(pName);
+		userInterface = pUi;
+	}
 
 	/**
 	 * Construct a new local player.
@@ -28,27 +41,29 @@ public class LocalPlayer extends Player {
 	 *            The local user interface
 	 */
 	public LocalPlayer(final String pName, final int pHandSize,
-			final int pLifes, final HostGameActivity pUi) {
+			final int pLifes, final GameActivity pUi) {
 		super(pName, pHandSize, pLifes);
 		userInterface = pUi;
 	}
 
 	/**
+	 * Get the local user interface.
+	 * 
 	 * @return The local user interface
 	 */
-	public final HostGameActivity getUserInterface() {
+	public final GameActivity getUserInterface() {
 		return userInterface;
 	}
 
 	@Override
-	public final void sendMessage(final String msg) {
-		
+	public final void command(final String msg) {
+
 		// process an incoming message from the game loop on the UI thread to
 		// be able to interact with it.
 		userInterface.runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				userInterface.checkMessage(msg);
+				userInterface.handleMessage(msg);
 			}
 		});
 	}

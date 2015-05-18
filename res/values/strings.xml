@@ -54,4 +54,10 @@ Danach geht es der Reihe nach im Uhrzeigersinn, angefangen beim Nebenmann des Ge
 <string name="leave_game">Spiel verlassen?</string>
 <string name="close_game">Spiel beenden?</string>
 <string name="close_game_info">Das Spiel wird für alle Spieler beendet.</string>
+<string name="table_card">Tischkarte</string>
+<string name="hand_card">Handkarte</string>
+<string name="action_push">Schieben</string>
+<string name="action_close">Klopfen</string>
+<string name="action_swap_one">Eine tauschen</string>
+<string name="action_swap_all">Alle tauschen</string>
 </resources>

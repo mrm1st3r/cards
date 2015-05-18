@@ -6,7 +6,7 @@
 
     <uses-sdk
         android:minSdkVersion="15"
-        android:targetSdkVersion="21" />
+        android:targetSdkVersion="15" />
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
@@ -33,7 +33,6 @@
         <activity
             android:name=".lobby.LobbyCreateActivity"
             android:label="@string/title_activity_lobby_create"
-            android:parentActivityName=".MainActivity"
             android:configChanges="orientation|keyboardHidden|screenSize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -41,8 +40,7 @@
         </activity>
         <activity
             android:name=".lobby.LobbyJoinActivity"
-            android:label="@string/title_activity_lobby_join"
-            android:parentActivityName=".MainActivity" >
+            android:label="@string/title_activity_lobby_join" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.github.mrm1st3r.cards.MainActivity" />
@@ -50,7 +48,6 @@
         <activity
             android:name=".lobby.LobbyActivity"
             android:label="@string/title_activity_lobby"
-            android:parentActivityName=".LobbyJoinActivity"
             android:configChanges="orientation|keyboardHidden|screenSize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -59,7 +56,6 @@
         <activity
             android:name="com.github.mrm1st3r.cards.game.ui.HostGameActivity"
             android:label="@string/title_activity_game" 
-            android:parentActivityName="com.github.mrm1st3r.cards.MainActivity"
             android:configChanges="orientation|keyboardHidden|screenSize" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -68,7 +64,14 @@
         <activity
             android:name="com.github.mrm1st3r.cards.game.ui.ClientGameActivity"
             android:label="@string/title_activity_game" 
-            android:parentActivityName="com.github.mrm1st3r.cards.MainActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.github.mrm1st3r.cards.MainActivity" />
+        </activity>
+        <activity
+            android:name="com.github.mrm1st3r.cards.game.ui.BotGameActivity"
+            android:label="@string/title_activity_game" 
             android:configChanges="orientation|keyboardHidden|screenSize" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -76,8 +79,7 @@
         </activity>
         <activity
             android:name=".RulesActivity"
-            android:label="@string/title_activity_rules"
-            android:parentActivityName="com.github.mrm1st3r.cards.MainActivity" >
+            android:label="@string/title_activity_rules" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.github.mrm1st3r.cards.MainActivity" />

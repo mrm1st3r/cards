@@ -3,206 +3,156 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#449944"
-    tools:context="com.github.mrm1st3r.cards.lobby.GameActivity"
-    android:keepScreenOn="true" >
+    android:background="@drawable/background"
+    android:keepScreenOn="true"
+    tools:context=".game.ui.GameActivity" >
 
-    <ImageView
-        android:id="@+id/img_rival0"
-        android:layout_width="53dp"
-        android:layout_height="56dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp"
-        android:src="@drawable/card_rival" />
-
-    <ImageView
-        android:id="@+id/img_rival2"
-        android:layout_width="53dp"
-        android:layout_height="56dp"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginRight="17dp"
-        android:src="@drawable/card_rival" />
-
-    <ImageView
-        android:id="@+id/img_rival1"
-        android:layout_width="53dp"
-        android:layout_height="56dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:src="@drawable/card_rival" />
-
-    <TextView
-        android:id="@+id/lbl_rival0"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/lay_rivals"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/img_rival0"
-        android:layout_below="@+id/img_rival0"
-        android:text="Spieler 1" />
-
-    <TextView
-        android:id="@+id/lbl_rival1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/lbl_rival0"
-        android:layout_alignBottom="@+id/lbl_rival0"
-        android:layout_centerHorizontal="true"
-        android:text="Spieler 2" />
-
-    <TextView
-        android:id="@+id/lbl_rival2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/lbl_rival1"
-        android:layout_alignBottom="@+id/lbl_rival1"
-        android:layout_alignLeft="@+id/img_rival2"
-        android:text="Spieler 3" />
-
-    <ImageView
-        android:id="@+id/img_table2"
-        android:layout_width="99dp"
-        android:layout_height="121dp"
-        android:layout_alignParentRight="true"
-        android:layout_alignTop="@+id/img_table1"
-        android:onClick="img_table"
-        android:src="@drawable/card_backside" />
-
-    <ImageView
-        android:id="@+id/img_hand0"
-        android:layout_width="99dp"
-        android:layout_height="121dp"
-        android:onClick="img_hand"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:src="@drawable/card_backside" />
-
-    <TextView
-        android:id="@+id/lbl_score1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/lbl_score0"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/lbl_score0"
-        android:text="0"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-    <ImageView
-        android:id="@+id/img_table1"
-        android:layout_width="99dp"
-        android:layout_height="121dp"
-        android:layout_below="@+id/lbl_rival1"
-        android:layout_centerHorizontal="true"
-        android:onClick="img_table"
-        android:layout_marginTop="36dp"
-        android:src="@drawable/card_backside" />
-
-    <ImageView
-        android:id="@+id/img_table0"
-        android:layout_width="99dp"
-        android:onClick="img_table"
-        android:layout_height="121dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignTop="@+id/img_table1"
-        android:src="@drawable/card_backside" />
-
-    <Button
-        android:id="@+id/btn_push"
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/btn_knock"
-        android:layout_alignRight="@+id/lbl_rival2"
-        android:layout_toRightOf="@+id/lbl_rival1"
-        android:text="Schieben"
-        android:onClick="btn_push" />
-
-    <Button
-        android:id="@+id/btn_knock"
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/img_hand1"
-        android:layout_alignLeft="@+id/btn_push"
-        android:layout_alignRight="@+id/btn_push"
-        android:text="Klopfen"
-        android:onClick="btn_knock" />
-
-    <Button
-        android:id="@+id/btn_1card"
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/btn_allcards"
-        android:layout_alignLeft="@+id/lbl_message"
-        android:layout_toLeftOf="@+id/img_rival1"
-        android:text="1 Karte"
-        android:onClick="btn_1card" />
-
-    <Button
-        android:id="@+id/btn_allcards"
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/img_hand0"
-        android:layout_alignLeft="@+id/btn_1card"
-        android:layout_alignRight="@+id/btn_1card"
-        android:text="Alle Karten"
-        android:onClick="btn_allcards" />
-
-    <ImageView
-        android:id="@+id/img_hand2"
-        android:layout_width="99dp"
-        android:onClick="img_hand"
-        android:layout_height="121dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignRight="@+id/lbl_rival1"
-        android:src="@drawable/card_backside" />
-
-    <ImageView
-        android:id="@+id/img_hand1"
-        android:onClick="img_hand"
-        android:layout_width="99dp"
-        android:layout_height="121dp"
-        android:layout_alignParentBottom="true"
-        android:layout_toLeftOf="@+id/lbl_score0"
-        android:src="@drawable/card_backside" />
-
-    <TextView
-        android:id="@+id/lbl_score0"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignRight="@+id/btn_knock"
-        android:layout_alignTop="@+id/img_hand1"
-        android:layout_marginTop="15dp"
-        android:text="Score" />
-
-    <TextView
-        android:id="@+id/lbl_life0"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/lbl_score1"
-        android:layout_toRightOf="@+id/img_hand1"
-        android:text="Life" />
-
-    <TextView
-        android:id="@+id/lbl_life1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/lbl_life0"
-        android:layout_below="@+id/lbl_life0"
-        android:text="0"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:gravity="center"
+        android:orientation="horizontal" />
 
     <TextView
         android:id="@+id/lbl_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/lbl_rival0"
-        android:layout_below="@+id/lbl_rival0"
-        android:text="Tischname"
+        android:layout_below="@+id/lay_rivals"
         android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <!-- table cards -->
+
+    <LinearLayout
+        android:id="@+id/lay_table_cards"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/lbl_message"
+        android:gravity="center"
+        android:orientation="horizontal" >
+
+        <ImageView
+            android:id="@+id/img_table0"
+            android:layout_width="@dimen/playcard_width"
+            android:layout_height="@dimen/playcard_height"
+            android:contentDescription="@string/table_card"
+            android:onClick="onTableClick"
+            android:src="@drawable/card_backside_2" />
+
+        <ImageView
+            android:id="@+id/img_table1"
+            android:layout_width="@dimen/playcard_width"
+            android:layout_height="@dimen/playcard_height"
+            android:contentDescription="@string/table_card"
+            android:onClick="onTableClick"
+            android:src="@drawable/card_backside_2" />
+
+        <ImageView
+            android:id="@+id/img_table2"
+            android:layout_width="@dimen/playcard_width"
+            android:layout_height="@dimen/playcard_height"
+            android:contentDescription="@string/table_card"
+            android:onClick="onTableClick"
+            android:src="@drawable/card_backside_2" />
+    </LinearLayout>
+
+    <!-- game statistics -->
+
+    <TextView
+        android:id="@+id/lbl_stats"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/lay_hand_cards" />
+
+    <!-- hand cards -->
+
+    <LinearLayout
+        android:id="@+id/lay_hand_cards"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/lay_action1"
+        android:gravity="center"
+        android:orientation="horizontal" >
+
+        <ImageView
+            android:id="@+id/img_hand0"
+            android:layout_width="@dimen/playcard_width"
+            android:layout_height="@dimen/playcard_height"
+            android:contentDescription="@string/hand_card"
+            android:onClick="onHandClick"
+            android:src="@drawable/card_backside_2" />
+
+        <ImageView
+            android:id="@+id/img_hand1"
+            android:layout_width="@dimen/playcard_width"
+            android:layout_height="@dimen/playcard_height"
+            android:contentDescription="@string/hand_card"
+            android:onClick="onHandClick"
+            android:src="@drawable/card_backside_2" />
+
+        <ImageView
+            android:id="@+id/img_hand2"
+            android:layout_width="@dimen/playcard_width"
+            android:layout_height="@dimen/playcard_height"
+            android:contentDescription="@string/hand_card"
+            android:onClick="onHandClick"
+            android:src="@drawable/card_backside_2" />
+    </LinearLayout>
+
+    <!-- action buttons -->
+
+    <LinearLayout
+        android:id="@+id/lay_action1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/lay_action2"
+        android:orientation="horizontal"
+        style="?android:attr/buttonBarStyle" >
+
+        <Button
+            android:id="@+id/btn_1card"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:onClick="onActionClick"
+            android:text="@string/action_swap_one"
+            style="?android:attr/borderlessButtonStyle" />
+
+        <Button
+            android:id="@+id/btn_push"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:onClick="onActionClick"
+            android:text="@string/action_push"
+            style="?android:attr/borderlessButtonStyle" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/lay_action2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        style="?android:attr/buttonBarStyle" >
+
+        <Button
+            android:id="@+id/btn_allcards"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:onClick="onActionClick"
+            android:text="@string/action_swap_all"
+            style="?android:attr/borderlessButtonStyle" />
+
+        <Button
+            android:id="@+id/btn_knock"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:onClick="onActionClick"
+            android:text="@string/action_close"
+            style="?android:attr/borderlessButtonStyle" />
+    </LinearLayout>
 
 </RelativeLayout>

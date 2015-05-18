@@ -20,17 +20,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.mrm1st3r.cards.Cards;
+import com.github.mrm1st3r.cards.Constant;
 import com.github.mrm1st3r.cards.R;
 import com.github.mrm1st3r.cards.game.ui.HostGameActivity;
-import com.github.mrm1st3r.connection.AsynchronousConnection;
-import com.github.mrm1st3r.connection.OnConnectionChangeHandler;
-import com.github.mrm1st3r.connection.OnReceivedHandler;
-import com.github.mrm1st3r.connection.ThreadedConnection;
-import com.github.mrm1st3r.connection.bluetooth.BluetoothUtil;
-import com.github.mrm1st3r.connection.bluetooth.ServerThread;
-import com.github.mrm1st3r.connection.bluetooth.SimpleBluetoothConnection;
-import com.github.mrm1st3r.util.HashMapAdapter;
-import com.github.mrm1st3r.util.ResultAction;
+import com.github.mrm1st3r.libdroid.connect.AsynchronousConnection;
+import com.github.mrm1st3r.libdroid.connect.OnConnectionChangeHandler;
+import com.github.mrm1st3r.libdroid.connect.OnReceivedHandler;
+import com.github.mrm1st3r.libdroid.connect.ThreadedConnection;
+import com.github.mrm1st3r.libdroid.connect.bluetooth.BluetoothUtil;
+import com.github.mrm1st3r.libdroid.connect.bluetooth.ServerThread;
+import com.github.mrm1st3r.libdroid.connect.bluetooth.SimpleBluetoothConnection;
+import com.github.mrm1st3r.libdroid.util.ResultAction;
+import com.github.mrm1st3r.libdroid.widget.HashMapAdapter;
 
 /**
  * This activity will create a new Bluetooth server socket and wait for incoming
@@ -325,6 +326,7 @@ public class LobbyCreateActivity extends Activity {
 		serv.close();
 
 		Intent intent = new Intent(this, HostGameActivity.class);
+		intent.putExtra(Constant.EXTRA_LOCAL_NAME, localPlayerName);
 		startActivity(intent);
 		finish();
 	}

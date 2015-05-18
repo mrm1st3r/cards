@@ -1,6 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.github.mrm1st3r.cards.LobbyCreateActivity" >
-    <item android:id="@+id/menu_create_visible" android:title="@string/become_visible" android:onClick="becomeVisible"></item>
+    <item android:id="@+id/menu_create_visible" android:title="@string/become_visible"></item>
 
 </menu>

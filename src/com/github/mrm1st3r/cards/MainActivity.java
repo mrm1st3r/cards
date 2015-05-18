@@ -11,6 +11,7 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
 
+import com.github.mrm1st3r.cards.game.ui.BotGameActivity;
 import com.github.mrm1st3r.cards.lobby.LobbyCreateActivity;
 import com.github.mrm1st3r.cards.lobby.LobbyJoinActivity;
 
@@ -104,8 +105,7 @@ public class MainActivity extends Activity {
 			activity = LobbyJoinActivity.class;
 			
 		} else if (id == R.id.btn_bot_game) {
-			return;
-			// TODO: implement playing against computer
+			activity = BotGameActivity.class;
 		} else if (id == R.id.btn_rules) {
 			activity = RulesActivity.class;
 			
@@ -113,6 +113,7 @@ public class MainActivity extends Activity {
 			return;
 		}
 		Intent intent = new Intent(this, activity);
+		intent.putExtra(Constant.EXTRA_LOCAL_NAME, inputPlayerName.getText());
 		startActivity(intent);
 	}
 }

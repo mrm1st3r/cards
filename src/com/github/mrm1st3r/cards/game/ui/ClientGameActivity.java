@@ -1,5 +1,7 @@
 package com.github.mrm1st3r.cards.game.ui;
 
+import java.util.Collection;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -8,11 +10,12 @@ import android.os.Bundle;
 
 import com.github.mrm1st3r.cards.Cards;
 import com.github.mrm1st3r.cards.R;
-import com.github.mrm1st3r.connection.AsynchronousConnection;
-import com.github.mrm1st3r.connection.OnConnectionChangeHandler;
-import com.github.mrm1st3r.connection.OnReceivedHandler;
-import com.github.mrm1st3r.connection.ThreadedConnection;
-import com.github.mrm1st3r.connection.bluetooth.SimpleBluetoothConnection;
+import com.github.mrm1st3r.cards.lobby.LobbyActivity;
+import com.github.mrm1st3r.libdroid.connect.AsynchronousConnection;
+import com.github.mrm1st3r.libdroid.connect.OnConnectionChangeHandler;
+import com.github.mrm1st3r.libdroid.connect.OnReceivedHandler;
+import com.github.mrm1st3r.libdroid.connect.ThreadedConnection;
+import com.github.mrm1st3r.libdroid.connect.bluetooth.SimpleBluetoothConnection;
 
 /**
  * This is the user interface started on the client devices which only receives
@@ -32,9 +35,13 @@ public class ClientGameActivity extends GameActivity {
 	 */
 	private AlertDialog quitDialog = null;
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public final void onCreate(final Bundle bun) {
 		super.onCreate(bun);
+		
+		setPlayerList((Collection<String>) getIntent().getExtras()
+				.getSerializable(LobbyActivity.EXTRA_PLAYER_LIST));
 
 		connection = ((Cards) getApplication())
 				.getConnections().keySet().iterator().next();
@@ -47,7 +54,7 @@ public class ClientGameActivity extends GameActivity {
 				runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						checkMessage(msg);
+						handleMessage(msg);
 					}
 				});
 			}

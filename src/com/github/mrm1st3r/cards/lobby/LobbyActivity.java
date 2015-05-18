@@ -14,11 +14,11 @@ import android.widget.ArrayAdapter;
 import com.github.mrm1st3r.cards.Cards;
 import com.github.mrm1st3r.cards.R;
 import com.github.mrm1st3r.cards.game.ui.ClientGameActivity;
-import com.github.mrm1st3r.connection.AsynchronousConnection;
-import com.github.mrm1st3r.connection.OnConnectionChangeHandler;
-import com.github.mrm1st3r.connection.OnReceivedHandler;
-import com.github.mrm1st3r.connection.ThreadedConnection;
-import com.github.mrm1st3r.connection.bluetooth.SimpleBluetoothConnection;
+import com.github.mrm1st3r.libdroid.connect.AsynchronousConnection;
+import com.github.mrm1st3r.libdroid.connect.OnConnectionChangeHandler;
+import com.github.mrm1st3r.libdroid.connect.OnReceivedHandler;
+import com.github.mrm1st3r.libdroid.connect.ThreadedConnection;
+import com.github.mrm1st3r.libdroid.connect.bluetooth.SimpleBluetoothConnection;
 
 /**
  * This activity shows all players who are connected in this lobby and will
@@ -35,9 +35,13 @@ public class LobbyActivity extends Activity {
 	 */
 	private static final String TAG = LobbyActivity.class.getSimpleName();
 	/**
-	 * Used as a extra field to hand over the player list to the game activity.
+	 * Extra field to hand over the player list to the game activity.
 	 */
 	public static final String EXTRA_PLAYER_LIST = "EXTRA_PLAYER_LIST";
+	/**
+	 * Extra field for local player name.
+	 */
+	public static final String EXTRA_LOCAL_NAME  = "EXTRA_LOCAL_NAME";
 	/**
 	 * Bluetooth connection to game host.
 	 */
@@ -53,7 +57,7 @@ public class LobbyActivity extends Activity {
 	/**
 	 * Local player name.
 	 */
-	private String name;
+	private String mLocalName;
 
 	@Override
 	protected final void onCreate(final Bundle savedInstanceState) {
@@ -74,10 +78,10 @@ public class LobbyActivity extends Activity {
 
 		SharedPreferences pref = getSharedPreferences(Cards.PREF_FILE,
 				Context.MODE_PRIVATE);
-		name = pref.getString(Cards.PREF_PLAYER_NAME, "");
+		mLocalName = pref.getString(Cards.PREF_PLAYER_NAME, "");
 
 		// send own name to host
-		conn.write("join " + name);
+		conn.write("join " + mLocalName);
 
 		// register new receive handler for incoming data
 		conn.setOnReceivedHandler(new OnReceivedHandler<String>() {
@@ -127,6 +131,7 @@ public class LobbyActivity extends Activity {
 					Intent intent = new Intent(LobbyActivity.this,
 							ClientGameActivity.class);
 					intent.putExtra(EXTRA_PLAYER_LIST, playerList);
+					intent.putExtra(EXTRA_LOCAL_NAME, mLocalName);
 					conn.setOnConnectionChangeHandler(null);
 					conn.pause();
 					startActivity(intent);

@@ -1,25 +1,35 @@
 package com.github.mrm1st3r.cards.game.ui;
 
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.github.mrm1st3r.cards.Constant;
 import com.github.mrm1st3r.cards.R;
+import com.github.mrm1st3r.cards.game.Command;
 import com.github.mrm1st3r.cards.game.ThirtyOne;
-import com.github.mrm1st3r.util.BitmapUtil;
+import com.github.mrm1st3r.libdroid.display.BitmapUtil;
+import com.github.mrm1st3r.libdroid.display.DimensionUtil;
 
 /**
  * This is the base user interface for both, host and client.
  * 
- * @author Sergius Maier
- * @version 1.0
+ * @author Sergius Maier, Lukas 'mrm1st3r' Taake
+ * @version 1.1.0
  */
 public abstract class GameActivity extends Activity {
 
@@ -32,49 +42,110 @@ public abstract class GameActivity extends Activity {
 	 */
 	private static final int SELECTED_OPACITY = 150;
 	/**
+	 * Size for rival card stacks.
+	 */
+	private static final int RIVAL_CARD_SIZE = 50;
+	/**
 	 * Debug tag.
 	 */
 	private static final String TAG = GameActivity.class.getSimpleName();
+
 	/**
 	 * The card images that are currently shown as hand cards.
 	 */
-	private String[] hand = new String[ThirtyOne.HAND_SIZE];
+	private String[] mHandCards = new String[ThirtyOne.HAND_SIZE];
 	/**
 	 * The card images that are currently shown as table cards.
 	 */
-	private String[] table = new String[ThirtyOne.HAND_SIZE];
+	private String[] mTableCards = new String[ThirtyOne.HAND_SIZE];
+	/**
+	 * All current players.
+	 */
+	private Collection<String> mPlayerList;
 	/**
 	 * The backside for all cards.
 	 */
-	private String bg = "card_backside";
+	private Bitmap mBg;
 	/**
 	 * Selected table card to swap.
 	 */
-	private int checkedTable = -1;
+	private int mCheckedTable = -1;
 	/**
 	 * Selected hand card to swap.
 	 */
-	private int checkedHand = -1;
+	private int mCheckedHand = -1;
+	/**
+	 * Local player name.
+	 */
+	private String mLocalName;
+
+	/**
+	 * All currently playing opponent players.
+	 */
+	private LinkedList<TextView> mOpponents = new LinkedList<TextView>();
 	/**
 	 * All table card views.
 	 */
-	private ImageView[] tableCards = new ImageView[ThirtyOne.HAND_SIZE];
+	private LinkedList<ImageView> mImgTable = new LinkedList<ImageView>();
 	/**
 	 * All hand card views.
 	 */
-	private ImageView[] handCards = new ImageView[ThirtyOne.HAND_SIZE];
+	private LinkedList<ImageView> mImgHand = new LinkedList<ImageView>();
+	/**
+	 * All action buttons.
+	 */
+	private LinkedList<Button> mBtnAction = new LinkedList<Button>();
+	/**
+	 * List of all opponent players.
+	 */
+	private LinearLayout mLstPlayers;
+	/**
+	 * Shown player status.
+	 */
+	private TextView mLblStatus;
+	/**
+	 * Shown game message.
+	 */
+	private TextView mLblMessage;
 
 	@Override
 	protected void onCreate(final Bundle b) {
 		super.onCreate(b);
 		setContentView(R.layout.activity_game);
 		Log.d(TAG, "Creating card lists");
-		tableCards[0] = (ImageView) findViewById(R.id.img_table0);
-		tableCards[1] = (ImageView) findViewById(R.id.img_table2);
-		tableCards[2] = (ImageView) findViewById(R.id.img_table1);
-		handCards[0] = (ImageView) findViewById(R.id.img_hand0);
-		handCards[1] = (ImageView) findViewById(R.id.img_hand1);
-		handCards[2] = (ImageView) findViewById(R.id.img_hand2);
+
+		mLocalName = getIntent().getExtras().getString(
+				Constant.EXTRA_LOCAL_NAME);
+
+		mImgTable.add((ImageView) findViewById(R.id.img_table0));
+		mImgTable.add((ImageView) findViewById(R.id.img_table1));
+		mImgTable.add((ImageView) findViewById(R.id.img_table2));
+
+		mImgHand.add((ImageView) findViewById(R.id.img_hand0));
+		mImgHand.add((ImageView) findViewById(R.id.img_hand1));
+		mImgHand.add((ImageView) findViewById(R.id.img_hand2));
+
+		mBtnAction.add((Button) findViewById(R.id.btn_1card));
+		mBtnAction.add((Button) findViewById(R.id.btn_allcards));
+		mBtnAction.add((Button) findViewById(R.id.btn_push));
+		mBtnAction.add((Button) findViewById(R.id.btn_knock));
+
+		mLblStatus = (TextView) findViewById(R.id.lbl_stats);
+		mLblMessage = (TextView) findViewById(R.id.lbl_message);
+
+		mLstPlayers = (LinearLayout) findViewById(R.id.lay_rivals);
+
+		mBg = BitmapUtil.decodeSampledBitmapFromResource(getResources(),
+				BitmapUtil.getDrawableIdentifier(this, "card_background_2"),
+				mImgTable.get(0).getWidth(), mImgTable.get(0).getHeight());
+	}
+
+	/**
+	 * Set a player list.
+	 * @param pPlayers List of player names
+	 */
+	protected void setPlayerList(final Collection<String> pPlayers) {
+		mPlayerList = pPlayers;
 	}
 
 	/**
@@ -83,107 +154,58 @@ public abstract class GameActivity extends Activity {
 	 * @param msg
 	 *            Message that was sent
 	 */
-	public final void checkMessage(final String msg) {
+	public final void handleMessage(final String msg) {
 		Log.d(TAG, "Check incoming message: " + msg);
-		String[] parts = msg.split(" ");
-		if (parts[0].equals("active")) {
-			active();
-		} else if (parts[0].equals("inactive")) {
-			inactive();
-		} else if (parts[0].equals("lastround")) {
-			lastround();
-		} else if (parts[0].equals("nextround")) {
-			nextRound();
-		} else if (parts[0].equals("newgame")) {
-			newGameChoice();
-		} else if (parts[0].equals("nextroundchoice")) {
-			nextRoundChoice();
-		} else if (parts[0].equals("takechoice")) {
+		if (msg.length() == 0) {
+			Log.w(TAG, "empty message incoming");
+			return;
+		}
+
+		Command comm = new Command(msg);
+
+		if (comm.equals("active")) {
+			enableInput();
+		} else if (comm.equals("takechoice")) {
 			takeChoice();
-		} else if (parts[0].equals("hand")) {
-			hand[0] = parts[1];
-			hand[1] = parts[2];
-			hand[2] = parts[3];
-			showHand();
-		} else if (parts[0].equals("table")) {
-			table[0] = parts[1];
-			table[1] = parts[2];
-			table[2] = parts[3];
-			showTable();
-		} else if (parts[0].equals("msg")) {
-			changeText(R.id.lbl_message, msg.substring(4));
-		} else if (parts[0].equals("score")) {
-			changeText(R.id.lbl_score1, parts[1]);
-		} else if (parts[0].equals("life")) {
-			changeText(R.id.lbl_life1, parts[1]);
-		} else if (parts[0].equals("players")) {
-			showPlayers(parts);
+			
+		} else if (comm.equals("hand")) {
+			mHandCards = comm.getArgs();
+			updateCardList(mImgHand, mHandCards);
+			
+		} else if (comm.equals("table")) {
+			mTableCards = comm.getArgs();
+			updateCardList(mImgTable, mTableCards);
+			
+		} else if (comm.equals("msg")) {
+			mLblMessage.setText(comm.getArg(0));
+			
+		} else if (comm.equals("status")) {
+			mLblStatus.setText(comm.getArg(0));
+			
+		} else if (comm.equals("left")) {
+			removeOpponent(comm.getArg(0));
+			
+		} else {
+			Log.w(TAG, "unknown command: " + comm.getCommand());
 		}
 	}
 
 	/**
 	 * Activates all buttons for an active player.
 	 */
-	private void active() {
-		switchButton(R.id.btn_knock, true);
-		switchButton(R.id.btn_1card, true);
-		switchButton(R.id.btn_allcards, true);
-		switchButton(R.id.btn_push, true);
+	private void enableInput() {
+		for (Button b : mBtnAction) {
+			b.setEnabled(true);
+		}
 	}
 
 	/**
 	 * Deactivates all buttons for a player who is waiting.
 	 */
-	private void inactive() {
-		switchButton(R.id.btn_knock, false);
-		switchButton(R.id.btn_1card, false);
-		switchButton(R.id.btn_allcards, false);
-		switchButton(R.id.btn_push, false);
-	}
-
-	/**
-	 * Activates all buttons without the "knock"-button for an active player for
-	 * the last round because another player has stopped the round before.
-	 */
-	private void lastround() {
-		switchButton(R.id.btn_knock, false);
-		switchButton(R.id.btn_1card, true);
-		switchButton(R.id.btn_allcards, true);
-		switchButton(R.id.btn_push, true);
-	}
-
-	/**
-	 * Sets everything to default for the next round.
-	 */
-	private void nextRound() {
-		inactive();
-		checkedTable = -1;
-		checkedHand = -1;
-		hand[0] = null;
-		hand[1] = null;
-		hand[2] = null;
-		showHand();
-		table[0] = null;
-		table[1] = null;
-		table[2] = null;
-		showTable();
-		changeText(R.id.lbl_message, "Neue Runde");
-	}
-
-	/**
-	 * Gives the host the choice for a new game.
-	 */
-	private void newGameChoice() {
-		alertBox("Ihre Wahl", "Neues Spiel", "Ja", "Nein", "newgame yes",
-				"newgame no");
-	}
-
-	/**
-	 * Gives the host the choice for a new round.
-	 */
-	private void nextRoundChoice() {
-		alertBox("Ihre Wahl", "Nächste Runde", "Ja", "Nein", "nextround yes",
-				"nextround no");
+	private void disableInput() {
+		for (Button b : mBtnAction) {
+			b.setEnabled(false);
+		}
 	}
 
 	/**
@@ -191,82 +213,80 @@ public abstract class GameActivity extends Activity {
 	 * at the beginning of a round.
 	 */
 	private void takeChoice() {
-		showHand();
 		alertBox("Ihre Wahl",
 				"Wollen Sie die Karten auf der Hand behalten oder "
 						+ "mit den verdeckten Karten auf dem Tisch spielen",
-				"Hand", "Tisch", "choice hand", "choice table");
+						"Hand", "Tisch", "choice hand", "choice table");
 	}
 
 	/**
-	 * Shows the cards on the table.
+	 * Updates a list of cards.
+	 * 
+	 * @param images
+	 *            List of images to update
+	 * @param cards
+	 *            Names of new cards to be shown
 	 */
-	private void showTable() {
-		if (table[0] != null) {
-			changeImage(R.id.img_table0,
-					BitmapUtil.getDrawableIdentifier(this, table[0]));
-			changeImage(R.id.img_table1,
-					BitmapUtil.getDrawableIdentifier(this, table[1]));
-			changeImage(R.id.img_table2,
-					BitmapUtil.getDrawableIdentifier(this, table[2]));
-		} else {
-			changeImage(R.id.img_table0,
-					BitmapUtil.getDrawableIdentifier(this, bg));
-			changeImage(R.id.img_table1,
-					BitmapUtil.getDrawableIdentifier(this, bg));
-			changeImage(R.id.img_table2,
-					BitmapUtil.getDrawableIdentifier(this, bg));
-		}
-	}
+	private void updateCardList(final List<ImageView> images,
+			final String[] cards) {
 
-	/**
-	 * Shows the hand cards of the player.
-	 */
-	private void showHand() {
-		Log.d(TAG, hand[0] + " / " + getPackageName());
-		if (hand[0] != null) {
-			changeImage(R.id.img_hand0,
-					BitmapUtil.getDrawableIdentifier(this, hand[0]));
-			changeImage(R.id.img_hand1,
-					BitmapUtil.getDrawableIdentifier(this, hand[1]));
-			changeImage(R.id.img_hand2,
-					BitmapUtil.getDrawableIdentifier(this, hand[2]));
-		} else {
-			changeImage(R.id.img_hand0,
-					BitmapUtil.getDrawableIdentifier(this, bg));
-			changeImage(R.id.img_hand1,
-					BitmapUtil.getDrawableIdentifier(this, bg));
-			changeImage(R.id.img_hand2,
-					BitmapUtil.getDrawableIdentifier(this, bg));
+		for (int i = 0; i < images.size(); i++) {
+			Bitmap cardImg;
+			if (i >= cards.length || cards[i] == null) {
+				cardImg = mBg;
+			} else {
+				cardImg = BitmapUtil.decodeSampledBitmapFromResource(
+						getResources(),
+						BitmapUtil.getDrawableIdentifier(this, cards[i]),
+						images.get(i).getWidth(), images.get(i).getHeight());
+			}
+
+			images.get(i).setImageBitmap(cardImg);
 		}
 	}
 
 	/**
 	 * Show name and image for playing players.
-	 * 
-	 * @param players
-	 *            Message with names of the opponents
 	 */
-	private void showPlayers(final String[] players) {
-		Log.d(TAG, "receiving new player names" + players[1]);
-		changeText(R.id.lbl_rival0, players[1]);
-		if (players.length >= 3) {
-			changeText(R.id.lbl_rival1, players[2]);
-			switchImageView(R.id.img_rival1, View.VISIBLE);
-			switchTextView(R.id.lbl_rival1, View.VISIBLE);
-			if (players.length >= 4) {
-				changeText(R.id.lbl_rival2, players[3]);
-				switchImageView(R.id.img_rival2, View.VISIBLE);
-				switchTextView(R.id.lbl_rival2, View.VISIBLE);
-			} else {
-				switchImageView(R.id.img_rival2, View.INVISIBLE);
-				switchTextView(R.id.lbl_rival2, View.INVISIBLE);
+	protected void showOpponentList() {
+		
+		if (mPlayerList == null) {
+			return;
+		}
+
+		for (String p : mPlayerList) {
+
+			if (p.equals(mLocalName)) {
+				continue;
 			}
-		} else {
-			switchImageView(R.id.img_rival1, View.INVISIBLE);
-			switchTextView(R.id.lbl_rival1, View.INVISIBLE);
-			switchImageView(R.id.img_rival2, View.INVISIBLE);
-			switchTextView(R.id.lbl_rival2, View.INVISIBLE);
+
+			TextView t = new TextView(this);
+			t.setText(p);
+			t.setCompoundDrawables(
+					null,
+					new BitmapDrawable(getResources(), BitmapUtil
+							.decodeSampledBitmapFromResource(getResources(),
+									R.drawable.card_rival,
+									DimensionUtil.dpToPx(RIVAL_CARD_SIZE),
+									DimensionUtil.dpToPx(RIVAL_CARD_SIZE))),
+									null, null);
+			mLstPlayers.addView(t);
+			mOpponents.add(t);
+		}
+	}
+
+	/**
+	 * Remove a player from opponent list.
+	 * 
+	 * @param name
+	 *            Opponent name
+	 */
+	private void removeOpponent(final String name) {
+		for (TextView t : mOpponents) {
+			if (t.getText().equals(name)) {
+				mOpponents.remove(t);
+				return;
+			}
 		}
 	}
 
@@ -298,88 +318,21 @@ public abstract class GameActivity extends Activity {
 		alertDialogBuilder.setTitle(title);
 		// set dialog message
 		alertDialogBuilder.setMessage(msg).setCancelable(false)
-				.setPositiveButton(yes, new DialogInterface.OnClickListener() {
-					public void onClick(final DialogInterface dialog,
-							final int id) {
-						sendMessage(yesMsg);
-					}
-				}).setNegativeButton(no, new DialogInterface.OnClickListener() {
-					public void onClick(final DialogInterface dialog,
-							final int id) {
-						sendMessage(noMsg);
-					}
-				});
+		.setPositiveButton(yes, new DialogInterface.OnClickListener() {
+			public void onClick(final DialogInterface dialog,
+					final int id) {
+				sendMessage(yesMsg);
+			}
+		}).setNegativeButton(no, new DialogInterface.OnClickListener() {
+			public void onClick(final DialogInterface dialog,
+					final int id) {
+				sendMessage(noMsg);
+			}
+		});
 		// create alert dialog
 		AlertDialog alertDialog = alertDialogBuilder.create();
 		// show it
 		alertDialog.show();
-	}
-
-	/**
-	 * Displays an image in the ImageView.
-	 * 
-	 * @param view
-	 *            ID of the ImageView which shows the image
-	 * @param img
-	 *            ID of the image to show
-	 */
-	private void changeImage(final int view, final int img) {
-		ImageView image = (ImageView) findViewById(view);
-		image.setImageBitmap(BitmapUtil.decodeSampledBitmapFromResource(
-				getResources(), img, image.getWidth(), image.getHeight()));
-	}
-
-	/**
-	 * Activate or deactivate a button.
-	 * 
-	 * @param b
-	 *            ID of the Button to switch
-	 * @param s
-	 *            true to activate/ false to deactivate
-	 */
-	private void switchButton(final int b, final boolean s) {
-		Button btn = (Button) findViewById(b);
-		btn.setEnabled(s);
-	}
-
-	/**
-	 * Show or hide an ImageView.
-	 * 
-	 * @param view
-	 *            ID of the Button to switch
-	 * @param state
-	 *            VISIBLE or INVISIBLE
-	 */
-	private void switchImageView(final int view, final int state) {
-		ImageView iv = (ImageView) findViewById(view);
-		iv.setVisibility(state);
-	}
-
-	/**
-	 * Show or hide an TextView.
-	 * 
-	 * @param view
-	 *            ID of the Button to switch
-	 * @param state
-	 *            VISIBLE or INVISIBLE
-	 */
-	private void switchTextView(final int view, final int state) {
-		TextView tv = (TextView) findViewById(view);
-		tv.setVisibility(state);
-	}
-
-	/**
-	 * Displays a text in the Textview.
-	 * 
-	 * @param view
-	 *            ID of the TextView which show the text
-	 * @param text
-	 *            Text to show
-	 */
-	private void changeText(final int view, final String text) {
-		Log.d(TAG, "Changing text to " + text);
-		final TextView textViewToChange = (TextView) findViewById(view);
-		textViewToChange.setText(text);
 	}
 
 	/**
@@ -388,32 +341,30 @@ public abstract class GameActivity extends Activity {
 	 * @param view
 	 *            ID of the ImageView which is marked
 	 */
-	@SuppressWarnings("deprecation")
-	public final void img_table(final View view) {
+	public final void onTableClick(final View view) {
 		resetTableCards();
 		((ImageView) view).setAlpha(SELECTED_OPACITY);
 
 		switch (view.getId()) {
 		case R.id.img_table0:
-			checkedTable = 0;
+			mCheckedTable = 0;
 			break;
 		case R.id.img_table1:
-			checkedTable = 1;
+			mCheckedTable = 1;
 			break;
 		case R.id.img_table2:
-			checkedTable = 2;
+			mCheckedTable = 2;
 			break;
 		default:
-			checkedTable = -1;
+			mCheckedTable = -1;
 		}
 	}
 
 	/**
 	 * Reset all table cards to 100% opacity.
 	 */
-	@SuppressWarnings("deprecation")
 	private void resetTableCards() {
-		for (ImageView v : tableCards) {
+		for (ImageView v : mImgTable) {
 			if (v == null) {
 				Log.d(TAG, "table card fail");
 				continue;
@@ -428,32 +379,30 @@ public abstract class GameActivity extends Activity {
 	 * @param view
 	 *            ID of the ImageView which is marked
 	 */
-	@SuppressWarnings("deprecation")
-	public final void img_hand(final View view) {
+	public final void onHandClick(final View view) {
 		resetHandCards();
 		((ImageView) view).setAlpha(SELECTED_OPACITY);
 
 		switch (view.getId()) {
 		case R.id.img_hand0:
-			checkedHand = 0;
+			mCheckedHand = 0;
 			break;
 		case R.id.img_hand1:
-			checkedHand = 1;
+			mCheckedHand = 1;
 			break;
 		case R.id.img_hand2:
-			checkedHand = 2;
+			mCheckedHand = 2;
 			break;
 		default:
-			checkedHand = -1;
+			mCheckedHand = -1;
 		}
 	}
 
 	/**
 	 * Reset all hand cards to 100% opacity.
 	 */
-	@SuppressWarnings("deprecation")
 	private void resetHandCards() {
-		for (ImageView v : handCards) {
+		for (ImageView v : mImgHand) {
 			if (v == null) {
 				Log.d(TAG, "hand card fail");
 				continue;
@@ -469,49 +418,33 @@ public abstract class GameActivity extends Activity {
 	 * @param view
 	 *            Button that was pressed, not used
 	 */
-	public final void btn_1card(final View view) {
-		if (checkedTable != -1 && checkedHand != -1) {
-			inactive();
-			sendMessage("swap " + checkedHand + " " + checkedTable);
+	public final void onActionClick(final View view) {
+		switch (view.getId()) {
+
+		case R.id.btn_1card:
+			if (mCheckedTable == -1 && mCheckedHand == -1) {
+				return;
+			}
+			sendMessage("swap " + mCheckedHand + " " + mCheckedTable);
+			mCheckedTable = -1;
+			mCheckedHand = -1;
+			resetHandCards();
+			resetTableCards();
+			break;
+
+		case R.id.btn_allcards:
+			sendMessage("swapall");
+
+		case R.id.btn_knock:
+			sendMessage("close");
+
+		case R.id.btn_push:
+			sendMessage("push");
+
+		default:
+			break;
 		}
-		checkedTable = -1;
-		checkedHand = -1;
-		resetHandCards();
-		resetTableCards();
-	}
-
-	/**
-	 * Send a message to the game, to exchange the table cards and the hand
-	 * cards of the player.
-	 * 
-	 * @param view
-	 *            Button that was pressed, not used
-	 */
-	public final void btn_allcards(final View view) {
-		inactive();
-		sendMessage("swapall");
-	}
-
-	/**
-	 * Send a message to the game, to close the round.
-	 * 
-	 * @param view
-	 *            Button that was pressed, not used
-	 */
-	public final void btn_knock(final View view) {
-		inactive();
-		sendMessage("close");
-	}
-
-	/**
-	 * Send a message to the game, to push.
-	 * 
-	 * @param view
-	 *            Button that was pressed, not used
-	 */
-	public final void btn_push(final View view) {
-		inactive();
-		sendMessage("push");
+		disableInput();
 	}
 
 	/**

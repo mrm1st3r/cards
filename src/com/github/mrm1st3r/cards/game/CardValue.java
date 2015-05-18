@@ -1,10 +1,11 @@
 package com.github.mrm1st3r.cards.game;
 
 /**
- * All possible game card values.
+ * This enumeration contains all card values used
+ * in a standard skat or power deck.
  * 
- * @author Lukas 'mrm1st3r' Taake, Sergius Maier
- * @version 1.0
+ * @author Lukas 'mrm1st3r' Taake
+ * @version 1.0.0
  */
 public enum CardValue {
 
@@ -72,11 +73,11 @@ public enum CardValue {
 	/**
 	 * The name of the card value.
 	 */
-	private String name;
+	private final String name;
 	/**
 	 * The represented numerical value.
 	 */
-	private int value;
+	private final int value;
 
 	/**
 	 * Construct a card value.
@@ -92,6 +93,7 @@ public enum CardValue {
 	}
 
 	/**
+	 * Get the card values name.
 	 * @return The name of the card value.
 	 */
 	public String getName() {
@@ -99,6 +101,7 @@ public enum CardValue {
 	}
 
 	/**
+	 * Get the numerical value.
 	 * @return The proper numerical value.
 	 */
 	public int getValue() {
@@ -106,15 +109,18 @@ public enum CardValue {
 	}
 
 	/**
-	 * @return All card values that will be used in a skat deck.
+	 * Get all values that are used in a skat deck.
+	 * @return All card values that are used in a skat deck.
 	 */
 	public static CardValue[] getSkatDeck() {
 		CardValue[] skatDeck = new CardValue[SKAT_DECK_SIZE];
 		CardValue[] all = values();
+
 		// minimum value that is used in a skat deck.
 		final int minValue = 7;
+		int j = 0;
 
-		for (int i = 0, j = 0; i < all.length; i++) {
+		for (int i = 0; i < all.length; i++) {
 			if (all[i].value >= minValue) {
 				skatDeck[j++] = all[i];
 			}
@@ -123,7 +129,8 @@ public enum CardValue {
 	}
 
 	/**
-	 * @return All card values that will be used in a poker deck.
+	 * Get all values that are used in a poker deck.
+	 * @return All card values that are used in a poker deck.
 	 */
 	public static CardValue[] getPokerDeck() {
 		return CardValue.values();

@@ -1,31 +1,45 @@
 package com.github.mrm1st3r.cards.game;
 
-import com.github.mrm1st3r.connection.bluetooth.SimpleBluetoothConnection;
+import com.github.mrm1st3r.libdroid.connect.bluetooth.SimpleBluetoothConnection;
 
 /**
  * This class describes a remote player connected via Bluetooth.
  * 
- * @author Sergius Maier
- * @version 1.0
+ * @author Lukas 'mrm1st3r' Taake, Sergius Maier
+ * @version 1.0.2
  */
 public class BluetoothPlayer extends Player {
 
 	/**
 	 * The Bluetooth connection to the remote device.
 	 */
-	private SimpleBluetoothConnection connection;
+	private final SimpleBluetoothConnection connection;
 
 	/**
 	 * Construct a new remote player.
 	 * 
 	 * @param pName
-	 *            The player name
-	 * @param pHandSize
-	 *            The maximum number of hand cards
-	 * @param pLifes
-	 *            The number of lifes to begin with
+	 *            Player name
 	 * @param pConn
-	 *            The remote connection
+	 *            Player connection
+	 */
+	public BluetoothPlayer(final String pName,
+			final SimpleBluetoothConnection pConn) {
+		super(pName);
+		connection = pConn;
+	}
+
+	/**
+	 * Construct a new remote player.
+	 * 
+	 * @param pName
+	 *            Player name
+	 * @param pHandSize
+	 *            Maximum number of hand cards
+	 * @param pLifes
+	 *            Number of lifes to begin with
+	 * @param pConn
+	 *            Remote connection
 	 */
 	public BluetoothPlayer(final String pName, final int pHandSize,
 			final int pLifes, final SimpleBluetoothConnection pConn) {
@@ -34,14 +48,16 @@ public class BluetoothPlayer extends Player {
 	}
 
 	/**
+	 * Get the connection to the players remote device.
+	 * 
 	 * @return The used Bluetooth connection to the remote device
 	 */
-	public final SimpleBluetoothConnection getConn() {
+	public final SimpleBluetoothConnection getConnection() {
 		return connection;
 	}
 
 	@Override
-	public final void sendMessage(final String msg) {
+	public final void command(final String msg) {
 		connection.write(msg);
 	}
 }

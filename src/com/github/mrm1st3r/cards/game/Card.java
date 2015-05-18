@@ -3,8 +3,8 @@ package com.github.mrm1st3r.cards.game;
 /**
  * This class describes a playing card.
  * 
- * @author Sergius Maier
- * @version 1.0
+ * @author Lukas 'mrm1st3r' Taake, Sergius Maier
+ * @version 1.0.0
  */
 public class Card {
 
@@ -36,6 +36,7 @@ public class Card {
 	}
 
 	/**
+	 * Get the cards color.
 	 * @return The cards color
 	 */
 	public final CardColor getColor() {
@@ -43,6 +44,7 @@ public class Card {
 	}
 
 	/**
+	 * Get the cards value.
 	 * @return The cards value
 	 */
 	public final CardValue getValue() {
@@ -50,6 +52,8 @@ public class Card {
 	}
 
 	/**
+	 * Get the cards integer value.
+	 * Will return the same value as {@link CardValue#getValue()}.
 	 * @return The cards integer value
 	 */
 	public final int getIntValue() {
@@ -57,6 +61,7 @@ public class Card {
 	}
 
 	/**
+	 * Get the name of the image representing this card.
 	 * @return The name of the image representing this card
 	 */
 	public final String getImageName() {

@@ -26,12 +26,12 @@ import android.widget.Toast;
 
 import com.github.mrm1st3r.cards.Cards;
 import com.github.mrm1st3r.cards.R;
-import com.github.mrm1st3r.connection.OnConnectionChangeHandler;
-import com.github.mrm1st3r.connection.ThreadedConnection;
-import com.github.mrm1st3r.connection.bluetooth.BluetoothUtil;
-import com.github.mrm1st3r.connection.bluetooth.ClientThread;
-import com.github.mrm1st3r.connection.bluetooth.SimpleBluetoothConnection;
-import com.github.mrm1st3r.util.ResultAction;
+import com.github.mrm1st3r.libdroid.connect.OnConnectionChangeHandler;
+import com.github.mrm1st3r.libdroid.connect.ThreadedConnection;
+import com.github.mrm1st3r.libdroid.connect.bluetooth.BluetoothUtil;
+import com.github.mrm1st3r.libdroid.connect.bluetooth.ClientThread;
+import com.github.mrm1st3r.libdroid.connect.bluetooth.SimpleBluetoothConnection;
+import com.github.mrm1st3r.libdroid.util.ResultAction;
 
 /**
  * This activity lists all currently available bluetooth devices and gives the

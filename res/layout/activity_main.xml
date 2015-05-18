@@ -36,7 +36,6 @@
     <Button
         android:id="@+id/btn_bot_game"
         android:layout_height="wrap_content"
-        android:enabled="false"
         android:onClick="onButtonPressed"
         android:text="@string/bot_game"
         android:layout_width="240dp" />

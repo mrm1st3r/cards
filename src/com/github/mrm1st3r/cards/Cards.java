@@ -4,8 +4,8 @@ import java.util.HashMap;
 
 import android.app.Application;
 
-import com.github.mrm1st3r.connection.bluetooth.BluetoothUtil;
-import com.github.mrm1st3r.connection.bluetooth.SimpleBluetoothConnection;
+import com.github.mrm1st3r.libdroid.connect.bluetooth.BluetoothUtil;
+import com.github.mrm1st3r.libdroid.connect.bluetooth.SimpleBluetoothConnection;
 
 /**
  * Application class that is used to hold bluetooth connections while activities
