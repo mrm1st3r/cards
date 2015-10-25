@@ -32,18 +32,18 @@ public class Cards extends Application {
 	/**
 	 * Contains all currently active bluetooth connections.
 	 */
-	private HashMap<SimpleBluetoothConnection, String> connections =
+	private HashMap<SimpleBluetoothConnection, String> mConnections =
 			new HashMap<SimpleBluetoothConnection, String>();
 	/**
 	 * True if bluetooth was enabled by the application.
 	 */
-	private boolean enabledBluetooth = false;
+	private boolean mEnabledBluetooth = false;
 
 	/**
 	 * @return List of all established connections.
 	 */
 	public final HashMap<SimpleBluetoothConnection, String> getConnections() {
-		return connections;
+		return mConnections;
 	}
 
 	/**
@@ -54,21 +54,21 @@ public class Cards extends Application {
 	 */
 	public final void setConnections(
 			final HashMap<SimpleBluetoothConnection, String> conn) {
-		connections = conn;
+		mConnections = conn;
 	}
 	/**
 	 * Register if bluetooth was enabled by the application.
 	 * @param state true if bluetooth was enabled by the application
 	 */
 	public final void setEnabled(final boolean state) {
-		enabledBluetooth = state;
+		mEnabledBluetooth = state;
 	}
 	/**
 	 * Reset the local bluetooth adapter to the state it was when the
 	 * application was launched.
 	 */
 	public final void resetBluetoothAdapter() {
-		if (enabledBluetooth) {
+		if (mEnabledBluetooth) {
 			BluetoothUtil.disable();
 		}
 	}

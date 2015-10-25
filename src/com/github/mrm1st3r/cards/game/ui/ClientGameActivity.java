@@ -29,11 +29,11 @@ public class ClientGameActivity extends GameActivity {
 	/**
 	 * Bluetooth connection to the host.
 	 */
-	private SimpleBluetoothConnection connection = null;
+	private SimpleBluetoothConnection mConnection = null;
 	/**
 	 * Dialog that is shown when the back key is pressed.
 	 */
-	private AlertDialog quitDialog = null;
+	private AlertDialog mQuitDialog = null;
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -43,10 +43,10 @@ public class ClientGameActivity extends GameActivity {
 		setPlayerList((Collection<String>) getIntent().getExtras()
 				.getSerializable(LobbyActivity.EXTRA_PLAYER_LIST));
 
-		connection = ((Cards) getApplication())
+		mConnection = ((Cards) getApplication())
 				.getConnections().keySet().iterator().next();
 
-		connection.setOnReceivedHandler(new OnReceivedHandler<String>() {
+		mConnection.setOnReceivedHandler(new OnReceivedHandler<String>() {
 			@Override
 			public void onReceived(final AsynchronousConnection<String> conn,
 					final String msg) {
@@ -59,8 +59,8 @@ public class ClientGameActivity extends GameActivity {
 				});
 			}
 		});
-		connection.unpause();
-		connection.setOnConnectionChangeHandler(
+		mConnection.unpause();
+		mConnection.setOnConnectionChangeHandler(
 				new OnConnectionChangeHandler() {
 			@Override
 			public void onDisconnect(final ThreadedConnection tc) {
@@ -82,14 +82,14 @@ public class ClientGameActivity extends GameActivity {
 				Context.MODE_PRIVATE);
 		String name = pref.getString(Cards.PREF_PLAYER_NAME, "");
 		
-		connection.write("left " + name);
-		connection.close();
+		mConnection.write("left " + name);
+		mConnection.close();
 		ClientGameActivity.super.onBackPressed();
 	}
 	
 	@Override
 	public final void sendMessage(final String msg) {
-		connection.write(msg);
+		mConnection.write(msg);
 	}
 
 	@Override
@@ -101,12 +101,12 @@ public class ClientGameActivity extends GameActivity {
 			
 			@Override
 			public void onClick(final DialogInterface dialog, final int which) {
-				quitDialog.dismiss();
+				mQuitDialog.dismiss();
 				leaveGame();
 			}
 		});
 		dialog.setNegativeButton(R.string.no, null);
-		quitDialog = dialog.create();
-		quitDialog.show();
+		mQuitDialog = dialog.create();
+		mQuitDialog.show();
 	}
 }

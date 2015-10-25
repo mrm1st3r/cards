@@ -45,16 +45,16 @@ public class ThirtyOne extends CardGame {
 	/**
 	 * The player who has closed the round.
 	 */
-	private Player stopper;
+	private Player mStopper;
 	/**
 	 * The player who has won the round.
 	 */
-	private Player winner;
+	private Player mWinner;
 	/**
 	 * The hidden cards that the dealer will get if he refuses his hand cards.
 	 * If the dealer accepts his hand cards, these will become the table cards.
 	 */
-	private CardDeck choice;
+	private CardDeck mChoice;
 
 	/**
 	 * Create a new singleton.
@@ -90,9 +90,9 @@ public class ThirtyOne extends CardGame {
 	@Override
 	protected final void onStart() {
 
-		stopper = null;
-		winner = null;
-		choice = new CardDeck();
+		mStopper = null;
+		mWinner = null;
+		mChoice = new CardDeck();
 
 		setDealer(getHostPlayer());
 	}
@@ -118,7 +118,7 @@ public class ThirtyOne extends CardGame {
 		broadcast(Command.encode("msg",
 				"Der Dealer ist dabei sich zu entscheiden"));
 
-		fillHand(choice);
+		fillHand(mChoice);
 
 		getDealer().command("takechoice");
 		// waiting for dealers choice
@@ -138,7 +138,7 @@ public class ThirtyOne extends CardGame {
 		// a game of "thirty one" consists of multiple game rounds
 		// one call of this method equals one whole round.
 
-		while (!p.equals(stopper) && winner == null) {
+		while (!p.equals(mStopper) && mWinner == null) {
 			broadcast(Command.encode("msg", p.getName() + " ist an der Reihe"));
 
 			// activate player input and wait for response
@@ -156,7 +156,7 @@ public class ThirtyOne extends CardGame {
 			updateStatus(p);
 
 			if (p.getScore() >= POINTS_WIN) {
-				winner = p;
+				mWinner = p;
 			}
 
 			// move to the next player
@@ -216,8 +216,8 @@ public class ThirtyOne extends CardGame {
 
 	@Override
 	protected final void onEnd() {
-		if (winner != null) {
-			broadcast(Command.encode("msg", winner.getName()
+		if (mWinner != null) {
+			broadcast(Command.encode("msg", mWinner.getName()
 					+ " hat das Spiel gewonnen"));
 		} else {
 			// all players left the game
@@ -263,8 +263,8 @@ public class ThirtyOne extends CardGame {
 				updateHand(p);
 
 			} else if (comm.equals("close")) {
-				if (stopper == null) {
-					stopper = p;
+				if (mStopper == null) {
+					mStopper = p;
 				}
 
 			} else if (comm.equals("push")) {
@@ -381,10 +381,10 @@ public class ThirtyOne extends CardGame {
 	 */
 	private void choiceResult(final String str) {
 		if (str.equals("table")) {
-			getDealer().getHand().swapWith(choice);
+			getDealer().getHand().swapWith(mChoice);
 			updateHand(getDealer());
 		}
-		getTableCards().replaceDeck(choice);
+		getTableCards().replaceDeck(mChoice);
 		updateTable();
 	}
 

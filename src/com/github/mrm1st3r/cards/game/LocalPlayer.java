@@ -13,7 +13,7 @@ public class LocalPlayer extends Player {
 	/**
 	 * The local user interface to interact with.
 	 */
-	private final GameActivity userInterface;
+	private final GameActivity mUserInterface;
 
 	/**
 	 * Construct a new local player.
@@ -25,7 +25,7 @@ public class LocalPlayer extends Player {
 	 */
 	public LocalPlayer(final String pName, final GameActivity pUi) {
 		super(pName);
-		userInterface = pUi;
+		mUserInterface = pUi;
 	}
 
 	/**
@@ -43,7 +43,7 @@ public class LocalPlayer extends Player {
 	public LocalPlayer(final String pName, final int pHandSize,
 			final int pLifes, final GameActivity pUi) {
 		super(pName, pHandSize, pLifes);
-		userInterface = pUi;
+		mUserInterface = pUi;
 	}
 
 	/**
@@ -52,7 +52,7 @@ public class LocalPlayer extends Player {
 	 * @return The local user interface
 	 */
 	public final GameActivity getUserInterface() {
-		return userInterface;
+		return mUserInterface;
 	}
 
 	@Override
@@ -60,10 +60,10 @@ public class LocalPlayer extends Player {
 
 		// process an incoming message from the game loop on the UI thread to
 		// be able to interact with it.
-		userInterface.runOnUiThread(new Runnable() {
+		mUserInterface.runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				userInterface.handleMessage(msg);
+				mUserInterface.handleMessage(msg);
 			}
 		});
 	}

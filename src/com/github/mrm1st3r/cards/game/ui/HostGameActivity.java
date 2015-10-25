@@ -37,19 +37,19 @@ public class HostGameActivity extends GameActivity {
 	/**
 	 * The background thread where the game loop is running.
 	 */
-	private Thread gameThread;
+	private Thread mGameThread;
 	/**
 	 * The game itself.
 	 */
-	private ThirtyOne game;
+	private ThirtyOne mGame;
 	/**
 	 * The local player.
 	 */
-	private LocalPlayer localPlayer;
+	private LocalPlayer mLocalPlayer;
 	/**
 	 * Dialog that is shown when the back key is pressed.
 	 */
-	private AlertDialog quitDialog = null;
+	private AlertDialog mQuitDialog = null;
 
 	@Override
 	public final void onCreate(final Bundle bun) {
@@ -75,9 +75,9 @@ public class HostGameActivity extends GameActivity {
 		int playerCount = connections.size() + 1;
 		Log.d(TAG, "starting new game with " + playerCount + " players");
 
-		game = ThirtyOne.createInstance(playerCount);
-		localPlayer = new LocalPlayer(localName, this);
-		game.addPlayer(localPlayer);
+		mGame = ThirtyOne.createInstance(playerCount);
+		mLocalPlayer = new LocalPlayer(localName, this);
+		mGame.addPlayer(mLocalPlayer);
 
 		for (SimpleBluetoothConnection conn : connections.keySet()) {
 			conn.unpause();
@@ -86,28 +86,28 @@ public class HostGameActivity extends GameActivity {
 			final BluetoothPlayer remotePlayer = new BluetoothPlayer(
 					remoteName, conn);
 
-			game.addPlayer(remotePlayer);
+			mGame.addPlayer(remotePlayer);
 			remotePlayer.getConnection().setOnReceivedHandler(
 					new OnReceivedHandler<String>() {
 						@Override
 						public void onReceived(
 								final AsynchronousConnection<String> conn,
 								final String msg) {
-							game.handleMessage(remotePlayer, msg);
+							mGame.handleMessage(remotePlayer, msg);
 						}
 					});
 		}
 
 		// Run the game loop in an own thread to avoid the user interface being
 		// not usable.
-		gameThread = new Thread(new Runnable() {
+		mGameThread = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				game.start();
+				mGame.start();
 			}
 		});
 
-		gameThread.setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
+		mGameThread.setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
 			@Override
 			public void uncaughtException(final Thread th, final Throwable e) {
 				Log.w(TAG, e);
@@ -118,9 +118,9 @@ public class HostGameActivity extends GameActivity {
 		});
 
 		// for debugging
-		gameThread.setName("game_loop");
+		mGameThread.setName("game_loop");
 
-		gameThread.start();
+		mGameThread.start();
 	}
 
 	/**
@@ -138,9 +138,9 @@ public class HostGameActivity extends GameActivity {
 		// hard-abort the game thread as otherwise the game round would have
 		// to be played until the end
 		try {
-			game.getPlayers().clear();
-			game = null;
-			gameThread.stop();
+			mGame.getPlayers().clear();
+			mGame = null;
+			mGameThread.stop();
 		} catch (Exception e) {
 			Log.w(TAG, e);
 		}
@@ -152,7 +152,7 @@ public class HostGameActivity extends GameActivity {
 
 	@Override
 	public final void sendMessage(final String msg) {
-		game.handleMessage(localPlayer, msg);
+		mGame.handleMessage(mLocalPlayer, msg);
 	}
 
 	@Override
@@ -166,12 +166,12 @@ public class HostGameActivity extends GameActivity {
 					@Override
 					public void onClick(final DialogInterface dialog,
 							final int which) {
-						quitDialog.dismiss();
+						mQuitDialog.dismiss();
 						closeGame();
 					}
 				});
 		dialog.setNegativeButton(R.string.no, null);
-		quitDialog = dialog.create();
-		quitDialog.show();
+		mQuitDialog = dialog.create();
+		mQuitDialog.show();
 	}
 }

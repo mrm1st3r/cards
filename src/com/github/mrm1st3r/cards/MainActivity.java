@@ -33,30 +33,30 @@ public class MainActivity extends Activity {
 	/**
 	 * Preferences for player name.
 	 */
-	private SharedPreferences pref;
+	private SharedPreferences mPrefs;
 	/**
 	 * Input field for player name.
 	 */
-	private EditText inputPlayerName;
+	private EditText mInputPlayerName;
 
 	@Override
 	protected final void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		// read currently saved player name
-		pref = getSharedPreferences(Cards.PREF_FILE, Context.MODE_PRIVATE);
+		mPrefs = getSharedPreferences(Cards.PREF_FILE, Context.MODE_PRIVATE);
 		// use null as default value to be able to immediately save
 		// default value to prevent empty user name.
-		String name = pref.getString(Cards.PREF_PLAYER_NAME, null);
+		String name = mPrefs.getString(Cards.PREF_PLAYER_NAME, null);
 
 		if (name == null) {
 			name = BluetoothAdapter.getDefaultAdapter().getName();
 			changePlayerName(name);
 		}
 
-		inputPlayerName = (EditText) findViewById(R.id.input_player_name);
-		inputPlayerName.setText(name);
-		inputPlayerName.addTextChangedListener(new TextWatcher() {
+		mInputPlayerName = (EditText) findViewById(R.id.input_player_name);
+		mInputPlayerName.setText(name);
+		mInputPlayerName.addTextChangedListener(new TextWatcher() {
 
 			@Override
 			public void afterTextChanged(final Editable input) {
@@ -82,7 +82,7 @@ public class MainActivity extends Activity {
 	 *            Player name to wrote
 	 */
 	private void changePlayerName(final String newName) {
-		SharedPreferences.Editor edit = pref.edit();
+		SharedPreferences.Editor edit = mPrefs.edit();
 
 		edit.putString(Cards.PREF_PLAYER_NAME, newName);
 		edit.commit();
@@ -113,7 +113,7 @@ public class MainActivity extends Activity {
 			return;
 		}
 		Intent intent = new Intent(this, activity);
-		intent.putExtra(Constant.EXTRA_LOCAL_NAME, inputPlayerName.getText());
+		intent.putExtra(Constant.EXTRA_LOCAL_NAME, mInputPlayerName.getText());
 		startActivity(intent);
 	}
 }

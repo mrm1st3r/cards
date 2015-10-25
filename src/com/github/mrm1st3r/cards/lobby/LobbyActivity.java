@@ -45,15 +45,15 @@ public class LobbyActivity extends Activity {
 	/**
 	 * Bluetooth connection to game host.
 	 */
-	private SimpleBluetoothConnection conn = null;
+	private SimpleBluetoothConnection mConn = null;
 	/**
 	 * List of all connected players.
 	 */
-	private LinkedList<String> playerList = new LinkedList<String>();
+	private LinkedList<String> mPlayerList = new LinkedList<String>();
 	/**
-	 * Adapter for {@link #playerList}.
+	 * Adapter for {@link #mPlayerList}.
 	 */
-	private ArrayAdapter<String> playerListAdapter;
+	private ArrayAdapter<String> mPlayerListAdapter;
 	/**
 	 * Local player name.
 	 */
@@ -66,14 +66,14 @@ public class LobbyActivity extends Activity {
 
 		// initialize user interface
 
-		playerListAdapter = new ArrayAdapter<String>(this,
-				android.R.layout.simple_list_item_1, playerList);
+		mPlayerListAdapter = new ArrayAdapter<String>(this,
+				android.R.layout.simple_list_item_1, mPlayerList);
 		LobbyFragment lobFrag = (LobbyFragment) getFragmentManager()
 				.findFragmentById(R.id.player_list);
-		lobFrag.setAdapter(playerListAdapter);
+		lobFrag.setAdapter(mPlayerListAdapter);
 
 		// get connection to host from application
-		conn = ((Cards) getApplication()).getConnections().keySet().iterator()
+		mConn = ((Cards) getApplication()).getConnections().keySet().iterator()
 				.next();
 
 		SharedPreferences pref = getSharedPreferences(Cards.PREF_FILE,
@@ -81,10 +81,10 @@ public class LobbyActivity extends Activity {
 		mLocalName = pref.getString(Cards.PREF_PLAYER_NAME, "");
 
 		// send own name to host
-		conn.write("join " + mLocalName);
+		mConn.write("join " + mLocalName);
 
 		// register new receive handler for incoming data
-		conn.setOnReceivedHandler(new OnReceivedHandler<String>() {
+		mConn.setOnReceivedHandler(new OnReceivedHandler<String>() {
 			@Override
 			public void onReceived(final AsynchronousConnection<String> ac,
 					final String msg) {
@@ -92,7 +92,7 @@ public class LobbyActivity extends Activity {
 			}
 		});
 
-		conn.setOnConnectionChangeHandler(new OnConnectionChangeHandler() {
+		mConn.setOnConnectionChangeHandler(new OnConnectionChangeHandler() {
 			@Override
 			public void onDisconnect(final ThreadedConnection tc) {
 				runOnUiThread(new Runnable() {
@@ -103,7 +103,7 @@ public class LobbyActivity extends Activity {
 				});
 			}
 		});
-		conn.start();
+		mConn.start();
 	}
 
 	/**
@@ -119,21 +119,21 @@ public class LobbyActivity extends Activity {
 				String[] set = msg.split(" ");
 
 				if (set[0].equals("join")) {
-					playerList.add(set[1]);
-					playerListAdapter.notifyDataSetChanged();
+					mPlayerList.add(set[1]);
+					mPlayerListAdapter.notifyDataSetChanged();
 
 				} else if (set[0].equals("left")) {
-					playerList.remove(set[0]);
-					playerListAdapter.notifyDataSetChanged();
+					mPlayerList.remove(set[0]);
+					mPlayerListAdapter.notifyDataSetChanged();
 
 				} else if (set[0].equals("start")) {
 
 					Intent intent = new Intent(LobbyActivity.this,
 							ClientGameActivity.class);
-					intent.putExtra(EXTRA_PLAYER_LIST, playerList);
+					intent.putExtra(EXTRA_PLAYER_LIST, mPlayerList);
 					intent.putExtra(EXTRA_LOCAL_NAME, mLocalName);
-					conn.setOnConnectionChangeHandler(null);
-					conn.pause();
+					mConn.setOnConnectionChangeHandler(null);
+					mConn.pause();
 					startActivity(intent);
 					finish();
 				} else if (set[0].equals("quit")) {
@@ -150,13 +150,13 @@ public class LobbyActivity extends Activity {
 	private void leaveLobby() {
 		Log.d(TAG, "leaving lobby");
 
-		if (conn != null) {
-			conn.setOnConnectionChangeHandler(null);
-			conn.close();
-			conn = null;
+		if (mConn != null) {
+			mConn.setOnConnectionChangeHandler(null);
+			mConn.close();
+			mConn = null;
 		}
 		((Cards) getApplication()).getConnections().clear();
-		playerList.clear();
+		mPlayerList.clear();
 	}
 
 	@Override

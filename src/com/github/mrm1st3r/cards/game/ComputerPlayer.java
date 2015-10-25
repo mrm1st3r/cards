@@ -17,11 +17,11 @@ public class ComputerPlayer extends Player implements Runnable {
 	/**
 	 * The game object.
 	 */
-	private CardGame game;
+	private CardGame mGame;
 	/**
 	 * The last received message.
 	 */
-	private String lastMessage;
+	private String mLastMessage;
 
 	/**
 	 * Construct a new computer player.
@@ -38,7 +38,7 @@ public class ComputerPlayer extends Player implements Runnable {
 	 * @param pGame Game instance
 	 */
 	public final void setGame(final CardGame pGame) {
-		game = pGame;
+		mGame = pGame;
 	}
 	
 	@Override
@@ -46,21 +46,19 @@ public class ComputerPlayer extends Player implements Runnable {
 		try {
 			Thread.sleep(WAIT_TIME);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		if (lastMessage.equals("active")) {
-			game.handleMessage(this, "push");
+		if (mLastMessage.equals("active")) {
+			mGame.handleMessage(this, "push");
 		}
 	}
 
 	@Override
 	public final void command(final String msg) {
-		// TODO Auto-generated method stub
-		lastMessage = msg;
+		mLastMessage = msg;
 		
 		Thread t = new Thread(this);
-		t.run();
+		t.start();
 	}
 }

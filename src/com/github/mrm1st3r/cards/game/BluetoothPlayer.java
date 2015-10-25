@@ -13,7 +13,7 @@ public class BluetoothPlayer extends Player {
 	/**
 	 * The Bluetooth connection to the remote device.
 	 */
-	private final SimpleBluetoothConnection connection;
+	private final SimpleBluetoothConnection mConnection;
 
 	/**
 	 * Construct a new remote player.
@@ -26,7 +26,7 @@ public class BluetoothPlayer extends Player {
 	public BluetoothPlayer(final String pName,
 			final SimpleBluetoothConnection pConn) {
 		super(pName);
-		connection = pConn;
+		mConnection = pConn;
 	}
 
 	/**
@@ -44,7 +44,7 @@ public class BluetoothPlayer extends Player {
 	public BluetoothPlayer(final String pName, final int pHandSize,
 			final int pLifes, final SimpleBluetoothConnection pConn) {
 		super(pName, pHandSize, pLifes);
-		connection = pConn;
+		mConnection = pConn;
 	}
 
 	/**
@@ -53,11 +53,11 @@ public class BluetoothPlayer extends Player {
 	 * @return The used Bluetooth connection to the remote device
 	 */
 	public final SimpleBluetoothConnection getConnection() {
-		return connection;
+		return mConnection;
 	}
 
 	@Override
 	public final void command(final String msg) {
-		connection.write(msg);
+		mConnection.write(msg);
 	}
 }

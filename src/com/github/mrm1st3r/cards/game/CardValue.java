@@ -73,11 +73,11 @@ public enum CardValue {
 	/**
 	 * The name of the card value.
 	 */
-	private final String name;
+	private final String mName;
 	/**
 	 * The represented numerical value.
 	 */
-	private final int value;
+	private final int mValue;
 
 	/**
 	 * Construct a card value.
@@ -88,8 +88,8 @@ public enum CardValue {
 	 *            The numerical value
 	 */
 	private CardValue(final String pName, final int pValue) {
-		name = pName;
-		value = pValue;
+		mName = pName;
+		mValue = pValue;
 	}
 
 	/**
@@ -97,7 +97,7 @@ public enum CardValue {
 	 * @return The name of the card value.
 	 */
 	public String getName() {
-		return name;
+		return mName;
 	}
 
 	/**
@@ -105,7 +105,7 @@ public enum CardValue {
 	 * @return The proper numerical value.
 	 */
 	public int getValue() {
-		return value;
+		return mValue;
 	}
 
 	/**
@@ -121,7 +121,7 @@ public enum CardValue {
 		int j = 0;
 
 		for (int i = 0; i < all.length; i++) {
-			if (all[i].value >= minValue) {
+			if (all[i].mValue >= minValue) {
 				skatDeck[j++] = all[i];
 			}
 		}
@@ -138,6 +138,6 @@ public enum CardValue {
 
 	@Override
 	public String toString() {
-		return name;
+		return mName;
 	}
 }

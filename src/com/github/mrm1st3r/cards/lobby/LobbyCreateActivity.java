@@ -57,29 +57,30 @@ public class LobbyCreateActivity extends Activity {
 	/**
 	 * Background thread that will wait for incoming client connections.
 	 */
-	private ServerThread serv = null;
+	private ServerThread mServ = null;
 	/**
 	 * List of all connected players.
 	 */
-	private HashMap<SimpleBluetoothConnection, String> playerList =
+	private HashMap<SimpleBluetoothConnection, String> mPlayerList =
 			new HashMap<SimpleBluetoothConnection, String>();
 	/**
-	 * Adapter for {@link #playerList}.
+	 * Adapter for {@link #mPlayerList}.
 	 */
-	private HashMapAdapter<SimpleBluetoothConnection, String> playerListAdapter;
+	private HashMapAdapter<SimpleBluetoothConnection, String>
+			mPlayerListAdapter;
 	/**
 	 * Button that will start the actual game when there are any players
 	 * connected.
 	 */
-	private Button btnStart = null;
+	private Button mBtnStart = null;
 	/**
 	 * Local player name.
 	 */
-	private String localPlayerName;
+	private String mLocalPlayerName;
 	/**
 	 * The Bluetooth adapters enabling status before the app was started.
 	 */
-	private boolean oldBtState = false;
+	private boolean mOldBtState = false;
 
 	@Override
 	protected final void onCreate(final Bundle savedInstanceState) {
@@ -96,7 +97,7 @@ public class LobbyCreateActivity extends Activity {
 		((TextView) findViewById(R.id.txtLobbyName)).setText(BluetoothUtil
 				.getDeviceName());
 
-		oldBtState = BluetoothUtil.isEnabled();
+		mOldBtState = BluetoothUtil.isEnabled();
 		
 		BluetoothUtil.requestEnable(this, new ResultAction() {
 
@@ -130,24 +131,24 @@ public class LobbyCreateActivity extends Activity {
 	 * service for the lobby.
 	 */
 	private void createLobby() {
-		if (serv != null) {
+		if (mServ != null) {
 			// this method should only be called once.
 			return;
 		}
-		((Cards) getApplication()).setEnabled(!oldBtState);
+		((Cards) getApplication()).setEnabled(!mOldBtState);
 		// read local player name from preferences
 		SharedPreferences pref = getSharedPreferences(Cards.PREF_FILE,
 				Context.MODE_PRIVATE);
-		localPlayerName = pref.getString(Cards.PREF_PLAYER_NAME, "");
-		playerList.put(null, localPlayerName);
+		mLocalPlayerName = pref.getString(Cards.PREF_PLAYER_NAME, "");
+		mPlayerList.put(null, mLocalPlayerName);
 
-		btnStart = (Button) findViewById(R.id.btnStart);
+		mBtnStart = (Button) findViewById(R.id.btnStart);
 		LobbyFragment lobbyFragment = (LobbyFragment) getFragmentManager()
 				.findFragmentById(R.id.player_list);
 
-		playerListAdapter =
+		mPlayerListAdapter =
 				new HashMapAdapter<SimpleBluetoothConnection, String>(
-				LobbyCreateActivity.this, playerList) {
+				LobbyCreateActivity.this, mPlayerList) {
 			@Override
 			public View getView(final int pos, final View convertView,
 					final ViewGroup parent) {
@@ -167,16 +168,16 @@ public class LobbyCreateActivity extends Activity {
 			}
 
 		};
-		lobbyFragment.setAdapter(playerListAdapter);
+		lobbyFragment.setAdapter(mPlayerListAdapter);
 
-		serv = new ServerThread(getString(R.string.app_name),
+		mServ = new ServerThread(getString(R.string.app_name),
 				UUID.fromString(Cards.UUID), new OnConnectionChangeHandler() {
 					@Override
 					public void onConnect(final ThreadedConnection conn) {
 						clientConnected(conn);
 					}
 				});
-		serv.start();
+		mServ.start();
 	}
 
 	/**
@@ -190,14 +191,14 @@ public class LobbyCreateActivity extends Activity {
 		SimpleBluetoothConnection conn = (SimpleBluetoothConnection) tc;
 
 		// do not accept new connections when maximum number is reached.
-		if (playerList.size() == MAXIMUM_REMOTE_PLAYER_COUNT) {
+		if (mPlayerList.size() == MAXIMUM_REMOTE_PLAYER_COUNT) {
 			conn.write("quit");
 			conn.close();
 			return;
 		}
 		
 		// send player list to new player
-		for (String player : playerList.values()) {
+		for (String player : mPlayerList.values()) {
 			conn.write("join " + player);
 		}
 
@@ -228,19 +229,19 @@ public class LobbyCreateActivity extends Activity {
 	 */
 	private void playerLeft(final ThreadedConnection conn) {
 		// temporarily save player name for notification
-		String leftPlayer = playerList.get(conn);
+		String leftPlayer = mPlayerList.get(conn);
 
-		playerList.remove(conn);
+		mPlayerList.remove(conn);
 
 		// update user interface
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				playerListAdapter.notifyDataSetChanged();
+				mPlayerListAdapter.notifyDataSetChanged();
 
 				// can't start game with no other players
-				if (playerList.size() == 0) {
-					btnStart.setEnabled(false);
+				if (mPlayerList.size() == 0) {
+					mBtnStart.setEnabled(false);
 				}
 			}
 		});
@@ -269,20 +270,21 @@ public class LobbyCreateActivity extends Activity {
 			if (set[1].length() == 0) {
 				return;
 			}
-			playerList.put(conn, msg.substring(namePos));
+			mPlayerList.put(conn, msg.substring(namePos));
 			// send new player name to other players
 			broadcast(msg);
 
 			runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
-					btnStart.setEnabled(true);
+					mBtnStart.setEnabled(true);
 					Log.d(TAG, "received: " + msg);
-					playerListAdapter.notifyDataSetChanged();
+					mPlayerListAdapter.notifyDataSetChanged();
 				}
 			});
 
-		} else if (set[0].equals("left") && set[1].equals(playerList.get(ac))) {
+		} else if (set[0].equals("left") && set[1].equals(
+				mPlayerList.get(ac))) {
 			// verify correct player name on leave
 
 			playerLeft((SimpleBluetoothConnection) ac);
@@ -298,7 +300,7 @@ public class LobbyCreateActivity extends Activity {
 	 *            Message to send
 	 */
 	private void broadcast(final String msg) {
-		for (SimpleBluetoothConnection c : playerList.keySet()) {
+		for (SimpleBluetoothConnection c : mPlayerList.keySet()) {
 			if (c != null) {
 				c.write(msg);
 			}
@@ -313,20 +315,20 @@ public class LobbyCreateActivity extends Activity {
 	 *            Calling user interface element
 	 */
 	public final void start(final View v) {
-		((Cards) getApplication()).setConnections(playerList);
+		((Cards) getApplication()).setConnections(mPlayerList);
 
-		playerList.remove(null);
+		mPlayerList.remove(null);
 
 		// send start command to clients and pause connections
-		for (SimpleBluetoothConnection conn : playerList.keySet()) {
+		for (SimpleBluetoothConnection conn : mPlayerList.keySet()) {
 			conn.write("start");
 			conn.pause();
 		}
 		// stop listening for new connections.
-		serv.close();
+		mServ.close();
 
 		Intent intent = new Intent(this, HostGameActivity.class);
-		intent.putExtra(Constant.EXTRA_LOCAL_NAME, localPlayerName);
+		intent.putExtra(Constant.EXTRA_LOCAL_NAME, mLocalPlayerName);
 		startActivity(intent);
 		finish();
 	}
@@ -335,15 +337,15 @@ public class LobbyCreateActivity extends Activity {
 	 * Close the server thread and close all client connections.
 	 */
 	private void cancelLobby() {
-		if (serv != null) {
-			serv.close();
+		if (mServ != null) {
+			mServ.close();
 		}
-		playerList.remove(null);
-		for (SimpleBluetoothConnection conn : playerList.keySet()) {
+		mPlayerList.remove(null);
+		for (SimpleBluetoothConnection conn : mPlayerList.keySet()) {
 			conn.write("quit");
 			conn.close();
 		}
-		playerList.clear();
+		mPlayerList.clear();
 	}
 
 	/**

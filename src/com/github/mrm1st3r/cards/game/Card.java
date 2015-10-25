@@ -11,15 +11,15 @@ public class Card {
 	/**
 	 * The cards value.
 	 */
-	private CardValue value;
+	private final CardValue mValue;
 	/**
 	 * The cards color.
 	 */
-	private CardColor color;
+	private final CardColor mColor;
 	/**
 	 * The cards image name.
 	 */
-	private String imageName;
+	private final String mImageName;
 
 	/**
 	 * Construct a new playing card.
@@ -30,9 +30,9 @@ public class Card {
 	 *            The cards value
 	 */
 	public Card(final CardColor pColor, final CardValue pValue) {
-		color = pColor;
-		value = pValue;
-		imageName = "card_" + color + "_" + value;
+		mColor = pColor;
+		mValue = pValue;
+		mImageName = "card_" + mColor + "_" + mValue;
 	}
 
 	/**
@@ -40,7 +40,7 @@ public class Card {
 	 * @return The cards color
 	 */
 	public final CardColor getColor() {
-		return color;
+		return mColor;
 	}
 
 	/**
@@ -48,7 +48,7 @@ public class Card {
 	 * @return The cards value
 	 */
 	public final CardValue getValue() {
-		return value;
+		return mValue;
 	}
 
 	/**
@@ -57,7 +57,7 @@ public class Card {
 	 * @return The cards integer value
 	 */
 	public final int getIntValue() {
-		return value.getValue();
+		return mValue.getValue();
 	}
 
 	/**
@@ -65,11 +65,11 @@ public class Card {
 	 * @return The name of the image representing this card
 	 */
 	public final String getImageName() {
-		return imageName;
+		return mImageName;
 	}
 
 	@Override
 	public final String toString() {
-		return value + " of " + color;
+		return mValue + " of " + mColor;
 	}
 }

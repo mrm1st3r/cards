@@ -23,17 +23,17 @@ public class LobbyFragment extends Fragment {
 	/**
 	 * List displaying all players.
 	 */
-	private ListView list;
+	private ListView mList;
 
 	@Override
 	public final View onCreateView(final LayoutInflater inflater,
 			final ViewGroup container, final Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.fragment_lobby, container, false);
-		list = (ListView) v;
+		mList = (ListView) v;
 
 		TextView header = new TextView(getActivity());
 		header.setText(getActivity().getString(R.string.connected_players));
-		list.addHeaderView(header);
+		mList.addHeaderView(header);
 		return v;
 	}
 
@@ -44,6 +44,6 @@ public class LobbyFragment extends Fragment {
 	 *            Player list wrapper adapter
 	 */
 	public final void setAdapter(final BaseAdapter adapter) {
-		list.setAdapter(adapter);
+		mList.setAdapter(adapter);
 	}
 }
