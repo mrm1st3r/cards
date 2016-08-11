@@ -26,3 +26,6 @@ proguard/
 *.log
 
 keystore/*
+
+.idea/
+*.iml
