@@ -4,10 +4,6 @@
     android:versionCode="1"
     android:versionName="1.0" >
 
-    <uses-sdk
-        android:minSdkVersion="15"
-        android:targetSdkVersion="15" />
-
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 
@@ -51,7 +47,7 @@
             android:configChanges="orientation|keyboardHidden|screenSize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.github.mrm1st3r.cards.LobbyJoinActivity" />
+                android:value="com.github.mrm1st3r.cards.lobby.LobbyJoinActivity" />
         </activity>
         <activity
             android:name="com.github.mrm1st3r.cards.game.ui.HostGameActivity"
