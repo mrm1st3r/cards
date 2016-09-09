@@ -1,4 +1,4 @@
-package com.github.mrm1st3r.cards;
+package com.github.mrm1st3r.cards.activity;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -11,9 +11,9 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
 
-import com.github.mrm1st3r.cards.game.ui.BotGameActivity;
-import com.github.mrm1st3r.cards.lobby.LobbyCreateActivity;
-import com.github.mrm1st3r.cards.lobby.LobbyJoinActivity;
+import com.github.mrm1st3r.cards.Cards;
+import com.github.mrm1st3r.cards.Constant;
+import com.github.mrm1st3r.cards.R;
 
 /**
  * This is the main activity that is started when the app gets started. It

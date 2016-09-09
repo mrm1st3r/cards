@@ -1,10 +1,9 @@
-package com.github.mrm1st3r.cards.game.ui;
+package com.github.mrm1st3r.cards.activity;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.HashMap;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -63,7 +62,7 @@ public class HostGameActivity extends GameActivity {
 	public final void newGame() {
 
 		SharedPreferences pref = getSharedPreferences(Cards.PREF_FILE,
-				Context.MODE_PRIVATE);
+				MODE_PRIVATE);
 		String localName = pref.getString(Cards.PREF_PLAYER_NAME, "");
 
 		HashMap<SimpleBluetoothConnection, String> connections =

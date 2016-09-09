@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/background"
     android:keepScreenOn="true"
-    tools:context=".game.ui.GameActivity" >
+    tools:context=".activity.GameActivity" >
 
     <LinearLayout
         android:id="@+id/lay_rivals"

@@ -1,6 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.github.mrm1st3r.cards.RulesActivity" >
+    tools:context=".activity.RulesActivity" >
 
     <item
         android:id="@+id/action_settings"

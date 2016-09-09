@@ -18,7 +18,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".MainActivity"
+            android:name=".activity.MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,58 +27,58 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".lobby.LobbyCreateActivity"
+            android:name=".activity.LobbyCreateActivity"
             android:label="@string/title_activity_lobby_create"
             android:configChanges="orientation|keyboardHidden|screenSize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.github.mrm1st3r.cards.MainActivity" />
+                android:value=".activity.MainActivity" />
         </activity>
         <activity
-            android:name=".lobby.LobbyJoinActivity"
+            android:name=".activity.LobbyJoinActivity"
             android:label="@string/title_activity_lobby_join" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.github.mrm1st3r.cards.MainActivity" />
+                android:value=".activity.MainActivity" />
         </activity>
         <activity
-            android:name=".lobby.LobbyActivity"
+            android:name=".activity.LobbyActivity"
             android:label="@string/title_activity_lobby"
             android:configChanges="orientation|keyboardHidden|screenSize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.github.mrm1st3r.cards.lobby.LobbyJoinActivity" />
+                android:value=".activity.LobbyJoinActivity" />
         </activity>
         <activity
-            android:name="com.github.mrm1st3r.cards.game.ui.HostGameActivity"
+            android:name=".activity.HostGameActivity"
             android:label="@string/title_activity_game" 
             android:configChanges="orientation|keyboardHidden|screenSize" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.github.mrm1st3r.cards.MainActivity" />
+                android:value=".activity.MainActivity" />
         </activity>
         <activity
-            android:name="com.github.mrm1st3r.cards.game.ui.ClientGameActivity"
+            android:name=".activity.ClientGameActivity"
             android:label="@string/title_activity_game" 
             android:configChanges="orientation|keyboardHidden|screenSize" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.github.mrm1st3r.cards.MainActivity" />
+                android:value=".activity.MainActivity" />
         </activity>
         <activity
-            android:name="com.github.mrm1st3r.cards.game.ui.BotGameActivity"
+            android:name=".activity.BotGameActivity"
             android:label="@string/title_activity_game" 
             android:configChanges="orientation|keyboardHidden|screenSize" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.github.mrm1st3r.cards.MainActivity" />
+                android:value=".activity.MainActivity" />
         </activity>
         <activity
-            android:name=".RulesActivity"
+            android:name=".activity.RulesActivity"
             android:label="@string/title_activity_rules" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.github.mrm1st3r.cards.MainActivity" />
+                android:value=".activity.MainActivity" />
         </activity>
     </application>
 

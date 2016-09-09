@@ -1,6 +1,6 @@
 package com.github.mrm1st3r.cards.game;
 
-import com.github.mrm1st3r.cards.game.ui.GameActivity;
+import com.github.mrm1st3r.cards.activity.GameActivity;
 
 /**
  * This class describes a local player.

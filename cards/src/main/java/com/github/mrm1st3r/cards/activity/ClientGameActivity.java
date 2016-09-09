@@ -1,4 +1,4 @@
-package com.github.mrm1st3r.cards.game.ui;
+package com.github.mrm1st3r.cards.activity;
 
 import java.util.Collection;
 
@@ -10,7 +10,6 @@ import android.os.Bundle;
 
 import com.github.mrm1st3r.cards.Cards;
 import com.github.mrm1st3r.cards.R;
-import com.github.mrm1st3r.cards.lobby.LobbyActivity;
 import com.github.mrm1st3r.libdroid.connect.AsynchronousConnection;
 import com.github.mrm1st3r.libdroid.connect.OnConnectionChangeHandler;
 import com.github.mrm1st3r.libdroid.connect.OnReceivedHandler;

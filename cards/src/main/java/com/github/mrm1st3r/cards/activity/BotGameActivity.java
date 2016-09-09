@@ -1,4 +1,4 @@
-package com.github.mrm1st3r.cards.game.ui;
+package com.github.mrm1st3r.cards.activity;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.LinkedList;

@@ -1,4 +1,4 @@
-package com.github.mrm1st3r.cards.lobby;
+package com.github.mrm1st3r.cards.activity;
 
 import java.util.LinkedList;
 
@@ -13,7 +13,7 @@ import android.widget.ArrayAdapter;
 
 import com.github.mrm1st3r.cards.Cards;
 import com.github.mrm1st3r.cards.R;
-import com.github.mrm1st3r.cards.game.ui.ClientGameActivity;
+import com.github.mrm1st3r.cards.lobby.LobbyFragment;
 import com.github.mrm1st3r.libdroid.connect.AsynchronousConnection;
 import com.github.mrm1st3r.libdroid.connect.OnConnectionChangeHandler;
 import com.github.mrm1st3r.libdroid.connect.OnReceivedHandler;

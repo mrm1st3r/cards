@@ -1,4 +1,4 @@
-package com.github.mrm1st3r.cards.lobby;
+package com.github.mrm1st3r.cards.activity;
 
 import java.util.LinkedList;
 import java.util.UUID;

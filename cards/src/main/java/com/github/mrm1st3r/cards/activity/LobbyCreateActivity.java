@@ -1,4 +1,4 @@
-package com.github.mrm1st3r.cards.lobby;
+package com.github.mrm1st3r.cards.activity;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -22,7 +22,7 @@ import android.widget.Toast;
 import com.github.mrm1st3r.cards.Cards;
 import com.github.mrm1st3r.cards.Constant;
 import com.github.mrm1st3r.cards.R;
-import com.github.mrm1st3r.cards.game.ui.HostGameActivity;
+import com.github.mrm1st3r.cards.lobby.LobbyFragment;
 import com.github.mrm1st3r.libdroid.connect.AsynchronousConnection;
 import com.github.mrm1st3r.libdroid.connect.OnConnectionChangeHandler;
 import com.github.mrm1st3r.libdroid.connect.OnReceivedHandler;
