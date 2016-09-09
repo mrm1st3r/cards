@@ -19,44 +19,39 @@ import com.github.mrm1st3r.cards.lobby.LobbyJoinActivity;
  * This is the main activity that is started when the app gets started. It
  * contains a player name input field and buttons to reach all of the apps
  * functions.
- * 
- * @author Lukas 'mrm1st3r' Taake
- * @version 1.0
+ *
+ * @author Lukas Taake
  */
 public class MainActivity extends Activity {
 
-	/**
-	 * Debug tag.
-	 */
-	@SuppressWarnings("unused")
-	private static final String TAG = MainActivity.class.getSimpleName();
-	/**
-	 * Preferences for player name.
-	 */
-	private SharedPreferences mPrefs;
-	/**
-	 * Input field for player name.
-	 */
-	private EditText mInputPlayerName;
+	private SharedPreferences prefs;
+
+	private EditText playerNameInput;
 
 	@Override
 	protected final void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		// read currently saved player name
-		mPrefs = getSharedPreferences(Cards.PREF_FILE, Context.MODE_PRIVATE);
-		// use null as default value to be able to immediately save
-		// default value to prevent empty user name.
-		String name = mPrefs.getString(Cards.PREF_PLAYER_NAME, null);
+
+		prefs = getSharedPreferences(Cards.PREF_FILE, Context.MODE_PRIVATE);
+		String name = prefs.getString(Cards.PREF_PLAYER_NAME, null);
 
 		if (name == null) {
-			name = BluetoothAdapter.getDefaultAdapter().getName();
+			name = getDefaultPlayerName();
 			changePlayerName(name);
 		}
 
-		mInputPlayerName = (EditText) findViewById(R.id.input_player_name);
-		mInputPlayerName.setText(name);
-		mInputPlayerName.addTextChangedListener(new TextWatcher() {
+		setupNameInput(name);
+	}
+
+	private String getDefaultPlayerName() {
+		return BluetoothAdapter.getDefaultAdapter().getName();
+	}
+
+	private void setupNameInput(String name) {
+		playerNameInput = (EditText) findViewById(R.id.input_player_name);
+		playerNameInput.setText(name);
+		playerNameInput.addTextChangedListener(new TextWatcher() {
 
 			@Override
 			public void afterTextChanged(final Editable input) {
@@ -75,45 +70,35 @@ public class MainActivity extends Activity {
 		});
 	}
 
-	/**
-	 * Write a new player name to preferences.
-	 * 
-	 * @param newName
-	 *            Player name to wrote
-	 */
 	private void changePlayerName(final String newName) {
-		SharedPreferences.Editor edit = mPrefs.edit();
+		SharedPreferences.Editor edit = prefs.edit();
 
 		edit.putString(Cards.PREF_PLAYER_NAME, newName);
 		edit.commit();
 	}
 
-	/**
-	 * React to a user input and start a new activity.
-	 * 
-	 * @param v
-	 *            The button that was pressed
-	 */
-	public final void onButtonPressed(final View v) {
-		Class<? extends Activity> activity = null;
-		int id = v.getId();
+	public final void onButtonPressed(final View button) {
+		Class<? extends Activity> activity;
+		int buttonId = button.getId();
 
-		if (id == R.id.btn_new_game) {
-			activity = LobbyCreateActivity.class;
-			
-		} else if (id == R.id.btn_join_game) {
-			activity = LobbyJoinActivity.class;
-			
-		} else if (id == R.id.btn_bot_game) {
-			activity = BotGameActivity.class;
-		} else if (id == R.id.btn_rules) {
-			activity = RulesActivity.class;
-			
-		} else {
-			return;
+		switch(buttonId) {
+			case R.id.btn_new_game:
+				activity = LobbyCreateActivity.class;
+				break;
+			case R.id.btn_join_game:
+				activity = LobbyJoinActivity.class;
+				break;
+			case R.id.btn_bot_game:
+				activity = BotGameActivity.class;
+				break;
+			case R.id.btn_rules:
+				activity = RulesActivity.class;
+				break;
+			default:
+				return;
 		}
 		Intent intent = new Intent(this, activity);
-		intent.putExtra(Constant.EXTRA_LOCAL_NAME, mInputPlayerName.getText());
+		intent.putExtra(Constant.EXTRA_LOCAL_NAME, playerNameInput.getText());
 		startActivity(intent);
 	}
 }
