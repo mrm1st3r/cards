@@ -25,22 +25,15 @@ import com.github.mrm1st3r.cards.R;
 public class MainActivity extends Activity {
 
 	private SharedPreferences prefs;
-
 	private EditText playerNameInput;
 
 	@Override
-	protected final void onCreate(final Bundle savedInstanceState) {
+	protected final void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
 		prefs = getSharedPreferences(Cards.PREF_FILE, Context.MODE_PRIVATE);
-		String name = prefs.getString(Cards.PREF_PLAYER_NAME, null);
-
-		if (name == null) {
-			name = getDefaultPlayerName();
-			changePlayerName(name);
-		}
-
+		String name = prefs.getString(Cards.PREF_PLAYER_NAME, getDefaultPlayerName());
 		setupNameInput(name);
 	}
 
@@ -52,36 +45,28 @@ public class MainActivity extends Activity {
 		playerNameInput = (EditText) findViewById(R.id.input_player_name);
 		playerNameInput.setText(name);
 		playerNameInput.addTextChangedListener(new TextWatcher() {
-
 			@Override
-			public void afterTextChanged(final Editable input) {
+			public void afterTextChanged(Editable input) {
 			}
-
 			@Override
-			public void beforeTextChanged(final CharSequence arg0,
-					final int arg1, final int arg2, final int arg3) {
+			public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
 			}
-
 			@Override
-			public void onTextChanged(final CharSequence name, final int arg1,
-					final int arg2, final int arg3) {
+			public void onTextChanged(CharSequence name, int arg1, int arg2, int arg3) {
 				changePlayerName(name.toString());
 			}
 		});
 	}
 
-	private void changePlayerName(final String newName) {
+	private void changePlayerName(String newName) {
 		SharedPreferences.Editor edit = prefs.edit();
-
 		edit.putString(Cards.PREF_PLAYER_NAME, newName);
-		edit.commit();
+		edit.apply();
 	}
 
-	public final void onButtonPressed(final View button) {
+	public final void onButtonPressed(View button) {
 		Class<? extends Activity> activity;
-		int buttonId = button.getId();
-
-		switch(buttonId) {
+		switch(button.getId()) {
 			case R.id.btn_new_game:
 				activity = LobbyCreateActivity.class;
 				break;

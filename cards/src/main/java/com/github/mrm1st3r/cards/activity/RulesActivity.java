@@ -7,14 +7,13 @@ import com.github.mrm1st3r.cards.R;
 
 /**
  * Activity that shows the game rules.
- * 
- * @author Lukas 'mrm1st3r' Taake
- * @version 1.0
+ *
+ * @author Lukas Taake
  */
 public class RulesActivity extends Activity {
 
 	@Override
-	protected final void onCreate(final Bundle savedInstanceState) {
+	protected final void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_rules);
 	}
