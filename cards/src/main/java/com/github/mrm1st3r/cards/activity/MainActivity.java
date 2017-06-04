@@ -12,15 +12,12 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.github.mrm1st3r.cards.Cards;
-import com.github.mrm1st3r.cards.Constant;
 import com.github.mrm1st3r.cards.R;
 
 /**
  * This is the main activity that is started when the app gets started. It
  * contains a player name input field and buttons to reach all of the apps
  * functions.
- *
- * @author Lukas Taake
  */
 public class MainActivity extends Activity {
 
@@ -83,7 +80,7 @@ public class MainActivity extends Activity {
 				return;
 		}
 		Intent intent = new Intent(this, activity);
-		intent.putExtra(Constant.EXTRA_LOCAL_NAME, playerNameInput.getText());
+		intent.putExtra(Cards.EXTRA_LOCAL_NAME, playerNameInput.getText());
 		startActivity(intent);
 	}
 }

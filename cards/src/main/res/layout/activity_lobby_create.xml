@@ -37,6 +37,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/labelLobbyName"
         android:layout_above="@id/btnStart"
-        android:layout_marginTop="5dp" />
+        android:layout_marginTop="5dp"
+        tools:layout="@layout/fragment_lobby" />
 
 </RelativeLayout>

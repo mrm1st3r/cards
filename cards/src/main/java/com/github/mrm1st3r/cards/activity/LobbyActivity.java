@@ -24,77 +24,49 @@ import com.github.mrm1st3r.libdroid.connect.bluetooth.SimpleBluetoothConnection;
  * This activity shows all players who are connected in this lobby and will
  * start the actual game activity when receiving the appropriate command from
  * the game host.
- * 
- * @author Lukas 'mrm1st3r' Taake
- * @version 1.0
  */
 public class LobbyActivity extends Activity {
 
-	/**
-	 * Debug tag.
-	 */
-	private static final String TAG = LobbyActivity.class.getSimpleName();
-	/**
-	 * Extra field to hand over the player list to the game activity.
-	 */
 	public static final String EXTRA_PLAYER_LIST = "EXTRA_PLAYER_LIST";
-	/**
-	 * Extra field for local player name.
-	 */
 	public static final String EXTRA_LOCAL_NAME  = "EXTRA_LOCAL_NAME";
-	/**
-	 * Bluetooth connection to game host.
-	 */
-	private SimpleBluetoothConnection mConn = null;
-	/**
-	 * List of all connected players.
-	 */
-	private LinkedList<String> mPlayerList = new LinkedList<String>();
-	/**
-	 * Adapter for {@link #mPlayerList}.
-	 */
-	private ArrayAdapter<String> mPlayerListAdapter;
-	/**
-	 * Local player name.
-	 */
-	private String mLocalName;
+
+	private static final String TAG = LobbyActivity.class.getSimpleName();
+
+	private SimpleBluetoothConnection connection = null;
+	private LinkedList<String> connectedPlayers = new LinkedList<>();
+	private ArrayAdapter<String> connectedPlayersAdapter;
+	private String localPlayerName;
 
 	@Override
-	protected final void onCreate(final Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_lobby);
+		initUi();
+		setupConnection();
+	}
 
-		// initialize user interface
+	private void initUi() {
+		connectedPlayersAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, connectedPlayers);
+		LobbyFragment lobFrag = (LobbyFragment) getFragmentManager().findFragmentById(R.id.player_list);
+		lobFrag.setAdapter(connectedPlayersAdapter);
+	}
 
-		mPlayerListAdapter = new ArrayAdapter<String>(this,
-				android.R.layout.simple_list_item_1, mPlayerList);
-		LobbyFragment lobFrag = (LobbyFragment) getFragmentManager()
-				.findFragmentById(R.id.player_list);
-		lobFrag.setAdapter(mPlayerListAdapter);
+	private void setupConnection() {
+		connection = ((Cards) getApplication()).getConnections().keySet().iterator().next();
+		SharedPreferences pref = getSharedPreferences(Cards.PREF_FILE, Context.MODE_PRIVATE);
+		localPlayerName = pref.getString(Cards.PREF_PLAYER_NAME, "");
+		connection.write("join " + localPlayerName);
 
-		// get connection to host from application
-		mConn = ((Cards) getApplication()).getConnections().keySet().iterator()
-				.next();
-
-		SharedPreferences pref = getSharedPreferences(Cards.PREF_FILE,
-				Context.MODE_PRIVATE);
-		mLocalName = pref.getString(Cards.PREF_PLAYER_NAME, "");
-
-		// send own name to host
-		mConn.write("join " + mLocalName);
-
-		// register new receive handler for incoming data
-		mConn.setOnReceivedHandler(new OnReceivedHandler<String>() {
+		connection.setOnReceivedHandler(new OnReceivedHandler<String>() {
 			@Override
-			public void onReceived(final AsynchronousConnection<String> ac,
-					final String msg) {
+			public void onReceived(AsynchronousConnection<String> ac, String msg) {
 				handleIncomingMessage(msg);
 			}
 		});
 
-		mConn.setOnConnectionChangeHandler(new OnConnectionChangeHandler() {
+		connection.setOnConnectionChangeHandler(new OnConnectionChangeHandler() {
 			@Override
-			public void onDisconnect(final ThreadedConnection tc) {
+			public void onDisconnect(ThreadedConnection tc) {
 				runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
@@ -103,76 +75,64 @@ public class LobbyActivity extends Activity {
 				});
 			}
 		});
-		mConn.start();
+		connection.start();
 	}
 
-	/**
-	 * Handle incoming messages.
-	 * 
-	 * @param msg
-	 *            incoming message
-	 */
 	private void handleIncomingMessage(final String msg) {
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
 				String[] set = msg.split(" ");
-
-				if (set[0].equals("join")) {
-					mPlayerList.add(set[1]);
-					mPlayerListAdapter.notifyDataSetChanged();
-
-				} else if (set[0].equals("left")) {
-					mPlayerList.remove(set[0]);
-					mPlayerListAdapter.notifyDataSetChanged();
-
-				} else if (set[0].equals("start")) {
-
-					Intent intent = new Intent(LobbyActivity.this,
-							ClientGameActivity.class);
-					intent.putExtra(EXTRA_PLAYER_LIST, mPlayerList);
-					intent.putExtra(EXTRA_LOCAL_NAME, mLocalName);
-					mConn.setOnConnectionChangeHandler(null);
-					mConn.pause();
-					startActivity(intent);
-					finish();
-				} else if (set[0].equals("quit")) {
-					onBackPressed();
+				switch (set[0]) {
+					case "join":
+						connectedPlayers.add(set[1]);
+						connectedPlayersAdapter.notifyDataSetChanged();
+						break;
+					case "left":
+						connectedPlayers.remove(set[0]);
+						connectedPlayersAdapter.notifyDataSetChanged();
+						break;
+					case "start":
+						Intent intent = new Intent(LobbyActivity.this, ClientGameActivity.class);
+						intent.putExtra(EXTRA_PLAYER_LIST, connectedPlayers);
+						intent.putExtra(EXTRA_LOCAL_NAME, localPlayerName);
+						connection.setOnConnectionChangeHandler(null);
+						connection.pause();
+						startActivity(intent);
+						finish();
+						break;
+					case "quit":
+						onBackPressed();
+						break;
 				}
 			}
 		});
 	}
 
-	/**
-	 * Close connection to game host and unregister connection change handler to
-	 * prevent any double quitting.
-	 */
 	private void leaveLobby() {
 		Log.d(TAG, "leaving lobby");
-
-		if (mConn != null) {
-			mConn.setOnConnectionChangeHandler(null);
-			mConn.close();
-			mConn = null;
+		if (connection != null) {
+			connection.setOnConnectionChangeHandler(null);
+			connection.close();
+			connection = null;
 		}
 		((Cards) getApplication()).getConnections().clear();
-		mPlayerList.clear();
+		connectedPlayers.clear();
 	}
 
 	@Override
-	public final void onDestroy() {
+	public void onDestroy() {
 		super.onDestroy();
 	}
 
 	@Override
-	public final boolean onCreateOptionsMenu(final Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
+	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.lobby, menu);
 		return true;
 	}
 
 	@Override
-	public final void onBackPressed() {
+	public void onBackPressed() {
 		super.onBackPressed();
 		leaveLobby();
 	}

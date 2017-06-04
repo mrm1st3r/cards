@@ -13,6 +13,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,102 +37,54 @@ import com.github.mrm1st3r.libdroid.util.ResultAction;
 /**
  * This activity lists all currently available bluetooth devices and gives the
  * user the ability to connect to one.
- * 
- * @author Lukas 'mrm1st3r' Taake
- * @version 1.0
  */
 public class LobbyJoinActivity extends Activity {
 
-	/**
-	 * Debug tag.
-	 */
 	private static final String TAG = LobbyJoinActivity.class.getSimpleName();
-	/**
-	 * Adapter for remote device list.
-	 */
-	private ArrayAdapter<BluetoothDevice> mDeviceAdapter;
-	/**
-	 * List holding all available remote devices.
-	 */
-	private LinkedList<BluetoothDevice> mDeviceList;
-	/**
-	 * List that views all available remote devices.
-	 */
-	private ListView mDeviceListView;
-	/**
-	 * Worker thread that will try to establish a connection to a selected
-	 * remote device.
-	 */
-	private ClientThread mConnector = null;
-	/**
-	 * Button to reactivate Bluetooth discovery and to show current discovery
-	 * status.
-	 */
-	private Button mBtnRefresh = null;
-	/**
-	 * Dialog that is shown while a new connection is being established.
-	 */
-	private ProgressDialog mDlgJoin = null;
-	/**
-	 * The Bluetooth adapters enabling status before the app was started.
-	 */
-	private boolean mOldBtState = false;
+	private LinkedList<BluetoothDevice> removeDevices;
+	private ArrayAdapter<BluetoothDevice> removeDevicesAdapter;
+	private ClientThread connectorThread = null;
+	private Button listRefreshButton = null;
+	private ProgressDialog joinDialog = null;
 
-	/**
-	 * Receiver that will receive any discovery results and status changes.
-	 */
-	private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+	private final BroadcastReceiver connectionEventReceiver = new BroadcastReceiver() {
 		@Override
-		public void onReceive(final Context context, final Intent intent) {
+		public void onReceive(Context context, Intent intent) {
 			String action = intent.getAction();
-
 			if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
-				mBtnRefresh.setEnabled(true);
-				mBtnRefresh.setText(getResources().getString(R.string.refresh));
+				listRefreshButton.setEnabled(true);
+				listRefreshButton.setText(getResources().getString(R.string.refresh));
 
 			} else if (!BluetoothDevice.ACTION_FOUND.equals(action)) {
 				// theoretically there should be no other broadcasts
 				// received here. Just in case.
 				return;
 			}
-
-			// Get the BluetoothDevice object from the Intent
-			BluetoothDevice device = intent
-					.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-
+			BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 			if (device == null) {
 				return;
 			}
-			Log.d(TAG, "Found new device: " + device.getAddress() + " / "
-					+ device.getName());
-
-			mDeviceList.add(device);
-			mDeviceAdapter.notifyDataSetChanged();
+			Log.d(TAG, String.format("Found new device: %s / %s", device.getAddress(), device.getName()));
+			removeDevices.add(device);
+			removeDevicesAdapter.notifyDataSetChanged();
 		}
 	};
 
 	@Override
-	protected final void onCreate(final Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_lobby_join);
-
-		// go back to start if bluetooth is not supported
 		if (!BluetoothUtil.isSupported()) {
 			Toast.makeText(this, getString(R.string.bluetooth_not_supported),
 					Toast.LENGTH_LONG).show();
 			cancelSearch();
 		}
-
-		mOldBtState = BluetoothUtil.isEnabled();
 		BluetoothUtil.requestEnable(this, new ResultAction() {
-
 			@Override
 			public void onSuccess() {
-				// user interface won't be needed if bluetooth isn't enabled
 				initUi();
 				searchForLobbies();
 			}
-
 			@Override
 			public void onFailure() {
 				onBackPressed();
@@ -139,147 +92,100 @@ public class LobbyJoinActivity extends Activity {
 		});
 	}
 
-	/**
-	 * Initialize user interface components.
-	 */
 	private void initUi() {
-		mBtnRefresh = (Button) findViewById(R.id.btnRefresh);
-		mDeviceListView = (ListView) findViewById(R.id.lobbyList);
-
-		mDeviceList = new LinkedList<BluetoothDevice>();
-
-		// override ArrayAdapter with custom getView() method
-		// to set BluetoothDevice.getName() as text
-		mDeviceAdapter = new ArrayAdapter<BluetoothDevice>(this,
-				android.R.layout.simple_list_item_1, mDeviceList) {
-
+		listRefreshButton = (Button) findViewById(R.id.btnRefresh);
+		ListView mDeviceListView = (ListView) findViewById(R.id.lobbyList);
+		removeDevices = new LinkedList<>();
+		removeDevicesAdapter = new ArrayAdapter<BluetoothDevice>(this,
+				android.R.layout.simple_list_item_1, removeDevices) {
+			@NonNull
 			@Override
-			public View getView(final int pos, final View vOld,
-					final ViewGroup parent) {
-
+			public View getView(int pos, View vOld, @NonNull ViewGroup parent) {
 				View vNew = super.getView(pos, vOld, parent);
 				((TextView) vNew).setText(getItem(pos).getName());
 				return vNew;
 			}
 		};
-		mDeviceListView.setAdapter(mDeviceAdapter);
-
+		mDeviceListView.setAdapter(removeDevicesAdapter);
 		mDeviceListView.setOnItemClickListener(new OnItemClickListener() {
-
 			@Override
-			public void onItemClick(final AdapterView<?> parent,
-					final View view, final int pos, final long id) {
-				joinLobby(mDeviceAdapter.getItem(pos));
+			public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
+				joinLobby(removeDevicesAdapter.getItem(pos));
 			}
-
 		});
-		
-		((Cards) getApplication()).setEnabled(!mOldBtState);
 	}
 
-	/**
-	 * Register {@link #mReceiver} and start a new Bluetooth discovery.
-	 */
 	private void searchForLobbies() {
 		Log.d(TAG, "searching for new devices...");
-
 		IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
 		filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-		registerReceiver(mReceiver, filter);
-
+		registerReceiver(connectionEventReceiver, filter);
 		refresh(null);
 	}
 
-	/**
-	 * Cancel the current search process.
-	 */
 	private void cancelSearch() {
 		Log.d(TAG, "canceling search process");
 		try {
-			unregisterReceiver(mReceiver);
-		} catch (IllegalArgumentException e) {
-			Log.d(TAG, "");
-		}
+			unregisterReceiver(connectionEventReceiver);
+		} catch (IllegalArgumentException ignored) {}
 		BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
 	}
 
-	/**
-	 * Reactivate Bluetooth discovery.
-	 * 
-	 * @param v
-	 *            Button that was pressed
-	 */
-	public final void refresh(final View v) {
+	public void refresh(View v) {
 		BluetoothAdapter self = BluetoothAdapter.getDefaultAdapter();
 		self.cancelDiscovery();
-
-		mDeviceList.clear();
-		mDeviceAdapter.notifyDataSetChanged();
-
+		removeDevices.clear();
+		removeDevicesAdapter.notifyDataSetChanged();
 		if (!self.startDiscovery()) {
 			Toast.makeText(this, getString(R.string.refresh_failed),
 					Toast.LENGTH_SHORT).show();
 			Log.w(TAG, "Failed to start bluetooth discovery");
 		} else {
-			mBtnRefresh.setEnabled(false);
-			mBtnRefresh.setText(getResources().getString(R.string.refreshing));
+			listRefreshButton.setEnabled(false);
+			listRefreshButton.setText(getResources().getString(R.string.refreshing));
 		}
 	}
 
-	/**
-	 * Try to connect to a discovered remote device.
-	 * 
-	 * @param dev
-	 *            Remote device to connect to
-	 */
-	private void joinLobby(final BluetoothDevice dev) {
+	private void joinLobby(BluetoothDevice dev) {
 		Log.d(TAG, "connecting to " + dev.getAddress());
-
-		mDlgJoin = new ProgressDialog(this);
-		mDlgJoin.setCancelable(true);
-		mDlgJoin.setCanceledOnTouchOutside(false);
-		mDlgJoin.setMessage(getResources().getString(R.string.joining));
-		mDlgJoin.setButton(ProgressDialog.BUTTON_NEGATIVE, getResources()
+		joinDialog = new ProgressDialog(this);
+		joinDialog.setCancelable(true);
+		joinDialog.setCanceledOnTouchOutside(false);
+		joinDialog.setMessage(getResources().getString(R.string.joining));
+		joinDialog.setButton(ProgressDialog.BUTTON_NEGATIVE, getResources()
 				.getString(R.string.cancel),
 				new DialogInterface.OnClickListener() {
 
 					@Override
 					public void onClick(final DialogInterface dialog,
 							final int which) {
-						mConnector.close();
+						connectorThread.close();
 					}
 				});
-		mDlgJoin.show();
+		joinDialog.show();
 
-		mConnector = new ClientThread(dev, UUID.fromString(Cards.UUID));
+		connectorThread = new ClientThread(dev, UUID.fromString(Cards.UUID));
 
-		mConnector.setOnConnectionChangeHandler(
-				new OnConnectionChangeHandler() {
+		connectorThread.setOnConnectionChangeHandler(new OnConnectionChangeHandler() {
 			@Override
-			public void onConnect(final ThreadedConnection tc) {
+			public void onConnect(ThreadedConnection tc) {
 				SimpleBluetoothConnection conn = (SimpleBluetoothConnection) tc;
-
 				Log.d(TAG, "joining lobby " + conn.getDeviceName());
-
 				((Cards) getApplication()).getConnections().clear();
 				((Cards) getApplication()).getConnections().put(conn, null);
 				cancelSearch();
-
-				mDlgJoin.dismiss();
-
-				Intent intent = new Intent(LobbyJoinActivity.this,
-						LobbyActivity.class);
+				joinDialog.dismiss();
+				Intent intent = new Intent(LobbyJoinActivity.this, LobbyActivity.class);
 				intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 				startActivity(intent);
 				finish();
 			}
 
 			@Override
-			public void onConnectionFailed(final BluetoothDevice dev) {
-				mDlgJoin.dismiss();
-				mDeviceList.remove(dev);
+			public void onConnectionFailed(BluetoothDevice dev) {
+				joinDialog.dismiss();
+				removeDevices.remove(dev);
 				Log.w(TAG, "failed to connect to " + dev.getName());
-
 				runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
@@ -288,39 +194,32 @@ public class LobbyJoinActivity extends Activity {
 								getResources().getString(
 										R.string.connection_failed),
 								Toast.LENGTH_SHORT).show();
-						mDeviceAdapter.notifyDataSetChanged();
+						removeDevicesAdapter.notifyDataSetChanged();
 					}
 				});
-
 			}
 		});
-		mConnector.start();
+		connectorThread.start();
 	}
 
 	@Override
-	protected final void onActivityResult(final int reqCode,
-			final int resultCode, final Intent data) {
+	protected void onActivityResult(int reqCode, int resultCode, Intent data) {
 		super.onActivityResult(reqCode, resultCode, data);
-
-		if (BluetoothUtil.onActivityResult(this, reqCode, resultCode, data)) {
-			// Bluetooth results should be covered by BtUtil.
-			return;
-		}
-
+		BluetoothUtil.onActivityResult(this, reqCode, resultCode, data);
 	}
 
 	@Override
-	public final void onBackPressed() {
+	public void onBackPressed() {
 		super.onBackPressed();
 		cancelSearch();
 		finish();
 	}
 
 	@Override
-	protected final void onResume() {
+	protected void onResume() {
 		super.onResume();
-		if (mDeviceAdapter != null) {
-			mDeviceAdapter.notifyDataSetChanged();
+		if (removeDevicesAdapter != null) {
+			removeDevicesAdapter.notifyDataSetChanged();
 		}
 	}
 }

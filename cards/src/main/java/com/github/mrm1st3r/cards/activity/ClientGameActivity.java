@@ -19,37 +19,23 @@ import com.github.mrm1st3r.libdroid.connect.bluetooth.SimpleBluetoothConnection;
 /**
  * This is the user interface started on the client devices which only receives
  * it's information from the host.
- * 
- * @author Sergius Maier, Lukas Taake
- * @version 1.0
  */
 public class ClientGameActivity extends GameActivity {
 
-	/**
-	 * Bluetooth connection to the host.
-	 */
-	private SimpleBluetoothConnection mConnection = null;
-	/**
-	 * Dialog that is shown when the back key is pressed.
-	 */
-	private AlertDialog mQuitDialog = null;
+	private SimpleBluetoothConnection connection = null;
+	private AlertDialog quitDialog = null;
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public final void onCreate(final Bundle bun) {
+	public void onCreate(Bundle bun) {
 		super.onCreate(bun);
-		
-		setPlayerList((Collection<String>) getIntent().getExtras()
-				.getSerializable(LobbyActivity.EXTRA_PLAYER_LIST));
+		setPlayerList((Collection<String>) getIntent().getExtras().getSerializable(LobbyActivity.EXTRA_PLAYER_LIST));
 
-		mConnection = ((Cards) getApplication())
-				.getConnections().keySet().iterator().next();
+		connection = ((Cards) getApplication()).getConnections().keySet().iterator().next();
 
-		mConnection.setOnReceivedHandler(new OnReceivedHandler<String>() {
+		connection.setOnReceivedHandler(new OnReceivedHandler<String>() {
 			@Override
-			public void onReceived(final AsynchronousConnection<String> conn,
-					final String msg) {
-
+			public void onReceived(AsynchronousConnection<String> conn, final String msg) {
 				runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
@@ -58,11 +44,11 @@ public class ClientGameActivity extends GameActivity {
 				});
 			}
 		});
-		mConnection.unpause();
-		mConnection.setOnConnectionChangeHandler(
+		connection.unpause();
+		connection.setOnConnectionChangeHandler(
 				new OnConnectionChangeHandler() {
 			@Override
-			public void onDisconnect(final ThreadedConnection tc) {
+			public void onDisconnect(ThreadedConnection tc) {
 				runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
@@ -73,39 +59,32 @@ public class ClientGameActivity extends GameActivity {
 		});
 	}
 
-	/**
-	 * Close the connection to the host and leave the game.
-	 */
 	private void leaveGame() {
-		SharedPreferences pref = getSharedPreferences(Cards.PREF_FILE,
-				Context.MODE_PRIVATE);
+		SharedPreferences pref = getSharedPreferences(Cards.PREF_FILE, Context.MODE_PRIVATE);
 		String name = pref.getString(Cards.PREF_PLAYER_NAME, "");
-		
-		mConnection.write("left " + name);
-		mConnection.close();
+		connection.write("left " + name);
+		connection.close();
 		ClientGameActivity.super.onBackPressed();
-	}
-	
-	@Override
-	public final void sendMessage(final String msg) {
-		mConnection.write(msg);
 	}
 
 	@Override
-	public final void onBackPressed() {
+	public void sendMessage(String msg) {
+		connection.write(msg);
+	}
+
+	@Override
+	public void onBackPressed() {
 		AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 		dialog.setTitle(R.string.leave_game);
-		dialog.setPositiveButton(R.string.yes,
-				new DialogInterface.OnClickListener() {
-			
+		dialog.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
 			@Override
-			public void onClick(final DialogInterface dialog, final int which) {
-				mQuitDialog.dismiss();
+			public void onClick(DialogInterface dialog, int which) {
+				quitDialog.dismiss();
 				leaveGame();
 			}
 		});
 		dialog.setNegativeButton(R.string.no, null);
-		mQuitDialog = dialog.create();
-		mQuitDialog.show();
+		quitDialog = dialog.create();
+		quitDialog.show();
 	}
 }

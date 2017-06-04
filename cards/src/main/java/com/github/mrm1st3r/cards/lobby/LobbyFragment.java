@@ -12,38 +12,23 @@ import android.widget.TextView;
 import com.github.mrm1st3r.cards.R;
 
 /**
- * Container for all user interface elements that are visible to both, host and
- * clients.
- * 
- * @author Lukas 'mrm1st3r' Taake
- * @version 1.0
+ * Container for all user interface elements that are visible to both, host and clients.
  */
 public class LobbyFragment extends Fragment {
 
-	/**
-	 * List displaying all players.
-	 */
-	private ListView mList;
+	private ListView playerList;
 
 	@Override
-	public final View onCreateView(final LayoutInflater inflater,
-			final ViewGroup container, final Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.fragment_lobby, container, false);
-		mList = (ListView) v;
-
+		playerList = (ListView) v;
 		TextView header = new TextView(getActivity());
 		header.setText(getActivity().getString(R.string.connected_players));
-		mList.addHeaderView(header);
+		playerList.addHeaderView(header);
 		return v;
 	}
 
-	/**
-	 * Register an adapter for the player list.
-	 * 
-	 * @param adapter
-	 *            Player list wrapper adapter
-	 */
-	public final void setAdapter(final BaseAdapter adapter) {
-		mList.setAdapter(adapter);
+	public void setAdapter(BaseAdapter adapter) {
+		playerList.setAdapter(adapter);
 	}
 }
