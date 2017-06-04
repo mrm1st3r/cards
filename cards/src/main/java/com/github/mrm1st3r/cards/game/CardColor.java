@@ -3,29 +3,12 @@ package com.github.mrm1st3r.cards.game;
 import java.util.Locale;
 
 /**
- * This enumeration contains all four colors used
- * in a standard French style card deck.
- * 
- * @author Lukas 'mrm1st3r' Taake
- * @version 1.0.1
+ * This enumeration contains all four colors used in a standard French style card deck.
  */
-public enum CardColor {
-
-	/**
-	 * Spades.
-	 */
+enum CardColor {
 	SPADES,
-	/**
-	 * Clubs.
-	 */
 	CLUBS,
-	/**
-	 * Hearts.
-	 */
 	HEARTS,
-	/**
-	 * Diamonds.
-	 */
 	DIAMONDS;
 
 	@Override

@@ -41,7 +41,7 @@ public class BotGameActivity extends GameActivity {
 		String localName = pref.getString(Cards.PREF_PLAYER_NAME, "");
 		int playerCount = 2;
 		Log.d(TAG, "starting new game with " + playerCount + " players");
-		game = ThirtyOne.createInstance(playerCount);
+		game = new ThirtyOne(playerCount);
 		localPlayer = new LocalPlayer(localName, ThirtyOne.HAND_SIZE, ThirtyOne.MAX_LIFES, this);
 		game.addPlayer(localPlayer);
 		ComputerPlayer bot = new ComputerPlayer("Bot 1", ThirtyOne.HAND_SIZE, ThirtyOne.MAX_LIFES);

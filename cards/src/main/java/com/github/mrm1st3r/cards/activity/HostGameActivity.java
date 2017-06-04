@@ -46,7 +46,7 @@ public class HostGameActivity extends GameActivity {
 		int playerCount = connections.size() + 1;
 		Log.d(TAG, "starting new game with " + playerCount + " players");
 
-		game = ThirtyOne.createInstance(playerCount);
+		game = new ThirtyOne(playerCount);
 		localPlayer = new LocalPlayer(localName, this);
 		game.addPlayer(localPlayer);
 
